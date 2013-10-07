@@ -1,0 +1,28 @@
+{
+  "name": "checker",
+  "version": "0.1.0",
+  "description": "Checker is the collection of common abstract methods for validatiors and setters.",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kaelzhang/node-checker.git"
+  },
+  "keywords": [
+    "checker",
+    "validator",
+    "validate",
+    "setter"
+  ],
+  "author": "kael",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kaelzhang/node-checker/issues"
+  },
+  "devDependencies": {
+    "mocha": "~1.13.0",
+    "chai": "~1.8.0"
+  }
+}
