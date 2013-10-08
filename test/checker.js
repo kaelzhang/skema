@@ -61,6 +61,43 @@ describe(".check()", function(){
             done();
         });
     });
+
+    it("array of error messages", function(done){
+        var schema = {
+            a: {
+                validator: [
+                    function(v){
+                        return !!v
+                    },
+
+                    function(v){
+                        return v.length > 2;
+                    }
+                ],
+
+                message: [
+                    'a',
+                    'b'
+                ]
+            }
+        };
+
+        var c = checker(schema);
+
+        c.check({
+            a: ''
+        }, function(err){
+            expect(err).to.equal('a');
+
+            c.check({
+                a: 'a'
+            }, function(err){
+                expect(err).to.equal('b');
+                
+                done();
+            });
+        })
+    });
 });
 
 

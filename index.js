@@ -129,13 +129,14 @@ checker._Single = Single;
 
 Single.prototype._process = function() {
     var self = this;
+    var done = this.done;
 
     this._validate(function (err) {
         if ( err ) {
-            return callback(err);
+            return done(err);
         }
 
-        self._set(self.done);
+        self._set(done);
     });
 };
 
@@ -195,14 +196,30 @@ Single.prototype._validate = function(callback) {
     }
 
     async.series(
-        validators.map(function (validator) {
+        validators.map(function (validator, index) {
             return function (done) {
-                self._runAsync(validator, [self.value, self.is_default], done, false);
+                self._runAsync(validator, [self.value, self.is_default], function(err){
+                    done(self._generateError(err, index));
+                }, false);
             };
         }),
 
         callback
     );
+};
+
+
+Single.prototype._generateError = function(err, index) {
+    if ( err === true ) {
+        var message = this.rule.message;
+        err = (
+            node_util.isArray(message) ?
+                message[index] || message[0]:
+                message
+        ) || true
+    }
+
+    return err;
 };
 
 
@@ -217,7 +234,7 @@ Single.prototype._set = function(callback) {
     }
 
     async.waterfall(
-        setters.map(function (setter) {
+        setters.map(function (setter, index) {
             return function(v, done){
                 // the first function of `async.waterfall` series
                 if(arguments.length === 1){
@@ -225,20 +242,15 @@ Single.prototype._set = function(callback) {
                     v = value;
                 }
 
-                self._runAsync(setter, [value, self.is_default], done, true);
+                self._runAsync(setter, [value, self.is_default], function(err, value){
+                    done(self._generateError(err, index), value);
+
+                }, true);
             }
         }),
         
         // user may pass unexpected parameters to `done`
         function(err, value){
-            if ( err ) {
-                if ( err === true ) {
-                    err = self.rule.message || true
-                }
-
-                return callback(err);
-            }
-
             callback(err, value, true);
         }
     );
