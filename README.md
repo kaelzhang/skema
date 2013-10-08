@@ -60,7 +60,10 @@ The `schema` below is equivalent to the one of the previous section:
 		}, 
 		/^[a-zA-Z0-9]+$/
 	],
-	message: ['Username must contain at least 6 charactors', 'Username must only contain letters and numbers'];
+	message: [
+		'Username must contain at least 6 charactors', 
+		'Username must only contain letters and numbers'
+	];
 }
 ```
 
