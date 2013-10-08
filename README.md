@@ -16,8 +16,29 @@ var checker = require('checker');
 # Synopsis
 
 ```js
-checker(schema, options).check(data, callback);
+checker(schema, options).check(data, function(err, value, details){
+});
 ```
+
+### err `mixed`
+
+### parsed `Object`
+
+The cleaned and parsed `data`.
+
+### details `Object`
+
+```
+{
+	<name>: <detail>
+}
+```
+
+- `detail.value` `mixed` the parsed value
+- `detail.is_default` `Boolean` if the current property is defined in `schema`, but the input data doesn't have it, then the value will be `true`
+- `detail.is_cooked` `Boolean` if there're any setters, it will be `true`
+- `detail.origin` the origin value of the property
+
 
 # Validation, Error Messages
 
