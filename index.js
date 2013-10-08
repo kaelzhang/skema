@@ -15,7 +15,7 @@ var node_util   = require('util');
 // @param {Object} options
 // - context: {Object} the context of the helper functions
 // - default_message: {string}
-// - series: {boolean=false}
+// - series: {boolean=false} whether checker should check the properties in series, default to false
 // - limit: {boolean=false} limit to the schema
 function Checker(schema, options){
     this.options = options = options || {};
@@ -45,6 +45,10 @@ Checker.prototype.check = function(object, callback) {
     var names = Object.keys(this._schema);
     var self = this;
 
+    if ( this.options.limit ) {
+        object = this._limitObject(object);
+    }
+    
     async[this.options.series ? 'series' : 'parallel'](
         names.map(function (name) {
             return function (done) {
@@ -93,6 +97,21 @@ Checker.prototype.check = function(object, callback) {
 
 // Private methods
 //////////////////////////////////////////////////////////////////////
+
+// All properties of the object should be within the schema
+Checker.prototype._limitObject = function(object) {
+    var parsed = {};
+    var name;
+
+    for (name in this._schema) {
+        if ( name in object ) {
+            parsed[name] = object;
+        }
+    }
+
+    return parsed;
+};
+
 
 Checker.prototype._process = function(value, is_default, rule, callback) {
     var self = this;
