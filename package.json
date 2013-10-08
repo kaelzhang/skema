@@ -24,5 +24,8 @@
   "devDependencies": {
     "mocha": "~1.13.0",
     "chai": "~1.8.0"
+  },
+  "dependencies": {
+    "async": "~0.2.9"
   }
 }
