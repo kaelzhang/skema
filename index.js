@@ -1,15 +1,16 @@
 'use strict';
 
-var util = require('./lib/util');
+var async       = require('async');
+var node_util   = require('util');
+var util        = require('./lib/util');
+var parser      = require('./lib/schema');
 
 var checker = module.exports = function(options) {
     return new Checker(options); 
 };
 
 checker.Checker = Checker;
-
-var async       = require('async');
-var node_util   = require('util');
+checker.parseSchema = parser.parseSchema;
 
 
 // @param {Object} options
@@ -21,7 +22,7 @@ function Checker(schema, options){
     this.options = options = options || {};
 
     this._types = {};
-    this._schema = this._parseSchema(schema);
+    this._schema = checker.parseSchema(schema);
 
     // context must be an object
     this._context = Object(options.context) === options.context ?
@@ -119,7 +120,7 @@ Checker.prototype._process = function(value, is_default, rule, callback) {
     this._validate(value, is_default, rule, function (err) {
         if ( err ) {
             if ( err === true ) {
-                err = rule.message || true;
+                err = rule.message || this.options.default_message || true;
             }
 
             return callback(err); 
@@ -204,121 +205,4 @@ Checker.prototype._set = function(value, is_default, rule, callback) {
         }
     );
 };
-
-
-Checker.prototype._parseSchema = function(schema) {
-    if ( !schema ) {
-        return {};
-    }
-
-    var parsed = {};
-    var name;
-
-    for (name in schema) {
-        parsed[name] = this._parseRule(schema[name]);
-    }
-
-    return parsed;
-};
-
-
-// ## Atom schema design
-
-// ```
-// name: {
-//     validator: 
-//         `Function`: function (v, is_default) {
-//             return 
-//                 'error message to display' -> override `schema.message`
-//         }, -> convert to `Array`
-
-//         `RegExp`: Regular expression that input must be valid against.
-//             -> convert to `Array.<Function>`
-
-//         `Array.<Function|RegExp>`
-
-//     message: 'error message to display',
-//          -> the default error message
-
-//     default: 'default value'
-//          -> if 
-// }
-// ```
-
-// Sync:
-
-// {
-//     setter: function (v, is_default) {
-//         // ...
-//         return value;
-//     }
-// }
-
-// Async:
-
-// {
-//     setter: function (v, is_default) {
-//         var done = this.async();
-
-//         async_method(v, is_default, function(err, value){
-//             done(err, value);
-//         });
-//     }
-// }
-
-// An `setter` could be an array.
-
-Checker.prototype._parseRule = function(rule) {
-    rule.message = rule.message || this.options.default_message;
-
-    // undefined -> []
-    rule.validator = this._parseValidators(rule.validator);
-    rule.setter = this._parseSetters(rule.setter);
-
-    return rule;
-};
-
-
-// See "schema design"
-Checker.prototype._parseValidators = function(validators) {
-    return util.makeArray(validators).map(function (validator) {
-        return this._wrapValidator(validator);
-
-    }, this).filter(Boolean);
-};
-
-
-Checker.prototype._wrapValidator = function(validator) {
-    if(typeof validator === 'function'){
-        return validator;
-    
-    }else if(node_util.isRegExp(validator)){
-        return function (v) {
-            return validator.test(v);
-        };
-
-    }else{
-        return false;
-    }
-};
-
-
-Checker.prototype._parseSetters = function(setters) {
-    return util.makeArray(setters).filter(function (setter) {
-        return typeof setter === 'function';
-    });
-};
-
-
-// 
-Checker.prototype._result = function(result_array) {
-    var ret = {};
-
-    result_array.forEach(function(result) {
-        ret[result.rule._name] = result.value;
-    });
-
-    return ret;
-};
-
 

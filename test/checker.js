@@ -5,7 +5,7 @@ var expect = require('chai').expect;
 
 describe("._parseSchema()", function(){
     it("validator is always an array", function(){
-        var parsed = checker()._parseSchema({
+        var parsed = checker.parseSchema({
             a: {}
         });
 
@@ -13,7 +13,7 @@ describe("._parseSchema()", function(){
     });
 
     it("setter is always an array", function(){
-        var parsed = checker()._parseSchema({
+        var parsed = checker.parseSchema({
             a: {}
         });
 
@@ -21,7 +21,7 @@ describe("._parseSchema()", function(){
     });
 
     it("regex", function(){
-        var parsed = checker()._parseSchema({
+        var parsed = checker.parseSchema({
             a: {
                 validator: /abc/
             }
@@ -86,3 +86,10 @@ describe("options.limit", function(){
         });
     });
 });
+
+// test error message
+
+// test async setter
+
+// test async validator
+
