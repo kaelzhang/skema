@@ -16,18 +16,13 @@ checker.parseSchema = parser.parseSchema;
 // @param {Object} options
 // - context: {Object} the context of the helper functions
 // - default_message: {string}
-// - series: {boolean=false} whether checker should check the properties in series, default to false
+// - parallel: {boolean=false} whether checker should check the properties in parallel, default to false
 // - limit: {boolean=false} limit to the schema
 function Checker(schema, options){
     this.options = options = options || {};
 
     this._types = {};
     this._schema = checker.parseSchema(schema);
-
-    // context must be an object
-    this._context = Object(options.context) === options.context ?
-        options.context :
-        {};
 };
 
 
@@ -50,7 +45,7 @@ Checker.prototype.check = function(object, callback) {
         object = this._limitObject(object);
     }
     
-    async[this.options.series ? 'series' : 'parallel'](
+    async[this.options.parallel ? 'parallel' : 'series'](
         names.map(function (name) {
             return function (done) {
                 var rule = self._schema[name];
@@ -58,7 +53,14 @@ Checker.prototype.check = function(object, callback) {
 
                 var value = is_default ? rule.default : object[name];
 
-                self._process(value, is_default, rule, done);
+                new checker._Single({
+                    object: object,
+                    value: value,
+                    is_default: is_default,
+                    rule: rule,
+                    done: done,
+                    context: self.options.context
+                });
             };
         }),
 
@@ -114,33 +116,58 @@ Checker.prototype._limitObject = function(object) {
 };
 
 
-Checker.prototype._process = function(value, is_default, rule, callback) {
+function Single (options) {
+    util.mix(this, options);
+
+    this._process();
+}
+
+// for testing
+checker._Single = Single;
+
+Single.prototype._process = function() {
     var self = this;
 
-    this._validate(value, is_default, rule, function (err) {
+    this._validate(function (err) {
         if ( err ) {
-            if ( err === true ) {
-                err = rule.message || this.options.default_message || true;
-            }
-
-            return callback(err); 
+            return callback(err);
         }
 
-        self._set(value, is_default, rule, callback);
+        self._set(self.done);
     });
+};
+
+
+Single.prototype._changeObj = function (name, value) {
+    this.object[name] = value;
+};
+
+
+Single.prototype._getValue = function(name) {
+    return this.object[name];
 };
 
 
 // @param {function(args)} validator
 // @param {Array} args
 // @param {function()} callback    
-Checker.prototype._runAsync = function (fn, args, callback, is_setter) {
+Single.prototype._runAsync = function (fn, args, callback, is_setter) {
     var async;
-    var context = this._context;
+    var self = this;
+    var context = {
+        context: this.context,
+        async: function() {
+            async = true;
+            return util.once(callback);
+        },
 
-    context.async = function() {
-        async = true;
-        return util.once(callback);
+        get: function(name){
+            return self._getValue(name);
+        },
+
+        set: function(name, value){
+            self._changeObj(name, value);
+        }
     };
 
     var result = fn.apply(context, args);
@@ -157,8 +184,8 @@ Checker.prototype._runAsync = function (fn, args, callback, is_setter) {
 };
 
 
-Checker.prototype._validate = function(value, is_default, rule, callback) {
-    var validators = rule.validator;
+Single.prototype._validate = function(callback) {
+    var validators = this.rule.validator;
     var self = this;
 
     if(validators.length === 0){
@@ -168,7 +195,7 @@ Checker.prototype._validate = function(value, is_default, rule, callback) {
     async.series(
         validators.map(function (validator) {
             return function (done) {
-                self._runAsync(validator, [value, is_default], done, false);
+                self._runAsync(validator, [self.value, self.is_default], done, false);
             };
         }),
 
@@ -177,8 +204,9 @@ Checker.prototype._validate = function(value, is_default, rule, callback) {
 };
 
 
-Checker.prototype._set = function(value, is_default, rule, callback) {
-    var setters = rule.setter;
+Single.prototype._set = function(callback) {
+    var setters = this.rule.setter;
+    var value = this.value;
     var self = this;
 
     if(setters.length === 0){
@@ -195,12 +223,20 @@ Checker.prototype._set = function(value, is_default, rule, callback) {
                     v = value;
                 }
 
-                self._runAsync(setter, [value, is_default], done, true);
+                self._runAsync(setter, [value, self.is_default], done, true);
             }
         }),
         
         // user may pass unexpected parameters to `done`
         function(err, value){
+            if ( err ) {
+                if ( err === true ) {
+                    err = self.rule.message || true
+                }
+
+                return callback(err);
+            }
+
             callback(err, value, true);
         }
     );
