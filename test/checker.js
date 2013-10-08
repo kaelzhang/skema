@@ -3,7 +3,7 @@
 var checker = require('../');
 var expect = require('chai').expect;
 
-describe("._parseSchema()", function(){
+describe("checker.parseSchema()", function(){
     it("validator is always an array", function(){
         var parsed = checker.parseSchema({
             a: {}
@@ -64,28 +64,98 @@ describe(".check()", function(){
 });
 
 
-describe("options.limit", function(){
-    it("should remove extra data, if options.limit -> true", function(done){
+describe("this.get()", function(){
+    it("could get the value of object in setters", function(done){
         var schema = {
-            a: {},
-            b: {}
+            a: {
+                default: 'abc',
+
+                setter: function(v){
+                    var b = this.get('b');
+
+                    expect(b).to.equal(2);
+                    done();
+                    
+                    return v + '123';
+                }
+            },
+
+            b: {
+                default: 'b'
+            }
+        }
+
+        var object = {
+            a: 1,
+            b: 2
         }
 
         var c = checker(schema);
 
-        c.check({
-            c: 1,
-            a: 2
+        c.check(object, function(err, value, detail){
+        });
+    });
 
-        }, function(err, value, detail){
-            expect('c' in value).to.equal(false);
-            expect(value.a).to.equal(2);
-            
+    it("could get the value of object in validators", function(done){
+        var schema = {
+            a: {
+                default: 'abc',
 
-            done();
+                validator: function(v){
+                    var b = this.get('b');
+
+                    expect(b).to.equal(2);
+                    done();
+                    
+                    return true;
+                }
+            },
+
+            b: {
+                default: 'b'
+            }
+        }
+
+        var object = {
+            a: 1,
+            b: 2
+        }
+
+        var c = checker(schema);
+
+        c.check(object, function(err, value, detail){
         });
     });
 });
+
+
+describe("options", function(){
+    describe("options.limit", function(){
+        it("should remove extra data, if options.limit -> true", function(done){
+            var schema = {
+                a: {},
+                b: {}
+            }
+
+            var c = checker(schema);
+
+            c.check({
+                c: 1,
+                a: 2
+
+            }, function(err, value, detail){
+                expect('c' in value).to.equal(false);
+                expect(value.a).to.equal(2);
+                
+
+                done();
+            });
+        });
+    });
+});
+
+
+
 
 // test error message
 
