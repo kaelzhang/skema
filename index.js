@@ -41,8 +41,6 @@ Checker.prototype.check = function(object, callback) {
     var names = Object.keys(this._schema);
     var self = this;
 
-    var origin_object = object;
-
     if ( this.options.limit ) {
         object = this._limitObject(object);
     }
@@ -56,7 +54,7 @@ Checker.prototype.check = function(object, callback) {
                 var value = is_default ? rule.default : object[name];
 
                 new checker._Single({
-                    object: origin_object,
+                    object: object,
                     value: value,
                     is_default: is_default,
                     rule: rule,

@@ -31,7 +31,8 @@ var schema = {
 		validator: function(value){
 			return /^[a-zA-Z0-9]{6,}$/.test(value);
 		},
-		message: 'Username must only contain letters, numbers; Username must contain at least 6 charactors'
+		message: 'Username must only contain letters, numbers; ' 
+			+ 'Username must contain at least 6 charactors'
 	}
 };
 
@@ -92,11 +93,21 @@ Default error message
 
 #### options.parallel `Boolean=false`
 
+By default, `checker` will check each properties in series, 
+
 #### options.limit `Boolean=false`
+
+If `options.limit` is `true` and a certain property of the input data is not defined in the `schema`, the property will be removed.
+
+Default to `false`.
 
 #### options.check_all `Boolean=false`
 
+Not implemented yet.
 
+#### options.context `Object`
+
+See sections below.
 
 ## Schema Structures 
 
@@ -125,3 +136,51 @@ See sections above for details.
 Default error message
 
 #### default: `String`
+
+
+## `this` object inside validators and setters
+
+Inside validators(`rule.validator`) and setters(`rule.setter`), there're several opaque methods
+
+### this.async()
+
+Generate the `done` function to make the validator or setter become an async method.
+
+	var done = this.async();
+	
+For details, see the demos above.
+
+### this.get(name)
+
+The value of the input object by name
+
+### this.set(name, value)
+
+Change the value of the specified property of the input object.
+
+```
+{
+	username: {
+	},
+	
+	password: {
+		validator: function(value){
+			var username = this.get('username');
+			
+			// Guests are welcome even without passwords
+			return value || username === 'guest';
+		}
+	}
+}
+```
+
+Notice that you'd better use `this.get` and `this.set` with the `options.parallel` setting as `false`(the default value). Otherwise, it might encounter unexpected situations, because the value of the object is ever changing due to the setter.
+
+So, use them wisely.
+
+### this.context `Object`
+
+The `options.context` itself.
+
+
+
