@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/kaelzhang/node-checker.png?branch=master)](https://travis-ci.org/kaelzhang/node-checker)
 
-(THIS DOCUMENTAION IS NOT FINISHED YET.)
-
 # checker
 
 Checker is the collection of common abstract node.js methods for validatiors and setters.
