@@ -5,8 +5,8 @@ var node_util   = require('util');
 var util        = require('./lib/util');
 var parser      = require('./lib/schema');
 
-var checker = module.exports = function(options) {
-    return new Checker(options); 
+var checker = module.exports = function(schema, options) {
+    return new Checker(schema, options); 
 };
 
 checker.Checker = Checker;
@@ -18,8 +18,9 @@ checker.parseSchema = parser.parseSchema;
 // - default_message: {string}
 // - parallel: {boolean=false} whether checker should check the properties in parallel, default to false
 // - limit: {boolean=false} limit to the schema
+// - check_all: {boolean=false} by default, checker will exit immediately when the first error is encountered.
 function Checker(schema, options){
-    this.options = options = options || {};
+    this.options = options || {};
 
     this._types = {};
     this._schema = checker.parseSchema(schema);
@@ -38,68 +39,78 @@ function Checker(schema, options){
 // }
 
 Checker.prototype.check = function(object, callback) {
-    var names = Object.keys(this._schema);
-    var self = this;
-
     if ( this.options.limit ) {
         object = this._limitObject(object);
     }
-    
-    async[this.options.parallel ? 'parallel' : 'series'](
-        names.map(function (name) {
-            return function (done) {
-                var rule = self._schema[name];
-                var is_default = !(name in object);
 
-                var value = is_default ? rule.default : object[name];
+    this._createTasks(object, function (err, details) {
+        var results = {};
 
-                new checker._Single({
-                    object: object,
-                    value: value,
-                    is_default: is_default,
-                    rule: rule,
-                    done: done,
-                    context: self.options.context
-                });
-            };
-        }),
+        util.map(details, function (detail, name) {
+            results[name] = detail.value;
+        });
 
-        function (err, results) {
-            if ( err ) {
-                return callback(err);
-            }
-
-            var parsed = {};
-            var detail = {};
-
-            names.forEach(function (name, index) {
-                var result = results[index];
-                var value = result[0];
-
-                parsed[name] = value;
-                detail[name] = {
-                    // the origin value
-                    origin: object[name],
-
-                    // if is_default is `true`, means the value is not specified
-                    is_default: !(name in object),
-
-                    // whether the value is parsed by the setters
-                    is_cooked: result[1],
-
-                    // the result
-                    value: value
-                };
-            });
-
-            callback(null, parsed, detail);
-        }
-    )
+        callback(err, results, details);
+    });
 };
 
 
 // Private methods
 //////////////////////////////////////////////////////////////////////
+
+
+Checker.prototype._createTasks = function(object, callback) {
+    var tasks = {};
+    var name;
+    var self = this;
+    var schema = this._schema;
+
+    util.map(schema, function (rule, name) {
+
+        // The value of the  `object` might be changed or ruined during the process,
+        // so store important data
+        var is_default = !(name in object);
+
+        // the origin value
+        var origin = object[name];
+        var value = is_default ? rule.default : object[name];
+
+        tasks[name] = function(done){
+            new checker._Single({
+                object: object,
+                value: value,
+                is_default: is_default,
+                rule: rule,
+                default_message: self.options.default_message,
+                done: function(err, new_value){
+                    done(err, {
+                        // the origin value
+                        origin: origin,
+
+                        // if is_default is `true`, means the value is not specified
+                        is_default: is_default,
+
+                        // whether the value is parsed by the setters
+                        is_cooked: !!rule.setter.length,
+
+                        // the new value
+                        value: new_value,
+
+                        // store the error in `details`
+                        error: err
+                    });
+                },
+                context: self.options.context
+            });
+        };
+    });
+
+    var method = this.options.parallel ? 'parallel' : 'series';
+    var mod = this.options.check_all ? util : async;
+
+    mod[method](tasks, callback);
+};
+
 
 // All properties of the object should be within the schema
 Checker.prototype._limitObject = function(object) {
@@ -131,7 +142,8 @@ Single.prototype._process = function() {
 
     this._validate(function (err) {
         if ( err ) {
-            return done(err);
+            // make sure, the argument types are always the same
+            return done(err, self.value);
         }
 
         self._set(done);
@@ -209,8 +221,9 @@ Single.prototype._validate = function(callback) {
 
 Single.prototype._generateError = function(err, index) {
     if ( err === true ) {
-        var message = this.rule.message;
+        var message = this.rule.message || this.default_message;
         err = (
+            // There's a error message for each validator
             node_util.isArray(message) ?
                 message[index] || message[0]:
                 message
@@ -228,7 +241,7 @@ Single.prototype._set = function(callback) {
 
     if(setters.length === 0){
         // the status of `is_default` is not changed
-        return callback(null, value, false);
+        return callback(null, value);
     }
 
     async.waterfall(
@@ -240,8 +253,8 @@ Single.prototype._set = function(callback) {
                     v = value;
                 }
 
-                self._runAsync(setter, [value, self.is_default], function(err, value){
-                    done(self._generateError(err, index), value);
+                self._runAsync(setter, [v, self.is_default], function(err, new_value){
+                    done(self._generateError(err, index), new_value);
 
                 }, true);
             }
@@ -249,7 +262,7 @@ Single.prototype._set = function(callback) {
         
         // user may pass unexpected parameters to `done`
         function(err, value){
-            callback(err, value, true);
+            callback(err, value);
         }
     );
 };
