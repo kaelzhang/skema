@@ -3,39 +3,8 @@
 var checker = require('../');
 var expect = require('chai').expect;
 
-describe("checker.parseSchema()", function(){
-    it("validator is always an array", function(){
-        var parsed = checker.parseSchema({
-            a: {}
-        });
-
-        expect(parsed.a.validator).to.deep.equal([]);
-    });
-
-    it("setter is always an array", function(){
-        var parsed = checker.parseSchema({
-            a: {}
-        });
-
-        expect(parsed.a.setter).to.deep.equal([]);
-    });
-
-    it("regex", function(){
-        var parsed = checker.parseSchema({
-            a: {
-                validator: /abc/
-            }
-        });
-
-        var validator = parsed.a.validator[0];
-
-        expect(validator.length).to.equal(1);
-        expect(validator('aabcde')).to.equal(true);
-    });
-});
-
 describe(".check()", function(){
-    it("complex", function(done){
+    it("setter and is_default", function(done){
         var schema = {
             a: {
                 default: 'abc',
@@ -187,6 +156,42 @@ describe("options", function(){
 
                 done();
             });
+        });
+    });
+
+    describe("options.check_all", function(){
+        it("will display all errors", function(done){
+            var schema = {
+                a: {
+                    validator: function (v, is_default) {
+                        return !is_default;
+                    },
+
+                    message: 'a'
+                },
+
+                b: {
+                    validator: function(v, is_default){
+                        return !is_default;
+                    },
+
+                    message: 'b'
+                }
+            };
+
+            var c = checker(schema, {
+                check_all: true
+            });
+
+            c.check({}, function(err, results, details){
+                done();
+
+                expect(err).to.equal('a');
+                expect(results.a).to.equal(undefined);
+                expect(results.b).to.equal(undefined);
+                expect(details.a.is_default).to.equal(true);
+                expect(details.a.error).to.equal('a');
+            })
         });
     });
 });
