@@ -22,9 +22,9 @@ checker(schema, options).check(data, function(err, value, details){
 
 ### err `mixed`
 
-### parsed `Object`
+### results `Object`
 
-The cleaned and parsed `data`.
+The parsed object.
 
 ### details `Object`
 
@@ -38,6 +38,7 @@ The cleaned and parsed `data`.
 - `detail.is_default` `Boolean` if the current property is defined in `schema`, but the input data doesn't have it, then the value will be `true`
 - `detail.is_cooked` `Boolean` if there're any setters, it will be `true`
 - `detail.origin` the origin value of the property
+- `detail.error` the error belongs to the current property. If not exists, it will be `null`
 
 
 # Validation, Error Messages
@@ -122,7 +123,7 @@ Default to `false`.
 
 #### options.check_all `Boolean=false`
 
-Not implemented yet.
+By default, `checker` will exit immediately at the first error. But if `options.check_all` is `true`, it will parse all the properties, and collect every possible error.
 
 #### options.context `Object`
 
