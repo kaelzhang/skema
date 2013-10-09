@@ -1,6 +1,6 @@
 {
   "name": "checker",
-  "version": "0.4.2",
+  "version": "0.5.1",
   "description": "Checker is the collection of common abstract methods for validatiors and setters.",
   "main": "index.js",
   "scripts": {

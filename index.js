@@ -11,6 +11,7 @@ var checker = module.exports = function(schema, options) {
 
 checker.Checker = Checker;
 checker.parseSchema = parser.parseSchema;
+checker.util = util;
 
 
 // @param {Object} options
