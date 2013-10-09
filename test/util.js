@@ -3,6 +3,19 @@
 var util = require('../lib/util');
 var expect = require('chai').expect;
 
+
+describe("util.map()", function(){
+    it("context", function(){
+        var map = { a: 1 };
+
+        util.map(map, function (value, key) {
+            expect(this.c).to.equal(3);
+            
+
+        }, { c: 3 });
+    });
+});
+
 describe("util.once()", function(){
     it("run only once", function(){
         var i = 0;
