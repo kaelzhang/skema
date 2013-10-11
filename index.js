@@ -45,13 +45,11 @@ Checker.prototype.check = function(object, callback) {
     }
 
     this._createTasks(object, function (err, details) {
-        var results = {};
-
         util.map(details, function (detail, name) {
-            results[name] = detail.value;
+            detail.value = object[name];
         });
 
-        callback(err, results, details);
+        callback(err, object, details);
     });
 };
 
@@ -76,10 +74,13 @@ Checker.prototype._createTasks = function(object, callback) {
         var origin = object[name];
         var value = is_default ? rule.default : object[name];
 
+        // set the new value
+        object[name] = value;
+
         tasks[name] = function(done){
             new checker._Single({
                 object: object,
-                value: value,
+                name: name,
                 is_default: is_default,
                 rule: rule,
                 default_message: self.options.default_message,
@@ -120,7 +121,7 @@ Checker.prototype._limitObject = function(object) {
 
     for (name in this._schema) {
         if ( name in object ) {
-            parsed[name] = object;
+            parsed[name] = object[name];
         }
     }
 
@@ -144,11 +145,20 @@ Single.prototype._process = function() {
     this._validate(function (err) {
         if ( err ) {
             // make sure, the argument types are always the same
-            return done(err, self.value);
+            return done(err, self._get_value());
         }
 
         self._set(done);
     });
+};
+
+
+Single.prototype._get_value = function() {
+    return this.object[this.name];
+};
+
+Single.prototype._set_value = function(value) {
+    this.object[this.name] = value;
 };
 
 
@@ -209,9 +219,17 @@ Single.prototype._validate = function(callback) {
     async.series(
         validators.map(function (validator, index) {
             return function (done) {
-                self._runAsync(validator, [self.value, self.is_default], function(err){
-                    done(self._generateError(err, index));
-                }, false);
+                self._runAsync(
+                    validator, 
+                    [
+                        // the value might be changed during the validation by `this.set()`
+                        self._get_value(), 
+                        self.is_default
+                    ], function(err){
+                        done(self._generateError(err, index));
+                    }, 
+                    false
+                );
             };
         }),
 
@@ -237,12 +255,11 @@ Single.prototype._generateError = function(err, index) {
 
 Single.prototype._set = function(callback) {
     var setters = this.rule.setter;
-    var value = this.value;
     var self = this;
 
     if(setters.length === 0){
         // the status of `is_default` is not changed
-        return callback(null, value);
+        return callback(null, this._get_value());
     }
 
     async.waterfall(
@@ -251,10 +268,12 @@ Single.prototype._set = function(callback) {
                 // the first function of `async.waterfall` series
                 if(arguments.length === 1){
                     done = v;
-                    v = value;
+                    v = self._get_value();
                 }
 
                 self._runAsync(setter, [v, self.is_default], function(err, new_value){
+                    // so the new value could be accessed by `this.get()`
+                    self._set_value(new_value);
                     done(self._generateError(err, index), new_value);
 
                 }, true);

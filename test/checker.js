@@ -132,6 +132,49 @@ describe("this.get()", function(){
         c.check(object, function(err, value, detail){
         });
     });
+
+
+    it("could access changed value", function(done){
+        var schema = {
+            a: {
+                default: 'abc',
+                setter: [
+                    function (v) {
+                        expect(this.get('a')).to.equal('abc');
+                        
+                        return 'a'
+                    },
+
+                    function (v) {
+                        expect(this.get('a')).to.equal('a');
+                        
+                        return 'aa';
+                    }
+                ]
+            },
+
+            b: {
+                default: 'b',
+                validator: function (v) {
+                    expect(this.get('b')).to.equal(2);
+                    
+                    expect(this.get('a')).to.equal('aa');
+                    done();
+                    
+                    return true;
+                }
+            }
+        }
+
+        var object = {
+            b: 2
+        }
+
+        var c = checker(schema);
+
+        c.check(object, function(err, value, detail){
+        });
+    });
 });
 
 
@@ -143,7 +186,9 @@ describe("options", function(){
                 b: {}
             }
 
-            var c = checker(schema);
+            var c = checker(schema, {
+                limit: true
+            });
 
             c.check({
                 c: 1,
