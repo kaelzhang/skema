@@ -19,7 +19,7 @@ describe(".validate", function(){
       context: {}
     });
 
-    c.validate(-1, function (err) {
+    c.validate(-1, [], function (err) {
       expect(err).not.to.equal(null);
       
       c.validate(1, function (err) {
@@ -41,7 +41,7 @@ describe(".validate", function(){
       context: {}
     });
 
-    c.validate(-1, function (err) {
+    c.validate(-1, [], function (err) {
       expect(err).not.to.equal(null);
       
       c.validate(1, function (err) {
@@ -87,7 +87,7 @@ describe(".validate", function(){
     var v = c[0];
     var e = c[1];
     it("array validate:" + v, function(done){
-      one.validate(v, function (err) {
+      one.validate(v, [], function (err) {
         expect(err).to.equal(e);
         done();
       });
@@ -118,7 +118,7 @@ describe(".validate", function(){
       }
     });
 
-    c.validate(-1, function (err) {
+    c.validate(-1, [], function (err) {
       expect(err).not.to.equal(null);
       skip = true;
       c.validate(-1, function (err) {
@@ -143,7 +143,7 @@ describe(".get/.set", function(){
       context: {}
     });
 
-    one.set(1, function (err, v) {
+    one.set(1, [], function (err, v) {
       expect(err).to.equal(null);
       expect(v).to.equal(2);
       done();
@@ -169,11 +169,11 @@ describe(".get/.set", function(){
       context: {}
     });
 
-    one.set(1, function (err, v) {
+    one.set(1, [], function (err, v) {
       expect(err).to.equal(null);
       expect(v).to.equal(2);
 
-      one.set(-1, function (err, v) {
+      one.set(-1, [], function (err, v) {
         expect(err).to.equal('must > 0');
         done();
       });
@@ -201,12 +201,12 @@ describe(".get/.set", function(){
     });
     var plus = 1;
 
-    one.set(1, function (err, v) {
+    one.set(1, [], function (err, v) {
       expect(err).to.equal(null);
       expect(v).to.equal(2);
 
       plus = 2;
-      one.set(1, function (err, v) {
+      one.set(1, [], function (err, v) {
         expect(err).to.equal(null);
         expect(v).to.equal(3);
         done();
