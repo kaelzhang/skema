@@ -1,6 +1,6 @@
 'use strict';
 
-var One = require('../lib/one');
+var One = require('../');
 var expect = require('chai').expect;
 
 describe(".validate", function(){

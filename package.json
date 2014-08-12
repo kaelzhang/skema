@@ -2,7 +2,7 @@
   "name": "skema",
   "version": "1.0.0",
   "description": "Skema is the collection of common abstract methods for validatiors and setters.",
-  "main": "lib/one",
+  "main": "lib/skema",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec ./test/*.js"
   },
