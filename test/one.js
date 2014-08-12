@@ -93,6 +93,40 @@ describe(".validate", function(){
       });
     });
   });
+
+  it("context", function(done){
+    var rule = {
+      validate: function (value) {
+        var done = this.async();
+        if (this.skip()) {
+          return done(null);
+        }
+
+        setTimeout(function () {
+          done(value > 0 ? null : true);
+        }, 0);
+      }
+    };
+
+    var skip;
+    var c = new One({
+      rule: rule,
+      context: {
+        skip: function () {
+          return skip;
+        }
+      }
+    });
+
+    c.validate(-1, function (err) {
+      expect(err).not.to.equal(null);
+      skip = true;
+      c.validate(-1, function (err) {
+        expect(err).to.equal(null);
+        done();
+      });
+    });
+  });
 });
 
 
@@ -145,5 +179,38 @@ describe(".get/.set", function(){
       });
     });
   });
-});
 
+  it("context", function(done){
+    var rule = {
+      set: function (v) {
+        var done = this.async();
+        var self = this;
+        setTimeout(function () {
+          done(null, v + self.plus());
+        }, 10);
+      }
+    };
+
+    var one = new One({
+      rule: rule,
+      context: {
+        plus: function () {
+          return plus;
+        }
+      }
+    });
+    var plus = 1;
+
+    one.set(1, function (err, v) {
+      expect(err).to.equal(null);
+      expect(v).to.equal(2);
+
+      plus = 2;
+      one.set(1, function (err, v) {
+        expect(err).to.equal(null);
+        expect(v).to.equal(3);
+        done();
+      });
+    });
+  });
+});
