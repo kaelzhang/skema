@@ -1,6 +1,6 @@
 'use strict';
 
-var One = require('../');
+var One = require('../').Skema;
 var expect = require('chai').expect;
 
 describe(".validate", function(){
