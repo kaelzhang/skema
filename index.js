@@ -5,31 +5,31 @@ var node_util = require('util');
 var util = require('./lib/util');
 var parser = require('./lib/schema');
 
-var checker = module.exports = function(schema, options) {
-  return new Checker(schema, options);
+var skema = module.exports = function(schema, options) {
+  return new Skema(schema, options);
 };
 
-checker.Checker = Checker;
-checker.parseSchema = parser.parseSchema;
-checker.util = util;
+skema.Skema = Skema;
+skema.parseSchema = parser.parseSchema;
+skema.util = util;
 
 
 // @param {Object} options
 // - context: {Object} the context of the helper functions
 // - default_message: {string}
-// - parallel: {boolean=false} whether checker should check the properties in parallel, default to false
+// - parallel: {boolean=false} whether skema should check the properties in parallel, default to false
 // - limit: {boolean=false} limit to the schema
-// - check_all: {boolean=false} by default, checker will exit immediately when the first error is encountered.
-function Checker(schema, options) {
+// - check_all: {boolean=false} by default, skema will exit immediately when the first error is encountered.
+function Skema(schema, options) {
   this.options = options || {};
 
   this._types = {};
-  this._schema = checker.parseSchema(schema);
+  this._schema = skema.parseSchema(schema);
 };
 
 
 // ## Design
-// checker.check({}, function (err, value, detail) {
+// skema.check({}, function (err, value, detail) {
 // });
 
 // detail -> {
@@ -39,7 +39,7 @@ function Checker(schema, options) {
 //     }
 // }
 
-Checker.prototype.check = function(object, callback) {
+Skema.prototype.check = function(object, callback) {
   if (this.options.limit) {
     object = this._limitObject(object);
   }
@@ -58,7 +58,7 @@ Checker.prototype.check = function(object, callback) {
 //////////////////////////////////////////////////////////////////////
 
 
-Checker.prototype._createTasks = function(object, callback) {
+Skema.prototype._createTasks = function(object, callback) {
   var tasks = {};
   var name;
   var self = this;
@@ -78,7 +78,7 @@ Checker.prototype._createTasks = function(object, callback) {
     object[name] = value;
 
     tasks[name] = function(done) {
-      new checker._Single({
+      new skema._Single({
         object: object,
         name: name,
         is_default: is_default,
@@ -115,7 +115,7 @@ Checker.prototype._createTasks = function(object, callback) {
 
 
 // All properties of the object should be within the schema
-Checker.prototype._limitObject = function(object) {
+Skema.prototype._limitObject = function(object) {
   var parsed = {};
   var name;
 
@@ -136,7 +136,7 @@ function Single(options) {
 }
 
 // for testing
-checker._Single = Single;
+skema._Single = Single;
 
 Single.prototype._process = function() {
   var self = this;

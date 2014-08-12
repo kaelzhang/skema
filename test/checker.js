@@ -1,6 +1,6 @@
 'use strict';
 
-var checker = require('../');
+var skema = require('../');
 var expect = require('chai').expect;
 
 describe(".check()", function() {
@@ -19,7 +19,7 @@ describe(".check()", function() {
       }
     }
 
-    var c = checker(schema);
+    var c = skema(schema);
 
     c.check({}, function(err, value, detail) {
       expect(value.a).to.equal('abc123');
@@ -52,7 +52,7 @@ describe(".check()", function() {
       }
     };
 
-    var c = checker(schema);
+    var c = skema(schema);
 
     c.check({
       a: ''
@@ -97,7 +97,7 @@ describe("this.get()", function() {
       b: 2
     }
 
-    var c = checker(schema);
+    var c = skema(schema);
 
     c.check(object, function(err, value, detail) {});
   });
@@ -127,7 +127,7 @@ describe("this.get()", function() {
       b: 2
     }
 
-    var c = checker(schema);
+    var c = skema(schema);
 
     c.check(object, function(err, value, detail) {});
   });
@@ -170,7 +170,7 @@ describe("this.get()", function() {
       b: 2
     }
 
-    var c = checker(schema);
+    var c = skema(schema);
 
     c.check(object, function(err, value, detail) {});
   });
@@ -185,7 +185,7 @@ describe("options", function() {
         b: {}
       }
 
-      var c = checker(schema, {
+      var c = skema(schema, {
         limit: true
       });
 
@@ -223,7 +223,7 @@ describe("options", function() {
         }
       };
 
-      var c = checker(schema, {
+      var c = skema(schema, {
         check_all: true
       });
 
@@ -240,10 +240,3 @@ describe("options", function() {
   });
 });
 
-
-
-// test error message
-
-// test async setter
-
-// test async validator

@@ -1,17 +1,18 @@
 {
-  "name": "checker",
+  "name": "skema",
   "version": "0.5.2",
-  "description": "Checker is the collection of common abstract methods for validatiors and setters.",
+  "description": "Skema is the collection of common abstract methods for validatiors and setters.",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec ./test/*.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/kaelzhang/node-checker.git"
+    "url": "git://github.com/kaelzhang/node-skema.git"
   },
   "keywords": [
-    "checker",
+    "skema",
+    "schema",
     "validator",
     "validate",
     "setter"
@@ -19,7 +20,7 @@
   "author": "kael",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kaelzhang/node-checker/issues"
+    "url": "https://github.com/kaelzhang/node-skema/issues"
   },
   "devDependencies": {
     "mocha": "~1.13.0",

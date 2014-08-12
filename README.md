@@ -1,24 +1,24 @@
-[![NPM version](https://badge.fury.io/js/checker.png)](http://badge.fury.io/js/checker)
-[![Build Status](https://travis-ci.org/kaelzhang/node-checker.png?branch=master)](https://travis-ci.org/kaelzhang/node-checker)
-[![Dependency Status](https://gemnasium.com/kaelzhang/node-checker.png)](https://gemnasium.com/kaelzhang/node-checker)
+[![NPM version](https://badge.fury.io/js/skema.png)](http://badge.fury.io/js/skema)
+[![Build Status](https://travis-ci.org/kaelzhang/node-skema.png?branch=master)](https://travis-ci.org/kaelzhang/node-skema)
+[![Dependency Status](https://gemnasium.com/kaelzhang/node-skema.png)](https://gemnasium.com/kaelzhang/node-skema)
 
-# checker
+# skema
 
-Checker is the collection of common abstract node.js methods for validatiors and setters.
+Skema is the collection of common abstract node.js methods for validatiors and setters.
 	
 # Usage
 ```sh
-npm install checker --save
+npm install skema --save
 ```
 
 ```js
-var checker = require('checker');
+var skema = require('skema');
 ```
 
 # Synopsis
 
 ```js
-checker(schema, options).check(data, function(err, value, details){
+skema(schema, options).check(data, function(err, value, details){
 });
 ```
 
@@ -58,7 +58,7 @@ var schema = {
 	}
 };
 
-var c = checker(schema);
+var c = skema(schema);
 
 c.check({
 	username: 'a'
@@ -115,7 +115,7 @@ Default error message
 
 #### options.parallel `Boolean=false`
 
-By default, `checker` will check each properties in series, 
+By default, `skema` will check each properties in series, 
 
 #### options.limit `Boolean=false`
 
@@ -125,7 +125,7 @@ Default to `false`.
 
 #### options.check_all `Boolean=false`
 
-By default, `checker` will exit immediately at the first error. But if `options.check_all` is `true`, it will parse all the properties, and collect every possible error.
+By default, `skema` will exit immediately at the first error. But if `options.check_all` is `true`, it will parse all the properties, and collect every possible error.
 
 #### options.context `Object`
 
