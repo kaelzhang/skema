@@ -2,8 +2,7 @@
 
 
 var parser = require('./lib/parser');
-var parser = require('./parser');
-var util = require('./util');
+var util = require('./lib/util');
 var mix = require('mix2');
 var async = require('async');
 var wrap = require('wrap-as-async');
@@ -60,6 +59,8 @@ Skema.prototype.context = function(context) {
 
 Skema.prototype.validate = overload(function(value, args, callback) {
   var self = this;
+
+  // Pass in the same parameters for validators
   value = [value].concat(args);
   async.eachSeries(this.rule.validate, function (fn, done) {
     self._run_async(fn, value, done);
@@ -85,48 +86,27 @@ Skema.prototype.get = overload(function(value, args, callback) {
 Skema.prototype._run_type = function(type, value, args, fallback) {
   var self = this;
   async.eachSeries(this.rule[type], function (fn, done) {
+    // Pass the last modified value to the next
     self._run_async(fn, [value].concat(args), function (err, v) {
       if (err) {
         return done(err);
       }
+
       value = v;
       done(null);
-    }, true);
-  
+    });
+
   }, function (err) {
     if (err) {
       return fallback(err);
     }
+
     fallback(null, value);
   });
 };
 
 
-Skema.prototype._run_async = function(fn, args, callback, is_setter) {
-  var is_async;
-  var context = {
-    async: function() {
-      is_async = true;
-      return util.once(callback);
-    }
-  };
-
-  mix(context, this.context);
-  var result = fn.apply(context, args);
-  if (is_async) {
-    return;
-  }
-
-  if (is_setter) {
-    callback(null, result);
-
-  } else {
-    if (typeof result === 'string' || result instanceof Error) {
-      return callback(result);
-    }
-
-    // `result` tells whether the value is valid
-    // if `result` == true, err -> null
-    callback(!result || null);
-  }
+Skema.prototype._run_async = function(fn, args, callback) {
+  args.push(callback);
+  wrap(fn).apply(context, args);
 };

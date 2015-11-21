@@ -89,7 +89,7 @@ s.set(2, function(err, v){
   - **rule.set**: `function(v)|Array.<function(v)>` if there is more than one setters, the result value of the previous setter will pass into the next setter.
   - **rule.get**: `function(v)|Array.<function(v)>` which is similar to `rule.set`
 
-Either of the three subject is optional.
+Either of the three subjects is optional.
 
 We can use the common `this.async()` style in each function of `rule.validate`, `rule.set` or `rule.get` to turn the function into an asynchronous one.
 
