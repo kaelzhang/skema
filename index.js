@@ -31,8 +31,7 @@ function skema (rule) {
 function Skema (rule) {
   // No arguments overloading, you should make sure the `options` is ok
   this.rule = parser.parse(rule);
-  this.context = {};
-  delete this.context.async;
+  this._context = {};
 }
 
 
@@ -50,7 +49,7 @@ function overload (fn) {
 
 Skema.prototype.context = function(context) {
   if (Object(context) === context) {
-    this.context = context;
+    this._context = context;
   }
 
   return this;
@@ -80,7 +79,7 @@ Skema.prototype.validate = overload(function(value, args, callback) {
     var ar = [value].concat(args);
     ar.push(cb);
 
-    var is_async = wrap(fn).appy(self.context, ar);
+    var is_async = wrap(fn).apply(self._context, ar);
 
   }, function (err) {
 
@@ -115,7 +114,7 @@ Skema.prototype._run_type = function(type, value, args, fallback) {
 
     var ar = [value].concat(args);
     ar.push(cb);
-    wrap(fn).apply(self.context, ar);
+    wrap(fn).apply(self._context, ar);
 
   }, function (err) {
     if (err) {

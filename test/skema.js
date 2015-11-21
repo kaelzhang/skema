@@ -132,10 +132,7 @@ describe(".get/.set", function(){
       }
     };
 
-    var one = new One({
-      rule: rule,
-      context: {}
-    });
+    var one = skema(rule);
 
     one.set(1, [], function (err, v) {
       expect(err).to.equal(null);
@@ -158,10 +155,7 @@ describe(".get/.set", function(){
       }
     };
 
-    var one = new One({
-      rule: rule,
-      context: {}
-    });
+    var one = skema(rule);
 
     one.set(1, [], function (err, v) {
       expect(err).to.equal(null);
@@ -185,14 +179,13 @@ describe(".get/.set", function(){
       }
     };
 
-    var one = new One({
-      rule: rule,
-      context: {
+    var one = skema(rule)
+      .context({
         plus: function () {
           return plus;
         }
-      }
-    });
+      });
+
     var plus = 1;
 
     one.set(1, [], function (err, v) {
