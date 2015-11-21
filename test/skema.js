@@ -1,6 +1,6 @@
 'use strict';
 
-var One = require('../').Skema;
+var skema = require('../');
 var expect = require('chai').expect;
 
 describe(".validate", function(){
@@ -14,10 +14,7 @@ describe(".validate", function(){
       }
     };
 
-    var c = new One({
-      rule: rule,
-      context: {}
-    });
+    var c = skema(rule);
 
     c.validate(-1, [], function (err) {
       expect(err).not.to.equal(null);
@@ -36,10 +33,7 @@ describe(".validate", function(){
       }
     };
 
-    var c = new One({
-      rule: rule,
-      context: {}
-    });
+    var c = skema(rule);
 
     c.validate(-1, [], function (err) {
       expect(err).not.to.equal(null);
@@ -55,7 +49,7 @@ describe(".validate", function(){
     validate: [
       function (v) {
         if (v <= 0) {
-          return 'must > 0';
+          return new Error('must > 0');
         }
         return true;
       },
@@ -78,16 +72,19 @@ describe(".validate", function(){
     [100, null]
   ];
 
-  var one = new One({
-    rule: rule,
-    context: {}
-  });
+  var one = skema(rule);
 
   cases.forEach(function (c) {
     var v = c[0];
     var e = c[1];
     it("array validate:" + v, function(done){
       one.validate(v, [], function (err) {
+        if (err instanceof Error) {
+          expect(err.message).to.equal(e);
+          done();
+          return;
+        }
+
         expect(err).to.equal(e);
         done();
       });
@@ -109,14 +106,11 @@ describe(".validate", function(){
     };
 
     var skip;
-    var c = new One({
-      rule: rule,
-      context: {
+    var c = skema(rule).context({
         skip: function () {
           return skip;
         }
-      }
-    });
+      });
 
     c.validate(-1, [], function (err) {
       expect(err).not.to.equal(null);

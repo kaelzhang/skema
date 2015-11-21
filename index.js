@@ -63,9 +63,27 @@ Skema.prototype.validate = overload(function(value, args, callback) {
   // Pass in the same parameters for validators
   value = [value].concat(args);
   async.eachSeries(this.rule.validate, function (fn, done) {
-    self._run_async(fn, value, done);
+    function cb (err, pass) {
+      if (err) {
+        return done(err);
+      }
+
+      // if is not an async method,
+      // and `parse` is `false`, then error is true
+      if (!is_async) {
+        return done(!pass);
+      }
+
+      done(null);
+    }
+
+    var ar = [value].concat(args);
+    ar.push(cb);
+
+    var is_async = wrap(fn).appy(self.context, ar);
 
   }, function (err) {
+
     // `err` might be undefined in async
     // make sure if there is no error, the error is always `null`
     callback(err || null);
@@ -86,15 +104,18 @@ Skema.prototype.get = overload(function(value, args, callback) {
 Skema.prototype._run_type = function(type, value, args, fallback) {
   var self = this;
   async.eachSeries(this.rule[type], function (fn, done) {
-    // Pass the last modified value to the next
-    self._run_async(fn, [value].concat(args), function (err, v) {
+    function cb (err, v) {
       if (err) {
         return done(err);
       }
 
       value = v;
       done(null);
-    });
+    }
+
+    var ar = [value].concat(args);
+    ar.push(cb);
+    wrap(fn).apply(self.context, ar);
 
   }, function (err) {
     if (err) {
@@ -103,10 +124,4 @@ Skema.prototype._run_type = function(type, value, args, fallback) {
 
     fallback(null, value);
   });
-};
-
-
-Skema.prototype._run_async = function(fn, args, callback) {
-  args.push(callback);
-  wrap(fn).apply(context, args);
 };
