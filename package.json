@@ -1,10 +1,10 @@
 {
   "name": "skema",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Skema is the collection of common abstract methods for validatiors and setters.",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec ./test/*.js"
+    "test": "./node_modules/.bin/mocha --reporter spec ./test/parser.js"
   },
   "repository": {
     "type": "git",
@@ -23,12 +23,13 @@
     "url": "https://github.com/kaelzhang/node-skema/issues"
   },
   "devDependencies": {
-    "mocha": "~1.13.0",
-    "chai": "~1.8.0"
+    "mocha": "*",
+    "chai": "*"
   },
   "dependencies": {
-    "async": "^0.9.0",
+    "async": "^1.5.0",
     "make-array": "^0.1.2",
-    "mix2": "^1.0.0"
+    "mix2": "^1.0.0",
+    "wrap-as-async": "^1.1.7"
   }
 }

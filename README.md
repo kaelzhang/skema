@@ -1,6 +1,7 @@
-[![NPM version](https://badge.fury.io/js/skema.png)](http://badge.fury.io/js/skema)
 [![Build Status](https://travis-ci.org/kaelzhang/node-skema.png?branch=master)](https://travis-ci.org/kaelzhang/node-skema)
-[![Dependency Status](https://gemnasium.com/kaelzhang/node-skema.png)](https://gemnasium.com/kaelzhang/node-skema)
+<!-- 
+[![NPM version](https://badge.fury.io/js/skema.png)](http://badge.fury.io/js/skema)
+[![Dependency Status](https://gemnasium.com/kaelzhang/node-skema.png)](https://gemnasium.com/kaelzhang/node-skema) -->
 
 # skema
 
@@ -16,24 +17,24 @@ npm install skema --save
 ```js
 var skema = require('skema');
 var s = skema({
-  rule: {
-    validate: function(v){
-      var done = this.async();
-      remoteChecking(v, function(err){
-        done(err);
-      });
-    },
-    set: function(v){
-      return v + 1;
-    },
-    get: function(v){
-      return v - 1;
-    }
+  validate: function(v){
+    var done = this.async();
+    remoteChecking(v, function(err){
+      done(err);
+    });
+  },
+  set: function(v){
+    return v + 1;
+  },
+  get: function(v){
+    return v - 1;
   }
 });
+
 s.validate(1, function(err){
   console.log(err);
 });
+
 s.set(1, function(err, v){
   console.log(v); // 2
   s.get(v, function(err){
@@ -42,13 +43,23 @@ s.set(1, function(err, v){
 });
 ```
 
-## options.rule
+## Synopsis
 
-- validate: `function(v)|RegExp|Array` Could be an validate function, or a regular expression, or an array of them.
-- set: `function(v)|Array.<function(v)>` 
-- get: `function(v)|Array.<function(v)>`
+```js
+var s = skema(rule).context(context)
+```
 
-The `this` object of each of `rule.validate`, `rule.set` and `rule.get` has a method called `async`, we can use:
+- **rule**
+  - **rule.validate**: `function(v)|RegExp|Array` Could be an validate function, or a regular expression, or an array of them.
+  - **rule.set**: `function(v)|Array.<function(v)>` 
+  - **rule.get**: `function(v)|Array.<function(v)>`
+
+We can use the common `this.async()` style in each function of `rule.validate`, `rule.set` or `rule.get` to turn the function into an asynchronous one. 
+
+For details, see [`wrap-as-async`](https://www.npmjs.com/package/wrap-as-async).
+
+- **context** 
+
 
 ```js
 var done = this.async();
