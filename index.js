@@ -10,7 +10,7 @@ var types = require('./lib/types')
 
 module.exports = skema
 skema.Skema = Skema
-skema.type = types
+skema.types = types
 
 function skema (rule, options) {
   return new Skema(rule, options || {})
