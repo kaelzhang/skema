@@ -3,6 +3,7 @@
 var parser = require('./lib/parser')
 var async = require('async')
 var wrap = require('wrap-as-async')
+var util = require('util')
 
 
 module.exports = skema
@@ -26,9 +27,9 @@ function Skema (rule, options) {
 }
 
 
-function overload (fn) {
+function overload (fn, n) {
   return function (value, args, callback) {
-    if (arguments.length === 2) {
+    if (!util.isArray(args)) {
       callback = args
       args = []
     }
@@ -80,16 +81,16 @@ Skema.prototype.validate = overload(function(value, args, callback) {
 
 
 Skema.prototype.set = overload(function(value, args, callback) {
-  return this.options.async_setter
-    ? this._run_async('set', value, args, callback)
-    : this._run_sync('set', value, args)
+  return this.options.sync_setter
+    ? this._run_sync('set', value, args)
+    : this._run_async('set', value, args, callback)
 })
 
 
 Skema.prototype.get = overload(function(value, args, callback) {
-  return this.options.async_getter
-    ? this._run_async('get', value, args, callback)
-    : this._run_sync('get', value, args)
+  return this.options.sync_getter
+    ? this._run_sync('get', value, args)
+    : this._run_async('get', value, args, callback)
 })
 
 

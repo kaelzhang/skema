@@ -18,7 +18,7 @@ describe(".validate", function(){
 
     c.validate(-1, [], function (err) {
       expect(err).not.to.equal(null);
-      
+
       c.validate(1, function (err) {
         expect(err).to.equal(null);
         done();
@@ -124,8 +124,8 @@ describe(".validate", function(){
 });
 
 
-describe(".get/.set", function(){
-  it("sync", function(done){
+describe("async: .get/.set", function(){
+  it("sync ", function(done){
     var rule = {
       set: function (v) {
         return v + 1;
@@ -201,3 +201,26 @@ describe(".get/.set", function(){
     });
   });
 });
+
+
+describe("sync: .get/.set", function(){
+  it.only("getter", function(done){
+    var one = skema({
+      set: [
+        function (v) {
+          return v + 1
+        },
+
+        function (v, n) {
+          return v + 1 + (n || 0)
+        }
+      ]
+    }, {
+      sync_getter: true
+    })
+
+    var result = one.get(1, [2])
+    expect(result).to.equal(5)
+    done()
+  })
+})
