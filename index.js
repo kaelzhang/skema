@@ -1,6 +1,6 @@
 'use strict'
 
-var parser = require('./parser')
+var parser = require('./lib/parser')
 var async = require('async')
 var wrap = require('wrap-as-async')
 
