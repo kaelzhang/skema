@@ -1,126 +1,127 @@
-'use strict';
+'use strict'
+
+var parser = require('./parser')
+var async = require('async')
+var wrap = require('wrap-as-async')
 
 
-var parser = require('./lib/parser');
-var util = require('./lib/util');
-var mix = require('mix2');
-var async = require('async');
-var wrap = require('wrap-as-async');
+module.exports = skema
+skema.Skema = Skema
 
-
-module.exports = skema;
-skema.Skema = Skema;
-skema.parse = parser.parse;
-
-
-function skema (rule) {
-  return new Skema(rule || {});
+function skema (rule, options) {
+  return new Skema(rule, options || {})
 }
 
 
-// ## options.rule
-// {
-//   validate: function (value) {
-//     var done = this.async();
-//     done(err, value);
-//   },
-//   set: function (value) {},
-//   get: function (value) {}
-// }
-
-function Skema (rule) {
+function Skema (rule, options) {
   // No arguments overloading, you should make sure the `options` is ok
-  this.rule = parser.parse(rule);
-  this._context = {};
+  this.rule = {
+    set: parser.parse_funcs(rule.set),
+    get: parser.parse_funcs(rule.set),
+    validate: parser.parse_validators(rule.validate)
+  }
+
+  this.options = options
+  this._context = {}
 }
 
 
 function overload (fn) {
   return function (value, args, callback) {
     if (arguments.length === 2) {
-      callback = args;
-      args = [];
+      callback = args
+      args = []
     }
 
-    return fn.call(this, value, args, callback);
-  };
+    return fn.call(this, value, args, callback)
+  }
 }
 
 
 Skema.prototype.context = function(context) {
   if (Object(context) === context) {
-    this._context = context;
+    this._context = context
   }
 
-  return this;
-};
+  return this
+}
 
 
 Skema.prototype.validate = overload(function(value, args, callback) {
-  var self = this;
-
   // Pass in the same parameters for validators
-  value = [value].concat(args);
+  value = [value].concat(args)
   async.eachSeries(this.rule.validate, function (fn, done) {
     function cb (err, pass) {
       if (err) {
-        return done(err);
+        return done(err)
       }
 
       // if is not an async method,
       // and `parse` is `false`, then error is true
       if (!is_async) {
-        return done(!pass);
+        return done(!pass)
       }
 
-      done(null);
+      done(null)
     }
 
-    var ar = [value].concat(args);
-    ar.push(cb);
+    var ar = [value].concat(args)
+    ar.push(cb)
 
-    var is_async = wrap(fn).apply(self._context, ar);
+    var is_async = wrap(fn).apply(this._context, ar)
 
-  }, function (err) {
+  }.bind(this), function (err) {
 
     // `err` might be undefined in async
     // make sure if there is no error, the error is always `null`
-    callback(err || null);
-  });
-});
+    callback(err || null)
+  })
+})
 
 
 Skema.prototype.set = overload(function(value, args, callback) {
-  this._run_type('set', value, args, callback);
-});
+  return this.options.async_setter
+    ? this._run_async('set', value, args, callback)
+    : this._run_sync('set', value, args)
+})
 
 
 Skema.prototype.get = overload(function(value, args, callback) {
-  this._run_type('get', value, args, callback);
-});
+  return this.options.async_getter
+    ? this._run_async('get', value, args, callback)
+    : this._run_sync('get', value, args)
+})
 
 
-Skema.prototype._run_type = function(type, value, args, fallback) {
-  var self = this;
-  async.eachSeries(this.rule[type], function (fn, done) {
+Skema.prototype._run_sync = function (type, value, args) {
+  return this.rule[type].reduce(function (prev, mutator) {
+    var ar = [prev].concat(args)
+    return mutator.apply(this._context, ar)
+
+  }.bind(this), value)
+}
+
+
+Skema.prototype._run_async = function(type, value, args, fallback) {
+  async.eachSeries(this.rule[type], function (mutator, done) {
     function cb (err, v) {
       if (err) {
-        return done(err);
+        return done(err)
       }
 
-      value = v;
-      done(null);
+      value = v
+      done(null)
     }
 
-    var ar = [value].concat(args);
-    ar.push(cb);
-    wrap(fn).apply(self._context, ar);
+    var ar = [value].concat(args)
+    ar.push(cb)
+    wrap(mutator).apply(this._context, ar)
 
-  }, function (err) {
+  }.bind(this), function (err) {
     if (err) {
-      return fallback(err);
+      return fallback(err)
     }
 
-    fallback(null, value);
-  });
-};
+    fallback(null, value)
+  })
+}
