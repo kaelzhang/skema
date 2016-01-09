@@ -204,9 +204,9 @@ describe("async: .get/.set", function(){
 
 
 describe("sync: .get/.set", function(){
-  it.only("getter", function(done){
+  it("getter", function(done){
     var one = skema({
-      set: [
+      get: [
         function (v) {
           return v + 1
         },
