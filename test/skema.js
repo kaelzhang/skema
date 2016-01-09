@@ -224,3 +224,55 @@ describe("sync: .get/.set", function(){
     done()
   })
 })
+
+
+describe("type", function(){
+  var type = {
+    validate: function (v) {
+      return v > 0
+    },
+
+    set: function (v) {
+      return v + 1
+    },
+
+    get: function (v) {
+      return v + 2
+    }
+  }
+
+  it("default validator, setter, and getter", function(done){
+    var one = skema({
+      type: type
+    }, {
+      sync_getter: true,
+      sync_setter: true
+    })
+
+    one.validate(0, function (err) {
+      expect(!!err).to.equal(true)
+      expect(one.set(1)).to.equal(2)
+      expect(one.get(1)).to.equal(3)
+      done()
+    })
+  })
+
+  it("default type and custom type", function(done){
+    var one = skema({
+      type: type,
+      get: function (v) {
+        return v + 1
+      }
+    }, {
+      sync_getter: true,
+      sync_setter: true
+    })
+
+    one.validate(0, function (err) {
+      expect(!!err).to.equal(true)
+      expect(one.set(1)).to.equal(2)
+      expect(one.get(1)).to.equal(4)
+      done()
+    })
+  })
+})

@@ -1,13 +1,16 @@
 'use strict'
 
-var parser = require('./lib/parser')
 var async = require('async')
 var wrap = require('wrap-as-async')
 var util = require('util')
 
+var parser = require('./lib/parser')
+var types = require('./lib/types')
+
 
 module.exports = skema
 skema.Skema = Skema
+skema.type = types
 
 function skema (rule, options) {
   return new Skema(rule, options || {})
@@ -15,15 +18,25 @@ function skema (rule, options) {
 
 
 function Skema (rule, options) {
+  var type = rule.type
+  type = Object(type) === type
+    ? type
+    : {}
+
   // No arguments overloading, you should make sure the `options` is ok
   this.rule = {
-    set: parser.parse_funcs(rule.set),
-    get: parser.parse_funcs(rule.set),
-    validate: parser.parse_validators(rule.validate)
+    set     : merge_rule(type.set, rule.set, parser.parse_funcs),
+    get     : merge_rule(type.get, rule.get, parser.parse_funcs),
+    validate: merge_rule(type.validate, rule.validate, parser.parse_validators)
   }
 
   this.options = options
   this._context = {}
+}
+
+
+function merge_rule (a, b, fn) {
+  return fn(a).concat(fn(b))
 }
 
 
