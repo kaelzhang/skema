@@ -1,0 +1,5 @@
+/src
+.travis.yml
+.appveyor.yml
+.babelrc
+.editorconfig

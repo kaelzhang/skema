@@ -1,0 +1,13 @@
+{
+  "presets": [
+    "es2015"
+  ],
+  "plugins": [
+    "transform-class-properties",
+    "transform-object-rest-spread",
+    "transform-exponentiation-operator",
+    "syntax-trailing-function-commas",
+    "transform-inline-environment-variables",
+    "transform-es2015-modules-commonjs"
+  ]
+}
