@@ -25,8 +25,68 @@ $ npm install skema --save
 ## Usage
 
 ```js
-const skema = require('skema')
+import skema from 'skema'
+
+const rules = {
+  foo: {
+    default: 10,
+    validate: v => v > 0
+  },
+
+  bar: {
+    type: String
+  },
+
+  baz: {
+    type: 'safe_string'
+  }
+}
+
+const types = {
+  'safe_string': {
+    set: (v) => {
+      return strip_html_tags(v)
+    }
+  }
+}
+
+skema({rules})
+.parse({
+  bar: 1,
+  baz: 'i am innocent<script>do_evil()</script>'
+})
+.then(value => {
+  console.log(value.foo)  // 10, the default value
+  console.log(value.bar)  // '1', ensure string type
+  console.log(value.baz)  // 'i am innocent', the script tag has been stripped
+})
 ```
+
+## skema({rules, types})
+
+- **rules** `{[key]: RuleProperty}`
+  - key `String` the name to match the property of data
+- **types** `{[typeName]: TypeDefinition}`
+  - typeName `String` the name of the type
+
+Creates the skema instance.
+
+### .parse(data, ...args)
+
+
+Validates and applies setters. Returns a `Promise`
+
+### .register(typeName, typeDefinition)
+
+Registers a new type, and returns `this`. This method should be called before `.parse()`
+
+### .add(key, ruleProperty)
+
+Adds a new rule, and returns `this`. This method should be called before `.parse()`
+
+## Struct `RuleProperty` `Object`
+
+## Struct `TypeDefinition` `Object`
 
 ## License
 
