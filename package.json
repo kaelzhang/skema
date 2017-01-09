@@ -1,7 +1,7 @@
 {
   "name": "skema",
-  "version": "3.0.1",
-  "description": "skema",
+  "version": "3.0.2",
+  "description": "Skema is the collection of common abstract methods for validatiors and setters.",
   "main": "index.js",
   "scripts": {
     "build": "babel src --out-dir lib",
@@ -13,7 +13,13 @@
     "url": "git://github.com/kaelzhang/node-skema.git"
   },
   "keywords": [
-    "skema"
+    "skema",
+    "schema",
+    "validators",
+    "default",
+    "setters",
+    "check",
+    "validate"
   ],
   "engines": {
     "node": ">=4"

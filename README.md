@@ -14,7 +14,7 @@
 
 # skema
 
-<!-- description -->
+Skema is the collection of common abstract methods for validatiors and setters.
 
 ## Install
 
@@ -34,7 +34,8 @@ const rules = {
   },
 
   bar: {
-    type: String
+    type: String,
+    validate: v => remote_check_unique_promise(v)
   },
 
   baz: {
@@ -50,15 +51,18 @@ const types = {
   }
 }
 
-skema({rules})
+skema({rules, types})
 .parse({
   bar: 1,
   baz: 'i am innocent<script>do_evil()</script>'
 })
 .then(value => {
-  console.log(value.foo)  // 10, the default value
+  console.log(value.foo)  // 10, make sure the default value
   console.log(value.bar)  // '1', ensure string type
   console.log(value.baz)  // 'i am innocent', the script tag has been stripped
+})
+.catch((error) => {
+  // If error, it means the value of `bar` it not unique.
 })
 ```
 
@@ -84,9 +88,9 @@ Registers a new type, and returns `this`. This method should be called before `.
 
 Adds a new rule, and returns `this`. This method should be called before `.parse()`
 
-## Struct `RuleProperty` `Object`
+## Struct `RuleProperty`
 
-## Struct `TypeDefinition` `Object`
+## Struct `TypeDefinition`
 
 ## License
 
