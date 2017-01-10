@@ -1,6 +1,6 @@
 {
   "name": "skema",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Skema is the collection of common abstract methods for validatiors and setters.",
   "main": "index.js",
   "scripts": {

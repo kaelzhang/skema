@@ -37,7 +37,19 @@ class Skema {
   }
 
   add (name, rule) {
-    const type = this._type.get(rule.type) || {}
+    if (!('type' in rule)) {
+      return this._add(name, rule, {})
+    }
+
+    const type = this._type.get(rule.type)
+    if (!type) {
+      throw new Error(`the type of "${name}" is not defined.`)
+    }
+
+    return this._add(name, rule, type)
+  }
+
+  _add (name, rule, type) {
     const cleaned = {}
 
     // User will override default setter
