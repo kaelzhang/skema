@@ -170,7 +170,7 @@ const TYPES = {
 function get_rule (raw) {
   const rule = {}
 
-  ['default', 'set', 'validate', 'type'].forEach((name) => {
+  ;['default', 'set', 'validate', 'type'].forEach((name) => {
     if (name in raw) {
       rule[name] = raw[name]
     }
@@ -197,7 +197,7 @@ Object.keys(RULES).forEach((key) => {
 
     skema({
       rules: {
-        [key]: rule
+        [key]: get_rule(rule)
       },
       types: TYPES
     })
@@ -239,31 +239,43 @@ Object.keys(RULES).forEach((key) => {
 })
 
 
-// test.cb('all', t => {
-//   const data = {}
-//   const expected = {}
-//   const keys = Object.keys(RULES)
-//   const rules = {}
+test.cb('all', t => {
+  const data = {}
+  const expected = {}
+  const keys = Object.keys(RULES)
+  const rules = {}
 
-//   keys.forEach((key) => {
-//     const rule = RULES[key]
+  keys.forEach((key) => {
+    const rule = RULES[key]
 
-//     if (!rule.no_rule) {
-//       rules[key] = get_rule(rule)
-//     }
+    if (rule.error || 'args' in rule) {
+      return
+    }
 
-//     if ('input' in rule) {
-//       data[key] = rule.input
-//     }
+    if (!rule.no_rule) {
+      rules[key] = get_rule(rule)
+    }
 
-//     if ('output' in rule) {
-//       expected[key] = rule.output
-//     }
-//   })
+    if ('input' in rule) {
+      data[key] = rule.input
+    }
 
-//   const s = skema({
-//     rules: rules,
-//     types: TYPES
+    if ('output' in rule) {
+      expected[key] = rule.output
+    }
+  })
 
-//   }).parse()
-// })
+  const s = skema({
+    rules,
+    types: TYPES
+  })
+  .parse(data)
+  .then((values) => {
+    t.deepEqual(values, expected)
+    t.end()
+  })
+  .catch(() => {
+    t.fail()
+    t.end()
+  })
+})
