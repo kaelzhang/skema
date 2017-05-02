@@ -66,12 +66,16 @@ skema({rules, types})
 })
 ```
 
-## skema({rules, types})
+## skema(options)
+
+**options**
 
 - **rules** `{[key]: RuleProperty}=`
   - key `String` the name to match the property of data
 - **types** `{[typeName]: TypeDefinition}=` optional
   - typeName `String` the name of the type
+- **clean** `Boolean=false` If `true`, only the properties that are defined in the `rules` will be validated and manipulated by `.parse()`, but the others will be purified and excluded from the result.
+- **parallel** `Boolean=true` If `true`, all rules will be checked and executed simultaneously, otherwise in the order or the `rules` object. Defaults to `true`
 
 Creates the skema instance.
 
