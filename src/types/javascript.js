@@ -1,3 +1,6 @@
+const path = require('path')
+
+
 module.exports = {
   string: {
     type: String,

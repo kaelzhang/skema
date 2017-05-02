@@ -158,12 +158,16 @@ const RULES = {
     type: 's',
     output: 'a',
     d: 'custom type'
+  },
+
+  s: {
+    d: 'unknown type',
+    type: 'unknown-type',
+    initError: 'unknown type of "unknown-type" for "s".'
   }
 }
 
 const TYPES = {
-  ...JAVASCRIPT,
-
   's': {
     set: (v) => {
       return v.replace(/\<.*\>/g, '')
@@ -188,8 +192,8 @@ function get_rule (raw) {
 Object.keys(RULES).forEach((key) => {
   const rule = RULES[key]
   const _t = rule.only
-    ? test.only.cb
-    : test.cb
+    ? test.only
+    : test
 
   _t(rule.d, t => {
     const data = {}
@@ -200,18 +204,31 @@ Object.keys(RULES).forEach((key) => {
 
     const args = rule.args || []
 
-    skema({
-      rules: {
-        [key]: get_rule(rule)
-      },
-      types: TYPES
-    })
-    .parse(data, ...args)
+    let s
+
+    try {
+      s = skema({
+        rules: {
+          [key]: get_rule(rule)
+        },
+        types: TYPES
+      })
+
+    } catch (e) {
+      t.is(e.message, rule.initError)
+      return
+    }
+
+    if (rule.initError) {
+      t.fail('should fails to init')
+      return
+    }
+
+    return s.parse(data, ...args)
     .then(
       value => {
         if (rule.error) {
           t.fail()
-          t.end()
           return
         }
 
@@ -222,13 +239,11 @@ Object.keys(RULES).forEach((key) => {
         } else {
           t.is(v, rule.output)
         }
-
-        t.end()
       },
+
       error => {
         if (!rule.error) {
           t.fail(`should not fail: ${error.stack}`)
-          t.end()
           return
         }
 
@@ -237,14 +252,13 @@ Object.keys(RULES).forEach((key) => {
           t.is(error.value, rule.input)
         }
         t.is(error.key, key)
-        t.end()
       }
     )
   })
 })
 
 
-test.cb('all', t => {
+test('all', t => {
   const data = {}
   const expected = {}
   const keys = Object.keys(RULES)
@@ -253,7 +267,7 @@ test.cb('all', t => {
   keys.forEach((key) => {
     const rule = RULES[key]
 
-    if (rule.error || 'args' in rule) {
+    if (rule.initError || rule.error || 'args' in rule) {
       return
     }
 
@@ -270,17 +284,15 @@ test.cb('all', t => {
     }
   })
 
-  const s = skema({
+  return skema({
     rules,
     types: TYPES
   })
   .parse(data)
   .then((values) => {
     t.deepEqual(values, expected)
-    t.end()
   })
   .catch(() => {
     t.fail()
-    t.end()
   })
 })
