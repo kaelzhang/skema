@@ -1,39 +1,49 @@
 module.exports = skema
 
-const Type = require('./type')
-const util = require('util')
-const {
-  merge,
-  thenify,
-  reject
-} = require('./util')
 const {
   series,
   waterfall
 } = require('promise.extra')
 
+const thenify = require('simple-thenify')
+
+const Type = require('./type')
+const Types = {
+  JAVASCRIPT: require('./types/javascript'),
+  QUERY: require('./types/query')
+}
+
+const {
+  merge,
+  reject,
+  isFunction,
+  isRegExp
+} = require('./util')
+
 
 class Skema {
   constructor ({
     rules = {},
-    types = {},
-    clean = false
+    types = Types.JAVASCRIPT,
+    clean = false,
+    parallel = true
   }) {
 
     this._rules = {}
-    this._type = new Type()
-    this._context = {}
+    this._type = new Type(types)
+    this._context = null
     this._clean = clean
-
-    let type
-    for (type in types) {
-      this.register(type, types[type])
-    }
+    this._parallel = parallel
 
     let name
     for (name in rules) {
       this.add(name, rules[name])
     }
+  }
+
+  context (context) {
+    this._context = context
+    return this
   }
 
   add (name, rule) {
@@ -43,7 +53,7 @@ class Skema {
 
     const type = this._type.get(rule.type)
     if (!type) {
-      throw new Error(`the type of "${name}" is not defined.`)
+      throw new Error(`unknown type of "${rule.type}" for "${name}".`)
     }
 
     return this._add(name, rule, type)
@@ -59,24 +69,25 @@ class Skema {
 
     if (default_setter) {
       cleaned.default = thenify(
-        util.isFunction(default_setter)
+        isFunction(default_setter)
           ? default_setter
           : () => default_setter
       )
     }
 
-    const setters = merge(type.set, rule.set, (setter) => {
-      if (!util.isFunction(setter)) {
+    const setters = merge(type.set, rule.set, setter => {
+      if (!isFunction(setter)) {
         throw new Error(`invalid setter for "${name}".`)
       }
 
       return thenify(setter)
     })
+
     if (setters.length) {
       cleaned.set = setters
     }
 
-    const validators = merge(type.validate, rule.validate, (validator) => {
+    const validators = merge(type.validate, rule.validate, validator => {
       validator = parse_validator(validator)
       if (!validator) {
         throw new Error(`invalid validator for "name", only functions and regular expressions are accepted.`)
@@ -84,6 +95,7 @@ class Skema {
 
       return thenify(validator)
     })
+
     if (validators.length) {
       cleaned.validate = validators
     }
@@ -93,7 +105,7 @@ class Skema {
     return this
   }
 
-  register (type, property) {
+  registerType (type, property) {
     this._type.register(type, property)
     return this
   }
@@ -103,19 +115,24 @@ class Skema {
       ? {}
       : {...data}
 
+    const context = this._context || {...data}
     const tasks = Object.keys(this._rules)
-    .map(key =>
-      this._parse(key, data[key], data, args)
+    .map(key => () =>
+      this._parse(key, data[key], data, context, args)
       .then(value => {
         values[key] = value
       })
     )
 
-    return Promise.all(tasks)
-    .then(() => values)
+    if (this._parallel) {
+      return Promise.all(tasks.map(task => task()))
+      .then(() => values)
+    }
+
+    return series(tasks).then(() => values)
   }
 
-  _parse (key, value, original, args) {
+  _parse (key, value, original, context, args) {
     const rule = this._rules[key]
     const is_default = !(key in original)
 
@@ -130,7 +147,7 @@ class Skema {
         return value
       }
 
-      return series(rule.validate, value, ...args)
+      return series.call(context, rule.validate, value, ...args)
       .then(
         passes => {
           const pass = passes.every(Boolean)
@@ -149,7 +166,7 @@ class Skema {
         return value
       }
 
-      return waterfall(rule.set, value, ...args)
+      return waterfall.call(context, rule.set, value, ...args)
       .then(
         value => value,
         error => reject(error, key, value)
@@ -164,13 +181,14 @@ function skema (options) {
 }
 
 skema.Skema = Skema
+skema.Types = Types
 
 
 // See "schema design"
 function parse_validator (validator) {
-  return util.isFunction(validator)
+  return isFunction(validator)
     ? validator
-    : util.isRegExp(validator)
+    : isRegExp(validator)
       ? v => validator.test(v)
       : false
 }

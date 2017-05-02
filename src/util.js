@@ -1,26 +1,9 @@
-module.exports = {
-  merge,
-  thenify,
-  reject
-}
+const {
+  isFunction,
+  isRegExp
+} = require('util')
 
-const util = require('util')
 const make_array = require('make-array')
-
-
-function thenable (subject) {
-  return subject && util.isFunction(subject.then)
-}
-
-
-function thenify (fn) {
-  return function (...args) {
-    const result = fn.apply(this, args)
-    return thenable(result)
-      ? result
-      : Promise.resolve(result)
-  }
-}
 
 
 function merge (a, b, mapper) {
@@ -40,4 +23,12 @@ function reject (message, key, value) {
   error.key = key
   error.value = value
   return Promise.reject(error)
+}
+
+
+module.exports = {
+  merge,
+  reject,
+  isFunction,
+  isRegExp
 }

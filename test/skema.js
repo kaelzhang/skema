@@ -1,5 +1,8 @@
 const test = require('ava')
 const skema = require('..')
+const {
+  JAVASCRIPT
+} = skema.Types
 
 function delay (delay, value) {
   return new Promise((resolve) => {
@@ -159,6 +162,8 @@ const RULES = {
 }
 
 const TYPES = {
+  ...JAVASCRIPT,
+
   's': {
     set: (v) => {
       return v.replace(/\<.*\>/g, '')

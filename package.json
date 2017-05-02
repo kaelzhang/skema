@@ -1,6 +1,6 @@
 {
   "name": "skema",
-  "version": "3.0.3",
+  "version": "4.0.0",
   "description": "Skema is the collection of common abstract methods for validatiors and setters.",
   "main": "index.js",
   "scripts": {
@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "make-array": "^1.0.1",
-    "promise.extra": "^1.2.0"
+    "promise.extra": "^1.2.0",
+    "simple-thenify": "^1.0.1"
   }
 }
