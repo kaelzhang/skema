@@ -66,12 +66,12 @@ skema({rules, types})
 })
 ```
 
-## skema({types, rules})
+## skema({rules, types})
 
-- **types** `{[typeName]: TypeDefinition}`
-  - typeName `String` the name of the type
-- **rules** `{[key]: RuleProperty}`
+- **rules** `{[key]: RuleProperty}=`
   - key `String` the name to match the property of data
+- **types** `{[typeName]: TypeDefinition}=` optional
+  - typeName `String` the name of the type
 
 Creates the skema instance.
 
@@ -83,9 +83,13 @@ Validates and applies setters. Returns a `Promise`
 
 Registers a new type, and returns `this`. This method should be called before `.parse()`
 
+Returns `this`
+
 ### .add(key, ruleProperty)
 
 Adds a new rule, and returns `this`. This method should be called before `.parse()`
+
+Returns `this`
 
 ## Struct `TypeDefinition`
 
@@ -128,7 +132,9 @@ const types = {
       return check_unique
         ? remote_check_unique_promise(username)
         : true
-    }
+    },
+
+    set: name => `Mr/Mrs ${name}`
   }
 }
 
@@ -143,8 +149,8 @@ const check_unique = true
 skema({rules, types})
 // `check_unique` will be passed into the validator, as the second parameter.
 .parse({name: 'John'}, check_unique)
-.then(() => {
-  // ok
+.then(result => {
+  result  // {name: 'Mr/Mrs John'}
 })
 .catch(error => {
   // Maybe the name 'John' already exists.
