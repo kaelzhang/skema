@@ -8,10 +8,6 @@ const {
 const thenify = require('simple-thenify')
 
 const Type = require('./type')
-const Types = {
-  JAVASCRIPT: require('./types/javascript'),
-  QUERY: require('./types/query')
-}
 
 const {
   merge,
@@ -24,7 +20,7 @@ const {
 class Skema {
   constructor ({
     rules = {},
-    types = Types.JAVASCRIPT,
+    types,
     clean = false,
     parallel = true
   }) {
@@ -181,7 +177,6 @@ function skema (options) {
 }
 
 skema.Skema = Skema
-skema.Types = Types
 
 
 // See "schema design"

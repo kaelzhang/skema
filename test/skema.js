@@ -1,8 +1,6 @@
 const test = require('ava')
 const skema = require('..')
-const {
-  JAVASCRIPT
-} = skema.Types
+
 
 function delay (delay, value) {
   return new Promise((resolve) => {
