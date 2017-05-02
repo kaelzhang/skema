@@ -105,7 +105,7 @@ class Skema {
     return this
   }
 
-  registerType (type, property) {
+  register (type, property) {
     this._type.register(type, property)
     return this
   }

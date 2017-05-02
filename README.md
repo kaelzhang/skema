@@ -113,23 +113,21 @@ skema({
 
 ```js
 const types = {
-  types: {
-    username: {
-      validate: (username, check_unique) => {
-        if (!username) {
-          // Validation fails.
-          return false
-        }
-
-        if (username.length < 5) {
-          // Returns a Promise.reject to define a detail error.
-          return Promise.reject('username should contain more than 4 chars.')
-        }
-
-        return check_unique
-          ? remote_check_unique_promise(username)
-          : true
+  username: {
+    validate: (username, check_unique) => {
+      if (!username) {
+        // Validation fails.
+        return false
       }
+
+      if (username.length < 5) {
+        // Returns a Promise.reject to define a detail error.
+        return Promise.reject('username should contain more than 4 chars.')
+      }
+
+      return check_unique
+        ? remote_check_unique_promise(username)
+        : true
     }
   }
 }
@@ -142,8 +140,8 @@ const rules = {
 
 const check_unique = true
 
-skema({types, rules})
-// `check_unique` will be passed into the validator
+skema({rules, types})
+// `check_unique` will be passed into the validator, as the second parameter.
 .parse({name: 'John'}, check_unique)
 .then(() => {
   // ok
