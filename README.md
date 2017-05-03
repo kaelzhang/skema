@@ -16,12 +16,6 @@
 
 `skema` is the collection of common abstract methods for validatiors and setters. All validators and setters could be normal synchronous functions or es7 async funtions or functions which returns `Promise`'s
 
-## Install
-
-```sh
-$ npm install skema --save
-```
-
 ## Usage
 
 ```js
@@ -32,12 +26,10 @@ const rules = {
     default: 10,
     validate: v => v > 0
   },
-
   bar: {
     type: String,
     validate: v => remote_check_unique_promise(v)
   },
-
   baz: {
     type: 'safe_string'
   }
@@ -45,9 +37,7 @@ const rules = {
 
 const types = {
   safe_string: {
-    set: (v) => {
-      return strip_html_tags(v)
-    }
+    set: v => strip_html_tags(v)
   }
 }
 
@@ -59,10 +49,11 @@ skema({rules, types})
 .then(value => {
   console.log(value.foo)  // 10, make sure the default value
   console.log(value.bar)  // '1', ensure string type
-  console.log(value.baz)  // 'i am innocent', the script tag has been stripped
+  console.log(value.baz)
+  // 'i am innocent', the script tag has been stripped
 })
 .catch((error) => {
-  // If error, it means the value of `bar` it not unique.
+  // If error, it might mean the value of `bar` it not unique.
 })
 ```
 
@@ -97,7 +88,11 @@ Returns `this`
 
 ## Struct `TypeDefinition`
 
-- **type** `Class=|AnyObject=` optional. If a type definition has a `type` property, a rule can match a type by Constructor.
+- **type** `(name|RuleProperty::type)=` optional. If a type definition has a `type` property, a rule can match a type by Constructor. And there are several built-in types:
+  - string: both `'string'` and `String` are ok.
+  - number: `'number'` and `Number`, if the given value is not a number, an error will be rejected
+  - boolean: `'boolean'` and `Boolean`
+  - date: `'date'` and `Date`, if the given value is not a date, an error will be rejected.
 
 ```js
 const path = require('path')
@@ -105,7 +100,7 @@ skema({
   types: {
     path: {
       type: path,
-      ...
+      set: path.resolve
     }
   },
   rules: {
@@ -143,9 +138,7 @@ const types = {
 }
 
 const rules = {
-  name: {
-    type: 'username'
-  }
+  name: {type: 'username'}
 }
 
 const check_unique = true
