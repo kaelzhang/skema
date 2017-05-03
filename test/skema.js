@@ -294,3 +294,137 @@ test('all', t => {
     t.fail()
   })
 })
+
+
+test('default context', t => {
+  return skema({
+    rules: {
+      a: {
+        set (v) {
+          return v + 1
+        }
+      },
+
+      b: {
+        set (v) {
+          return v + this.a
+        }
+      }
+    }
+  })
+  .parse({
+    a: 2,
+    b: 2
+  })
+  .then(result => {
+    t.deepEqual(result, {
+      a: 3,
+      b: 4
+    })
+  })
+})
+
+
+test('custom context', t => {
+  return skema({
+    rules: {
+      a: {
+        set (v) {
+          return v + this.a
+        }
+      }
+    }
+  })
+  .context({a: 4})
+  .parse({a: 1})
+  .then(result => {
+    t.deepEqual(result, {a: 5})
+  })
+})
+
+
+test('parallel', t => {
+  return skema({
+    rules: {
+      a: {
+        set (v) {
+          return delay(20)
+          .then(() => {
+            this.x = 2
+
+            return v
+          })
+        }
+      },
+
+      b: {
+        set (v) {
+          return v + (this.x || 0)
+        }
+      }
+    }
+  })
+  .parse({
+    a: 1,
+    b: 2
+  })
+  .then(result => {
+    t.deepEqual(result, {a: 1, b: 2})
+  })
+})
+
+
+test('no parallel', t => {
+  return skema({
+    rules: {
+      a: {
+        set (v) {
+          return delay(20)
+          .then(() => {
+            this.x = 2
+
+            return v
+          })
+        }
+      },
+
+      b: {
+        set (v) {
+          return v + (this.x || 0)
+        }
+      }
+    },
+
+    parallel: false
+  })
+  .parse({
+    a: 1,
+    b: 2
+  })
+  .then(result => {
+    t.deepEqual(result, {a: 1, b: 4})
+  })
+})
+
+
+test('clean', t => {
+  return skema({
+    rules: {
+      a: {
+
+      }
+    },
+    clean: true
+  })
+  .parse({
+    a: 1,
+    b: 2
+  })
+  .then(result => {
+    t.deepEqual(result, {
+      a: 1
+    })
+  })
+})
+
+
