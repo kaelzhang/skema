@@ -31,7 +31,8 @@ const rules = {
     validate: v => remote_check_unique_promise(v)
   },
   baz: {
-    type: 'safe_string'
+    type: 'safe_string',
+    writable: false
   }
 }
 
@@ -51,6 +52,12 @@ skema({rules, types})
   console.log(value.bar)  // '1', ensure string type
   console.log(value.baz)
   // 'i am innocent', the script tag has been stripped
+
+  try {
+    value.baz = 'i am evil'   // It should throw because not writable
+  } catch (e) {
+
+  }
 })
 .catch((error) => {
   // If error, it might mean the value of `bar` it not unique.
@@ -113,6 +120,9 @@ skema({
 
 - **default** `function()|Any` Default value to use if key is not included in the `data`, or a function that returns the default value or a Promise.
 - **validate** `Array.<Validator>|Validator` A `Validator` could be a `function(v, ...args)` which accepts the given value of the key, and the "spreaded" `args` of the `.parse(data, ...args)`, or a regular expression to test the value.
+- **enumerable** `Boolean=true` defaults to `true`
+- **configurable** `Boolean=true` defaults to `true`
+- **writable** `Boolean=true` defaults to `true`
 
 ```js
 const types = {

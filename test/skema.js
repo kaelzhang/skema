@@ -428,3 +428,44 @@ test('clean', t => {
 })
 
 
+test('enumerable: false', t => {
+  return skema({
+    rules: {
+      a: {
+        enumerable: false
+      }
+    }
+  })
+  .parse({
+    a: 1
+  })
+  .then(result => {
+    t.is(result.a, 1, 'value')
+    t.is(Object.keys(result).length, 0, 'enumerable: false')
+  })
+})
+
+
+test('writable: false', t => {
+  return skema({
+    rules: {
+      a: {
+        writable: false
+      }
+    }
+  })
+  .parse({
+    a: 1
+  })
+  .then(result => {
+    t.is(result.a, 1, 'value')
+
+    try {
+      result.a = 2
+      t.fail('should not allow to write')
+    } catch (e) {
+    }
+  })
+})
+
+

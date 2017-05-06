@@ -56,7 +56,17 @@ class Skema {
   }
 
   _add (name, rule, type) {
-    const cleaned = {}
+    const {
+      configurable = true,
+      enumerable = true,
+      writable = true
+    } = rule
+
+    const cleaned = {
+      configurable,
+      enumerable,
+      writable
+    }
 
     // User will override default setter
     const default_setter = 'default' in rule
@@ -116,7 +126,7 @@ class Skema {
     .map(key => () =>
       this._parse(key, data[key], data, context, args)
       .then(value => {
-        values[key] = value
+        define_property(values, key, value, this._rules[key])
       })
     )
 
@@ -186,4 +196,20 @@ function parse_validator (validator) {
     : isRegExp(validator)
       ? v => validator.test(v)
       : false
+}
+
+
+function define_property (data, key, value, rules) {
+  const {
+    configurable,
+    enumerable,
+    writable
+  } = rules
+
+  Object.defineProperty(data, key, {
+    configurable,
+    enumerable,
+    writable,
+    value
+  })
 }
