@@ -205,9 +205,9 @@ s.parse({foo: 5}).catch(error => {
 })
 ```
 
-- **when** `function()=` If the result if not `true`, then the current key will be skipped.
+- **when** `function()=` If the result is not `true`, then the current key will be skipped.
 
-```
+```js
 const rules = {
   foo: {
     when () {
