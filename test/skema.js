@@ -325,24 +325,6 @@ test('default context', t => {
 })
 
 
-test('custom context', t => {
-  return skema({
-    rules: {
-      a: {
-        set (v) {
-          return v + this.a
-        }
-      }
-    }
-  })
-  .context({a: 4})
-  .parse({a: 1})
-  .then(result => {
-    t.deepEqual(result, {a: 5})
-  })
-})
-
-
 test('parallel', t => {
   return skema({
     rules: {
@@ -370,6 +352,71 @@ test('parallel', t => {
   })
   .then(result => {
     t.deepEqual(result, {a: 1, b: 2})
+  })
+})
+
+
+test('parallel, and context', t => {
+  return skema({
+    rules: {
+      a: {
+        set (v) {
+          return v + 1
+        }
+      },
+
+      b: {
+        validate (v) {
+          return delay(20)
+          .then(() => {
+            return v > this.a
+          })
+        }
+      }
+    }
+  })
+  .parse({
+    a: 1,
+    b: 2
+  })
+  .then(result => {
+    t.deepEqual(result, {a: 2, b: 2})
+  })
+  .catch(() => {
+    t.fail('context should not change when runs in parallel')
+  })
+})
+
+
+test('no parallel, and context', t => {
+  return skema({
+    rules: {
+      a: {
+        set (v) {
+          return v + 1
+        }
+      },
+
+      b: {
+        validate (v) {
+          return delay(20)
+          .then(() => {
+            return v > this.a
+          })
+        }
+      }
+    },
+    parallel: false
+  })
+  .parse({
+    a: 1,
+    b: 2
+  })
+  .then(result => {
+    t.fail('context should change when not run in parallel')
+  })
+  .catch(err => {
+    t.pass()
   })
 })
 
@@ -465,6 +512,30 @@ test('writable: false', t => {
       t.fail('should not allow to write')
     } catch (e) {
     }
+  })
+})
+
+
+test('when', t => {
+  return skema({
+    rules: {
+      a: {
+        when () {
+          return this.x > 0
+        },
+
+        validate (v) {
+          return v > 10
+        }
+      }
+    }
+  })
+  .parse({
+    a: 1,
+    x: 0
+  })
+  .then(result => {
+    t.deepEqual(result, {a: 1, x: 0})
   })
 })
 

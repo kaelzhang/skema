@@ -27,7 +27,6 @@ class Skema {
 
     this._rules = {}
     this._type = new Type(types)
-    this._context = null
     this._clean = clean
     this._parallel = parallel
 
@@ -35,11 +34,6 @@ class Skema {
     for (name in rules) {
       this.add(name, rules[name])
     }
-  }
-
-  context (context) {
-    this._context = context
-    return this
   }
 
   add (name, rule) {
@@ -66,6 +60,10 @@ class Skema {
       configurable,
       enumerable,
       writable
+    }
+
+    if (isFunction(rule.when)) {
+      cleaned.when = rule.when
     }
 
     // User will override default setter
@@ -120,17 +118,22 @@ class Skema {
     const values = this._clean
       ? {}
       : {...data}
+    const parallel = this._parallel
 
-    const context = this._context || {...data}
+    const context = {...data}
     const tasks = Object.keys(this._rules)
     .map(key => () =>
       this._parse(key, data[key], data, context, args)
       .then(value => {
+        if (!parallel) {
+          context[key] = value
+        }
+
         define_property(values, key, value, this._rules[key])
       })
     )
 
-    if (this._parallel) {
+    if (parallel) {
       return Promise.all(tasks.map(task => task()))
       .then(() => values)
     }
@@ -140,14 +143,35 @@ class Skema {
 
   _parse (key, value, original, context, args) {
     const rule = this._rules[key]
-    const is_default = !(key in original)
 
+    // When
+    //////////////////////////////////////////////////
+    if (rule.when) {
+      return Promise.resolve(rule.when.call(context, args))
+      .then(hit => {
+        if (hit) {
+          return this._real_parse(key, value, rule, original, context, args)
+        }
+
+        return value
+      })
+    }
+
+    return this._real_parse(key, value, rule, original, context, args)
+  }
+
+  _real_parse (key, value, rule, original, context, args) {
+    // Default
+    //////////////////////////////////////////////////
+    const is_default = !(key in original)
     const result = is_default && rule.default
       ? rule.default(...args)
       // Not default value
       : Promise.resolve(value)
 
     return result
+    // Validator
+    //////////////////////////////////////////////////
     .then((value) => {
       if (!rule.validate) {
         return value
@@ -167,6 +191,8 @@ class Skema {
         error => reject(error, key, value)
       )
     })
+    // Setter
+    //////////////////////////////////////////////////
     .then((value) => {
       if (!rule.set) {
         return value

@@ -169,7 +169,7 @@ skema({rules, types})
 ## Struct `RuleProperty`
 
 - **type** `String|Object` type to match the `TypeDefinition`. See examples above.
-- **default** `default` of RuleProperty will **override** the matched `TypeDefinition`'s `default`.
+- **default** `function()|other` default of RuleProperty will **override** the matched `TypeDefinition`'s `default`.
 - **validate** Same as `TypeDefinition::validate`, the validators of `TypeDefinition` will be checked first, then validators of `RuleProperty`.
 - **set** Same as `TypeDefinition::set` the setters of `TypeDefinition` will be run first.
 
@@ -204,6 +204,35 @@ s.parse({foo: 5}).catch(error => {
   console.log(error.message)   // '<= 5'
 })
 ```
+
+- **when** `function()=` If the result if not `true`, then the current key will be skipped.
+
+```
+const rules = {
+  foo: {
+    when () {
+      return false
+    }
+
+    // The validation of foo will always be skipped.
+    validate () {
+      return false
+    }
+  }
+}
+
+skema({rules}).parse({foo: 1})
+// {foo: 1}
+```
+
+## Access to the given value from helper functions
+
+We could use `this[key]` to access to the given value from all helper functions, including `set`, `default`, `when`, `validate`.
+
+Pay attension:
+
+- If `options.parallel=true`(the default value), then `this[key]` is always the given value, even the value of `key` changes after parsing. Because we should not rely on the process sequence of the parsing.
+- Otherwise, `this[key]` is the already parsed value of the `key`
 
 ## License
 
