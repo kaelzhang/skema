@@ -11,10 +11,7 @@ module.exports = class Type {
 
     this[IS_TYPES] = true
 
-    this._types = {
-      ...JAVASCRIPT,
-      ...types
-    }
+    this._types = Object.assign(Object.create(null), JAVASCRIPT, types)
   }
 
   get (type) {

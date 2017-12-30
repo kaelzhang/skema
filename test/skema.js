@@ -237,6 +237,8 @@ Object.keys(RULES).forEach((key) => {
         } else {
           t.is(v, rule.output)
         }
+
+        t.is(value.toString, undefined)
       },
 
       error => {

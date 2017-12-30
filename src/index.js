@@ -103,11 +103,12 @@ class Skema {
 
   parse (data, ...args) {
     const values = this._clean
-      ? {}
-      : {...data}
+      ? Object.create(null)
+      : simpleClone(data)
+
     const parallel = this._parallel
 
-    const context = {...data}
+    const context = simpleClone(data)
     const tasks = Object.keys(this._rules)
     .map(key => () => {
       return this._parse(key, data[key], data, context, args)
@@ -224,4 +225,8 @@ function define_property (data, key, value, rules) {
     writable,
     value
   })
+}
+
+function simpleClone (object) {
+  return Object.assign(Object.create(null), object)
 }
