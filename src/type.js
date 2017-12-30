@@ -1,7 +1,16 @@
 const JAVASCRIPT = require('./types/javascript')
+const {symbol} = require('./util')
+
+const IS_TYPES = symbol('skema:types')
 
 module.exports = class Type {
   constructor (types = {}) {
+    if (types[IS_TYPES]) {
+      return types
+    }
+
+    this[IS_TYPES] = true
+
     this._types = {
       ...JAVASCRIPT,
       ...types

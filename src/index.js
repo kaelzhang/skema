@@ -199,6 +199,7 @@ function skema (options) {
 }
 
 skema.Skema = Skema
+skema.Types = Type
 skema.i18n = i18n
 
 // See "schema design"

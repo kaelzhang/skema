@@ -23,9 +23,14 @@ function reject (message, key, value) {
   return Promise.reject(error)
 }
 
+const symbol = typeof Symbol === 'function'
+  ? Symbol.for
+  : x => x
+
 module.exports = {
   merge,
   reject,
   isFunction,
-  isRegExp
+  isRegExp,
+  symbol
 }
