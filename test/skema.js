@@ -538,17 +538,3 @@ test('when', t => {
     t.deepEqual(result, {a: 1, x: 0})
   })
 })
-
-test('map', async t => {
-  const s = skema({
-    map: {
-      _t: 't'
-    }
-  })
-
-  const value = await s.parse({
-    _t: 1
-  })
-
-  t.deepEqual(value, {t: 1})
-})

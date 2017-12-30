@@ -10,14 +10,12 @@ class Skema {
   constructor ({
     rules = {},
     types,
-    map,
     clean = false,
     parallel = true
   }) {
 
     this._rules = {}
     this._type = new Type(types)
-    this._map = map
     this._clean = clean
     this._parallel = parallel
 
@@ -25,10 +23,6 @@ class Skema {
     for (name in rules) {
       this.add(name, rules[name])
     }
-  }
-
-  i18n (__) {
-
   }
 
   add (name, rule) {
@@ -108,10 +102,6 @@ class Skema {
   }
 
   parse (data, ...args) {
-    data = this._map
-      ? map_object(this._map, data)
-      : data
-
     const values = this._clean
       ? {}
       : {...data}
@@ -233,14 +223,4 @@ function define_property (data, key, value, rules) {
     writable,
     value
   })
-}
-
-function map_object (map, from) {
-  const to = {}
-
-  forEach(from, (value, key) => {
-    to[map[key] || key] = value
-  })
-
-  return to
 }
