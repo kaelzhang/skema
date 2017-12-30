@@ -1,5 +1,5 @@
 const path = require('path')
-
+const {reject} = require('../util')
 
 module.exports = {
   string: {
@@ -13,12 +13,14 @@ module.exports = {
   number: {
     type: Number,
     set (value) {
-      if (isNaN(value)) {
+      value = Number(value)
+
+      if (value !== value) {
         const error = new TypeError('not a number.')
         return Promise.reject(error)
       }
 
-      return Number(value)
+      return value
     }
   },
 

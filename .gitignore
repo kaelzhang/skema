@@ -16,6 +16,7 @@
 *~
 *.sass-cache
 *.lock
+.nyc_output/
 
 # OS or Editor folders
 .DS_Store
@@ -29,6 +30,7 @@
 *.sublime-workspace
 nbproject
 thumbs.db
+package-lock.json
 
 # Folders to ignore
 .hg

@@ -1,6 +1,5 @@
 const JAVASCRIPT = require('./types/javascript')
 
-
 module.exports = class Type {
   constructor (types = {}) {
     this._types = {

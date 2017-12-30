@@ -1,32 +1,21 @@
 module.exports = skema
 
-const {
-  series,
-  waterfall
-} = require('promise.extra')
-
-const thenify = require('simple-thenify')
-
+const {series, waterfall} = require('promise.extra')
 const Type = require('./type')
-
-const {
-  merge,
-  reject,
-  isFunction,
-  isRegExp
-} = require('./util')
-
+const {merge, reject, isFunction, isRegExp} = require('./util')
 
 class Skema {
   constructor ({
     rules = {},
     types,
+    map,
     clean = false,
     parallel = true
   }) {
 
     this._rules = {}
     this._type = new Type(types)
+    this._map = map
     this._clean = clean
     this._parallel = parallel
 
@@ -72,11 +61,9 @@ class Skema {
       : type.default
 
     if (default_setter) {
-      cleaned.default = thenify(
-        isFunction(default_setter)
-          ? default_setter
-          : () => default_setter
-      )
+      cleaned.default = isFunction(default_setter)
+        ? default_setter
+        : () => default_setter
     }
 
     const setters = merge(type.set, rule.set, setter => {
@@ -84,7 +71,7 @@ class Skema {
         throw new Error(`invalid setter for "${name}".`)
       }
 
-      return thenify(setter)
+      return setter
     })
 
     if (setters.length) {
@@ -97,7 +84,7 @@ class Skema {
         throw new Error(`invalid validator for "name", only functions and regular expressions are accepted.`)
       }
 
-      return thenify(validator)
+      return validator
     })
 
     if (validators.length) {
@@ -122,8 +109,10 @@ class Skema {
 
     const context = {...data}
     const tasks = Object.keys(this._rules)
-    .map(key => () =>
-      this._parse(key, data[key], data, context, args)
+    .map(key => () => {
+      const value = data[key]
+      key = this._map && this._map[key] || key
+      return this._parse(key, value, data, context, args)
       .then(value => {
         if (!parallel) {
           context[key] = value
@@ -131,7 +120,7 @@ class Skema {
 
         define_property(values, key, value, this._rules[key])
       })
-    )
+    })
 
     if (parallel) {
       return Promise.all(tasks.map(task => task()))
@@ -167,9 +156,9 @@ class Skema {
     const result = is_default && rule.default
       ? rule.default(...args)
       // Not default value
-      : Promise.resolve(value)
+      : value
 
-    return result
+    return Promise.resolve(result)
     // Validator
     //////////////////////////////////////////////////
     .then((value) => {
@@ -207,13 +196,11 @@ class Skema {
   }
 }
 
-
 function skema (options) {
   return new Skema(options)
 }
 
 skema.Skema = Skema
-
 
 // See "schema design"
 function parse_validator (validator) {
@@ -223,7 +210,6 @@ function parse_validator (validator) {
       ? v => validator.test(v)
       : false
 }
-
 
 function define_property (data, key, value, rules) {
   const {

@@ -1,6 +1,5 @@
 const test = require('ava')
-const skema = require('..')
-
+const skema = require('../src')
 
 function delay (delay, value) {
   return new Promise((resolve) => {
@@ -538,5 +537,3 @@ test('when', t => {
     t.deepEqual(result, {a: 1, x: 0})
   })
 })
-
-

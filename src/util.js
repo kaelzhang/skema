@@ -5,7 +5,6 @@ const {
 
 const make_array = require('make-array')
 
-
 function merge (a, b, mapper) {
   const receiver = b
     ? make_array(a).concat(b)
@@ -13,7 +12,6 @@ function merge (a, b, mapper) {
 
   return receiver.map(mapper)
 }
-
 
 function reject (message, key, value) {
   const error = message instanceof Error
@@ -24,7 +22,6 @@ function reject (message, key, value) {
   error.value = value
   return Promise.reject(error)
 }
-
 
 module.exports = {
   merge,
