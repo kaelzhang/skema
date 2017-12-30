@@ -1,8 +1,10 @@
 module.exports = skema
 
 const {series, waterfall} = require('promise.extra')
+const forEach = require('lodash.foreach')
 const Type = require('./type')
 const {merge, reject, isFunction, isRegExp} = require('./util')
+const {i18n} = require('./error')
 
 class Skema {
   constructor ({
@@ -23,6 +25,10 @@ class Skema {
     for (name in rules) {
       this.add(name, rules[name])
     }
+  }
+
+  i18n (__) {
+
   }
 
   add (name, rule) {
@@ -102,6 +108,10 @@ class Skema {
   }
 
   parse (data, ...args) {
+    data = this._map
+      ? map_object(this._map, data)
+      : data
+
     const values = this._clean
       ? {}
       : {...data}
@@ -110,9 +120,7 @@ class Skema {
     const context = {...data}
     const tasks = Object.keys(this._rules)
     .map(key => () => {
-      const value = data[key]
-      key = this._map && this._map[key] || key
-      return this._parse(key, value, data, context, args)
+      return this._parse(key, data[key], data, context, args)
       .then(value => {
         if (!parallel) {
           context[key] = value
@@ -201,6 +209,7 @@ function skema (options) {
 }
 
 skema.Skema = Skema
+skema.i18n = i18n
 
 // See "schema design"
 function parse_validator (validator) {
@@ -224,4 +233,14 @@ function define_property (data, key, value, rules) {
     writable,
     value
   })
+}
+
+function map_object (map, from) {
+  const to = {}
+
+  forEach(from, (value, key) => {
+    to[map[key] || key] = value
+  })
+
+  return to
 }

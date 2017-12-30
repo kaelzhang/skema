@@ -1,5 +1,5 @@
 const path = require('path')
-const {reject} = require('../util')
+const {error} = require('../error')
 
 module.exports = {
   string: {
@@ -16,8 +16,7 @@ module.exports = {
       value = Number(value)
 
       if (value !== value) {
-        const error = new TypeError('not a number.')
-        return Promise.reject(error)
+        return Promise.reject(error('ERR_NOT_A_NUMBER'))
       }
 
       return value
@@ -34,9 +33,8 @@ module.exports = {
     set (value) {
       const date = Date.parse(value)
 
-      if (isNaN(date)) {
-        const error = new TypeError(`"${value}" is not a valid date.`)
-        return Promise.reject(error)
+      if (date !== date) {
+        return Promise.reject(error('ERR_NOT_A_DATE', value))
       }
 
       return new Date(date)

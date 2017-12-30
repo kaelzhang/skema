@@ -9,6 +9,8 @@ function delay (delay, value) {
   })
 }
 
+const only = true
+
 const RULES = {
   a: {
     default: 1,
@@ -139,7 +141,7 @@ const RULES = {
   p: {
     input: 'a',
     type: Number,
-    error: 'not a number.',
+    error: 'not a number',
     d: 'invalid Number'
   },
 
@@ -185,7 +187,6 @@ function get_rule (raw) {
   return rule
 }
 
-
 Object.keys(RULES).forEach((key) => {
   const rule = RULES[key]
   const _t = rule.only
@@ -229,7 +230,7 @@ Object.keys(RULES).forEach((key) => {
           return
         }
 
-        const v = value[key]
+        const v = value[rule.key || key]
 
         if (Object(value) === value) {
           t.deepEqual(v, rule.output)
@@ -536,4 +537,18 @@ test('when', t => {
   .then(result => {
     t.deepEqual(result, {a: 1, x: 0})
   })
+})
+
+test('map', async t => {
+  const s = skema({
+    map: {
+      _t: 't'
+    }
+  })
+
+  const value = await s.parse({
+    _t: 1
+  })
+
+  t.deepEqual(value, {t: 1})
 })
