@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/kaelzhang/node-skema.svg?branch=master)](https://travis-ci.org/kaelzhang/node-skema)
+[![Coverage](https://codecov.io/gh/kaelzhang/node-skema/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/node-skema)
 <!-- optional appveyor tst
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/kaelzhang/node-skema?branch=master&svg=true)](https://ci.appveyor.com/project/kaelzhang/node-skema)
 -->
@@ -42,26 +43,19 @@ const types = {
   }
 }
 
-skema({rules, types})
+const parsed = await skema({rules, types})
 .parse({
   bar: 1,
   baz: 'i am innocent<script>do_evil()</script>'
 })
-.then(value => {
-  console.log(value.foo)  // 10, make sure the default value
-  console.log(value.bar)  // '1', ensure string type
-  console.log(value.baz)
-  // 'i am innocent', the script tag has been stripped
 
-  try {
-    value.baz = 'i am evil'   // It should throw because not writable
-  } catch (e) {
+console.log(parsed.foo)  // 10, make sure the default value
+console.log(parsed.bar)  // '1', ensure string type
+console.log(parsed.baz)
+// 'i am innocent', the script tag has been stripped
 
-  }
-})
-.catch((error) => {
-  // If error, it might mean the value of `bar` it not unique.
-})
+// It will throw because not writable
+value.baz = 'i am evil'   
 ```
 
 ## skema(options)
@@ -152,16 +146,11 @@ const rules = {
 }
 
 const check_unique = true
-
-skema({rules, types})
+const result = await skema({rules, types})
 // `check_unique` will be passed into the validator, as the second parameter.
 .parse({name: 'John'}, check_unique)
-.then(result => {
-  result  // {name: 'Mr/Mrs John'}
-})
-.catch(error => {
-  // Maybe the name 'John' already exists.
-})
+
+result // {name: 'Mr/Mrs John'}
 ```
 
 - **set** `Array.<Setter>|Setter` A `Setter` receives the value and extra args and returns the altered value or a `Promise`. If there are more than one setter, the previous value has been returned will be passed into the next setter.
