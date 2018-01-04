@@ -142,7 +142,7 @@ const RULES = {
   p: {
     input: 'a',
     type: Number,
-    error: 'not a number',
+    error: '"NaN" is not a number',
     d: 'invalid Number'
   },
 
@@ -248,11 +248,15 @@ Object.keys(RULES).forEach((key) => {
           return
         }
 
-        t.is(error.message, rule.error)
-        if ('input' in rule) {
-          t.is(error.value, rule.input)
+        if (typeof error === 'string') {
+          t.is(error, rule.error)
+          return
         }
-        t.is(error.key, key)
+
+        if (error instanceof Error) {
+          t.is(error.message, rule.error)
+        }
+
       }
     )
   })
@@ -461,7 +465,6 @@ test('clean', t => {
   return skema({
     rules: {
       a: {
-
       }
     },
     clean: true

@@ -58,15 +58,23 @@ function parseSetters (setters) {
 
 function parseWhen (when) {
   if (isFunction(when)) {
-    return
+    return when
   }
 
-  return () => !!when
+  if (when === false) {
+    return () => false
+  }
+
+  // Then true
 }
 
 function parseDefault (_default) {
   if (_default === undefined) {
     return
+  }
+
+  if (isFunction(_default)) {
+    return _default
   }
 
   return () => _default

@@ -18,33 +18,30 @@ module.exports = class Processor {
       }
 
       return Promise.resolve(this.processDefault())
-      .then(() => this.type
-               && this.processValidator(this.type.validate))
+      .then(() => this.processValidator(this.type.validate))
       .then(() => this.processValidator(this.rule.validate))
-      .then(() => this.type
-               && this.processSetter(this.type.set))
+      .then(() => this.processSetter(this.type.set))
       .then(() => this.processSetter(this.rule.set))
       .then(() => this.processDone())
     })
   }
 
   processWhen () {
-    if (!this.when) {
+    const when = this.rule.when || this.type.when
+    if (!when) {
       return true
     }
 
-    return this.when.apply(this.context, this.args)
+    return when.apply(this.context, this.args)
   }
 
   processDefault () {
-    // Default
-    //////////////////////////////////////////////////
     const isDefault = !(this.key in this.data)
     if (!isDefault) {
       return
     }
 
-    const _default = this.type && this.type.default || this.rule.default
+    const _default = this.type.default || this.rule.default
 
     if (!_default) {
       return
@@ -89,7 +86,9 @@ module.exports = class Processor {
 }
 
 function runValidate (validator) {
-  return validator.call(this.context, this.value, this.args)
+  return Promise.resolve(
+    validator.call(this.context, this.value, this.args)
+  )
   .then(pass => {
     if (!pass) {
       throw error('VALIDATE_FAILS', this.value, this.key)
@@ -108,12 +107,12 @@ function configure (config, name, type, rule) {
     return
   }
 
-  if (!type) {
-    return
-  }
-
   value = type[name]
   if (value !== undefined) {
     config[name] = value
+    return
   }
+
+  // default to true
+  config[name] = true
 }

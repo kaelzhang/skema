@@ -72,14 +72,14 @@ class Types {
 const isType = type => !!(type && type[IS_TYPE])
 const Type = class Type {
   constructor (definition) {
-    if (!definition) {
-      throw error('INVALID_TYPE')
-    }
-
     if (isType(definition)) {
       return definition
     }
     defineProperty(this, IS_TYPE, true)
+
+    if (!definition || Object.keys(definition).length === 0) {
+      return
+    }
 
     const {
       default: _default,

@@ -2,7 +2,7 @@ const {Errors} = require('err-object')
 const {E, error, i18n} = new Errors()
 
 E('ERR_NOT_A_NUMBER', {
-  message: 'not a number',
+  message: '"%s" is not a number',
   ctor: TypeError
 })
 
@@ -12,7 +12,7 @@ E('ERR_NOT_A_DATE', {
 })
 
 E('ERR_NOT_A_FUNCTION', {
-  message: 'not a function',
+  message: '"%s" is not a function',
   ctor: TypeError
 })
 

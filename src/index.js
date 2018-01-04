@@ -45,7 +45,7 @@ class Skema {
       this._rules[name] = Object.create(null))
 
     define.rule = new Type(rule)
-    define.type = type
+    define.type = type || new Type()
   }
 
   register (type, property) {
