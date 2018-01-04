@@ -4,7 +4,7 @@ const {series, waterfall} = require('promise.extra')
 const forEach = require('lodash.foreach')
 const {Types, Type} = require('./type')
 const {merge, reject, isFunction, isRegExp} = require('./util')
-const {i18n} = require('./error')
+const {error, i18n} = require('./error')
 
 class Skema {
   constructor ({
@@ -32,7 +32,7 @@ class Skema {
 
     const type = this._type.get(rule.type)
     if (!type) {
-      throw error(rule.type, name)
+      throw error('UNKNOWN_TYPE', rule.type, name)
     }
 
     return this._add(name, rule, type)

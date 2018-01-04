@@ -162,7 +162,7 @@ const RULES = {
   s: {
     d: 'unknown type',
     type: 'unknown-type',
-    initError: 'unknown type of "unknown-type" for "s".'
+    initError: 'unknown type of "unknown-type" for "s"'
   }
 }
 
