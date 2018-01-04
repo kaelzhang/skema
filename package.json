@@ -53,8 +53,7 @@
   },
   "dependencies": {
     "err-object": "^2.0.3",
-    "lodash.foreach": "^4.5.0",
     "make-array": "^1.0.1",
-    "promise.extra": "^1.2.0"
+    "promise.extra": "^2.0.2"
   }
 }

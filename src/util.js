@@ -1,36 +1,85 @@
-const {
-  isFunction,
-  isRegExp
-} = require('util')
-
 const make_array = require('make-array')
+const {error} = require('./error')
 
-function merge (a, b, mapper) {
-  const receiver = b
-    ? make_array(a).concat(b)
-    : make_array(a)
-
-  return receiver.map(mapper)
+function isFunction (subject) {
+  return typeof subject === 'function'
 }
 
-function reject (message, key, value) {
-  const error = message instanceof Error
-    ? message
-    : new Error(message)
-
-  error.key = key
-  error.value = value
-  return Promise.reject(error)
+function isRegExp (subject) {
+  return !!subject && typeof subject.test === 'function'
 }
 
 const symbol = typeof Symbol === 'function'
   ? Symbol.for
   : x => x
 
+function defineProperty (data, key, value, rules = {}) {
+  rules.value = value
+  Object.defineProperty(data, key, rules)
+}
+
+function simpleClone (object) {
+  return Object.assign(Object.create(null), object)
+}
+
+// See "schema design"
+function parseValidator (validator) {
+  if (isFunction(validator)) {
+    return validator
+  }
+
+  if (isRegExp(validator)) {
+    return v => validator.test(v)
+  }
+
+  throw error('INVALID_VALIDATOR')
+}
+
+function parseValidators (validators) {
+  if (!validators) {
+    return
+  }
+  return make_array(validators).map(parseValidator)
+}
+
+function parseSetters (setters) {
+  if (!setters) {
+    return
+  }
+
+  return make_array(setters).map(setter => {
+    if (isFunction(setter)) {
+      return setter
+    }
+
+    throw error('INVALID_SETTER')
+  })
+}
+
+function parseWhen (when) {
+  if (isFunction(when)) {
+    return
+  }
+
+  return () => !!when
+}
+
+function parseDefault (_default) {
+  if (_default === undefined) {
+    return
+  }
+
+  return () => _default
+}
+
 module.exports = {
-  merge,
-  reject,
   isFunction,
   isRegExp,
-  symbol
+  symbol,
+  defineProperty,
+  simpleClone,
+  parseValidators,
+  parseSetters,
+  parseWhen,
+  parseDefault
 }

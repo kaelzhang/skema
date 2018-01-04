@@ -1,5 +1,11 @@
-const JAVASCRIPT = require('./types/javascript')
-const {symbol} = require('./util')
+const {
+  symbol,
+  defineProperty,
+  parseValidators,
+  parseSetters,
+  parseWhen,
+  parseDefault
+} = require('./util')
 const {error} = require('./error')
 
 const IS_TYPES = symbol('skema:types')
@@ -11,10 +17,13 @@ class Types {
     if (isTypes(types)) {
       return types
     }
+    defineProperty(this, IS_TYPES, true)
 
-    this[IS_TYPES] = true
+    this._types = Object.create(null)
 
-    this._types = Object.assign(Object.create(null), JAVASCRIPT, types)
+    Object.keys(types).forEach(name => {
+      this.register(name, types[name])
+    })
   }
 
   get (type) {
@@ -29,8 +38,8 @@ class Types {
     return Types.get(type, this._types)
   }
 
-  register (type, property) {
-    this._types[type] = new Type(property)
+  register (name, type) {
+    this._types[name] = new Type(type)
   }
 
   // @param {String} type
@@ -46,12 +55,9 @@ class Types {
       }
     }
 
-    let key
-    let def
-
     // type.get(String)
-    for (key in types) {
-      def = types[key]
+    for (const key in types) {
+      const def = types[key]
 
       if (type === def.type) {
         return def
@@ -65,26 +71,35 @@ class Types {
 
 const isType = type => !!(type && type[IS_TYPE])
 const Type = class Type {
-  constructor (type) {
-    if (isType(type)) {
-      return type
-    }
-
-    this[IS_TYPE] = true
-
-    const {
-      default: _default = null,
-      set = null,
-      validate = null
-    } = type
-
-    if (!_default && !set && !validate) {
+  constructor (definition) {
+    if (!definition) {
       throw error('INVALID_TYPE')
     }
 
-    this.default = _default
-    this.set = set
-    this.validate = validate
+    if (isType(definition)) {
+      return definition
+    }
+    defineProperty(this, IS_TYPE, true)
+
+    const {
+      default: _default,
+      set,
+      validate,
+      when,
+      configurable,
+      enumerable,
+      writable,
+      type
+    } = definition
+
+    this.default = parseDefault(_default)
+    this.set = parseSetters(set)
+    this.validate = parseValidators(validate)
+    this.when = parseWhen(when)
+    this.configurable = configurable
+    this.enumerable = enumerable
+    this.writable = writable
+    this.type = type
   }
 }
 

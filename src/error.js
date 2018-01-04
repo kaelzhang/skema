@@ -11,8 +11,8 @@ E('ERR_NOT_A_DATE', {
   ctor: TypeError
 })
 
-E('INVALID_TYPE', {
-  message: 'a type must have either default, set, or validate',
+E('ERR_NOT_A_FUNCTION', {
+  message: 'not a function',
   ctor: TypeError
 })
 
@@ -22,13 +22,22 @@ E('UNKNOWN_TYPE', {
 })
 
 E('INVALID_SETTER', {
-  message: 'invalid setter for "%s"',
+  message: 'invalid setter, only functions are accepted',
   ctor: TypeError
 })
 
 E('INVALID_VALIDATOR', {
-  message: 'invalid validator for "%s", only functions and regular expressions are accepted',
+  message: 'invalid validator for "%s", only functions or regular expressions are accepted',
   ctor: TypeError
+})
+
+E('NOT_FUNCTION', {
+  message: '%s must be a function',
+  ctor: TypeError
+})
+
+E('VALIDATE_FAILS', {
+  message: 'invalid value "%s" for key "%s"'
 })
 
 module.exports = {error, i18n}

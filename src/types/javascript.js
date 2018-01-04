@@ -16,7 +16,7 @@ module.exports = {
       value = Number(value)
 
       if (value !== value) {
-        return Promise.reject(error('ERR_NOT_A_NUMBER'))
+        return Promise.reject(error('ERR_NOT_A_NUMBER', value))
       }
 
       return value
@@ -26,6 +26,15 @@ module.exports = {
   boolean: {
     type: Boolean,
     set: Boolean
+  },
+
+  function: {
+    type: Function,
+    validate (value) {
+      if (typeof value !== 'function') {
+        return Promise.reject(error('ERR_NOT_A_FUNCTION', value))
+      }
+    }
   },
 
   date: {
