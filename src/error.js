@@ -16,4 +16,19 @@ E('INVALID_TYPE', {
   ctor: TypeError
 })
 
+E('UNKNOWN_TYPE', {
+  message: 'unknown type of "%s" for "%s"',
+  ctor: RangeError
+})
+
+E('INVALID_SETTER', {
+  message: 'invalid setter for "%s"',
+  ctor: TypeError
+})
+
+E('INVALID_VALIDATOR', {
+  message: 'invalid validator for "%s", only functions and regular expressions are accepted',
+  ctor: TypeError
+})
+
 module.exports = {error, i18n}

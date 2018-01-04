@@ -32,7 +32,7 @@ class Skema {
 
     const type = this._type.get(rule.type)
     if (!type) {
-      throw new Error(`unknown type of "${rule.type}" for "${name}".`)
+      throw error(rule.type, name)
     }
 
     return this._add(name, rule, type)
@@ -68,7 +68,7 @@ class Skema {
 
     const setters = merge(type.set, rule.set, setter => {
       if (!isFunction(setter)) {
-        throw new Error(`invalid setter for "${name}".`)
+        throw error('INVALID_SETTER', name)
       }
 
       return setter
@@ -81,7 +81,7 @@ class Skema {
     const validators = merge(type.validate, rule.validate, validator => {
       validator = parse_validator(validator)
       if (!validator) {
-        throw new Error(`invalid validator for "name", only functions and regular expressions are accepted.`)
+        throw error('INVALID_VALIDATOR', name)
       }
 
       return validator
