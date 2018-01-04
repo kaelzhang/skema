@@ -2,7 +2,7 @@ module.exports = skema
 
 const {series, waterfall} = require('promise.extra')
 const forEach = require('lodash.foreach')
-const Type = require('./type')
+const {Types, Type} = require('./type')
 const {merge, reject, isFunction, isRegExp} = require('./util')
 const {i18n} = require('./error')
 
@@ -15,7 +15,7 @@ class Skema {
   }) {
 
     this._rules = {}
-    this._type = new Type(types)
+    this._type = new Types(types)
     this._clean = clean
     this._parallel = parallel
 
@@ -200,7 +200,8 @@ function skema (options) {
 }
 
 skema.Skema = Skema
-skema.Types = Type
+skema.Types = Types
+skema.Type = Type
 skema.i18n = i18n
 
 // See "schema design"

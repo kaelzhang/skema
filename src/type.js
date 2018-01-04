@@ -1,11 +1,14 @@
 const JAVASCRIPT = require('./types/javascript')
 const {symbol} = require('./util')
+const {error} = require('./error')
 
 const IS_TYPES = symbol('skema:types')
+const IS_TYPE = symbol('skema:type')
 
-module.exports = class Type {
+const isTypes = types => !!(types && types[IS_TYPES])
+class Types {
   constructor (types = {}) {
-    if (types[IS_TYPES]) {
+    if (isTypes(types)) {
       return types
     }
 
@@ -19,11 +22,15 @@ module.exports = class Type {
       return
     }
 
-    return Type.get(type, this._types)
+    if (isType(type)) {
+      return type
+    }
+
+    return Types.get(type, this._types)
   }
 
   register (type, property) {
-    this._types[type] = property
+    this._types[type] = new Type(property)
   }
 
   // @param {String} type
@@ -54,4 +61,36 @@ module.exports = class Type {
     // type not found
     return
   }
+}
+
+const isType = type => !!(type && type[IS_TYPE])
+const Type = class Type {
+  constructor (type) {
+    if (isType(type)) {
+      return type
+    }
+
+    this[IS_TYPE] = true
+
+    const {
+      default: _default = null,
+      set = null,
+      validate = null
+    } = type
+
+    if (!_default && !set && !validate) {
+      throw error('INVALID_TYPE')
+    }
+
+    this.default = _default
+    this.set = set
+    this.validate = validate
+  }
+}
+
+module.exports = {
+  isTypes,
+  Types,
+  isType,
+  Type
 }

@@ -11,4 +11,9 @@ E('ERR_NOT_A_DATE', {
   ctor: TypeError
 })
 
+E('INVALID_TYPE', {
+  message: 'a type must have either default, set, or validate',
+  ctor: TypeError
+})
+
 module.exports = {error, i18n}
