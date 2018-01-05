@@ -21,7 +21,7 @@
 
 - [Basic Usage](#usage)
 - [API References](#skemaoptions)
-- [Many Examples](#Examples)
+- [Many Examples](#examples)
 
 ## Usage
 
