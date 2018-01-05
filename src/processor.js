@@ -41,7 +41,7 @@ module.exports = class Processor {
       return
     }
 
-    const _default = this.type.default || this.rule.default
+    const _default = this.rule.default || this.type.default
 
     if (!_default) {
       return

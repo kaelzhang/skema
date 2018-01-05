@@ -17,6 +17,12 @@
 
 `skema` is the collection of common abstract methods for validatiors and setters. All validators and setters could be normal synchronous functions or es7 async funtions or functions which returns `Promise`'s
 
+## Table of Contents
+
+- [Basic Usage](#usage)
+- [API References](#skemaoptions)
+- [Many Examples](#Examples)
+
 ## Usage
 
 ```js
@@ -62,38 +68,42 @@ value.baz = 'i am evil'
 
 **options**
 
-- **rules** `{[key]: RuleProperty}=`
+- **rules** `?{[key]: TypeDefinition}`
   - key `String` the name to match the property of data
-- **types** `{[typeName]: TypeDefinition}=` optional
+- **types** `?{[typeName]: TypeDefinition}` optional
   - typeName `String` the name of the type
-- **clean** `Boolean=false` If `true`, only the properties that are defined in the `rules` will be validated and manipulated by `.parse()`, but the others will be purified and excluded from the result.
-- **parallel** `Boolean=true` If `true`, all rules will be checked and executed simultaneously, otherwise in the order or the `rules` object. Defaults to `true`
+- **clean** `?Boolean=false` If `true`, only the properties that are defined in the `rules` will be validated and manipulated by `.parse()`, but the others will be purified and excluded from the result.
+- **parallel** `?Boolean=true` If `true`, all rules will be checked and executed simultaneously, otherwise in the order or the `rules` object. Defaults to `true`
 
-Creates the skema instance.
+Creates the `Skema` instance.
 
 ### .parse(data, ...args)
 
 Validates and applies setters. Returns a `Promise`
 
-### .register(typeName, typeDefinition)
+`skema` never modifies the original `data`.
+
+### .type(typeName, typeDefinition)
 
 Registers a new type, and returns `this`. This method should be called before `.parse()`
 
 Returns `this`
 
-### .add(key, ruleProperty)
+### .rule(key, typeDefinition)
 
 Adds a new rule, and returns `this`. This method should be called before `.parse()`
 
 Returns `this`
 
-## Struct `TypeDefinition`
+## Struct
 
-- **type** `(name|RuleProperty::type)=` optional. If a type definition has a `type` property, a rule can match a type by Constructor. And there are several built-in types:
-  - string: both `'string'` and `String` are ok.
-  - number: `'number'` and `Number`, if the given value is not a number, an error will be rejected
-  - boolean: `'boolean'` and `Boolean`
-  - date: `'date'` and `Date`, if the given value is not a date, an error will be rejected.
+### Struct `AsyncOrSyncFunc()`
+
+`skema` supports both async functions and sync functions in almost every circumstances either for validators, setters or others.
+
+### Struct `TypeDefinition`
+
+- **type** `?(string|Object)` optional. If a type definition has a `type` property, a rule can match a type by Constructor.
 
 ```js
 const path = require('path')
@@ -106,37 +116,54 @@ skema({
   },
   rules: {
     // Both a and b can match type 'path'
-    a: {type: 'path'},
-    b: {type: path}
+    a: {type: 'path'}, // match the type by name `'path'`
+    b: {type: path}    // match the type by the object `path`
   }
 })
 ```
 
-- **default** `function()|Any` Default value to use if key is not included in the `data`, or a function that returns the default value or a Promise.
-- **validate** `Array.<Validator>|Validator` A `Validator` could be a `function(v, ...args)` which accepts the given value of the key, and the "spreaded" `args` of the `.parse(data, ...args)`, or a regular expression to test the value.
+- **when** `?(AsyncOrSyncFunc()|false|any)` To indicate that whether we should process the value.
+  - If the value or return value is `false` or `Promise<false>`, then skip;
+  - Otherwise, not skip.
+- **default** `?(AsyncOrSyncFunc()|Any)` The default value to be used If the `key` is not included in the `data`. It could either be a function that returns the default value or a Promise, or just a value. If you need the default value to be a function, `default` should be a function that returns a function.
+- **validate** `?(Array.<Validator>|Validator)` A `Validator` could be:
+  - a `AsyncOrSyncFunc(v, ...args)` which accepts the given value of the key, and the "spreaded" `args` of the `.parse(data, ...args)`
+  - or a regular expression to test the value.
+- **set** `?(Array.<Setter>|Setter)` A `Setter` is a `AsyncOrSyncFunc()` which receives the value and extra args and returns the altered value or a `Promise`. If there are more than one setters, the previous value has been returned will be passed into the next setter.
 - **enumerable** `Boolean=true` defaults to `true`
 - **configurable** `Boolean=true` defaults to `true`
 - **writable** `Boolean=true` defaults to `true`
+
+## Flow
+
+For a given object `data`, and `key`:
+
+1. `when`: First check if we need to process `key`, if skipped then the value will be maintained and untouched
+2. `default`: If `key` is not found in `data` and `default` supplied, then assign the default value to `tmpData[key]`. The default value in its rule will override the default definition in its type.
+3. `validate`: First we will use the validators from type, then from rule, one by one.
+4. `set`: setters from type, then from rule, and change `tmpData[key]`
+5. According to `enumerable`, `configurable` and `writable`, create the `finalData`
+6. END.
+
+## Examples
+
+### An example about `validate`
 
 ```js
 const types = {
   username: {
     validate: (username, check_unique) => {
-      if (!username) {
-        // Validation fails.
-        return false
-      }
-
+      if (!username) return false
       if (username.length < 5) {
         // Returns a Promise.reject to define a detail error.
-        return Promise.reject('username should contain more than 4 chars.')
+        return Promise.reject(
+          'username should contain more than 4 chars.')
       }
 
       return check_unique
         ? remote_check_unique_promise(username)
         : true
     },
-
     set: name => `Mr/Mrs ${name}`
   }
 }
@@ -153,65 +180,88 @@ const result = await skema({rules, types})
 result // {name: 'Mr/Mrs John'}
 ```
 
-- **set** `Array.<Setter>|Setter` A `Setter` receives the value and extra args and returns the altered value or a `Promise`. If there are more than one setter, the previous value has been returned will be passed into the next setter.
-
-## Struct `RuleProperty`
-
-- **type** `String|Object` type to match the `TypeDefinition`. See examples above.
-- **default** `function()|other` default of RuleProperty will **override** the matched `TypeDefinition`'s `default`.
-- **validate** Same as `TypeDefinition::validate`, the validators of `TypeDefinition` will be checked first, then validators of `RuleProperty`.
-- **set** Same as `TypeDefinition::set` the setters of `TypeDefinition` will be run first.
+### The Sequences of Validators and Setters.
 
 ```js
 const types = {
   a: {
     default: 10,
-    validate: v => v > 1 ? true : Promise.reject('<= 1'),   // validator1
+    // validator1
+    validate: v => v > 1 ? true : Promise.reject('<= 1'),
     set: v => v + 'a'
   }
 }
-
 const rules = {
   foo: {
     type: 'a',
-    validate: v => v > 5 ? true : Promise.reject('<= 5'),   // validator2
+    // validator2
+    validate: v => v > 5 ? true : Promise.reject('<= 5'),
     set: v => v + 'b'
   }
 }
-
 const s = skema({types, rules})
-
-s.parse({}).then(value => {
-  console.log(value)   // '10ab'
-})
+await s.parse({}) // {foo:'10ab'}
 
 s.parse({foo: 3}).catch(error => {
-  console.log(error.message)   // '<= 1', validator1 runs first
+  console.log(error.message) // '<= 1', validator1 runs first
 })
 
 s.parse({foo: 5}).catch(error => {
-  console.log(error.message)   // '<= 5'
+  console.log(error.message) // '<= 5'
 })
 ```
 
-- **when** `function()=` If the result is not `true`, then the current key will be skipped.
+### Use `when` to skip processing for a certain value.
 
 ```js
 const rules = {
   foo: {
     when () {
-      return false
-    }
-
-    // The validation of foo will always be skipped.
-    validate () {
-      return false
-    }
+      return this.bar < 10
+    },
+    // If not skipped, foo always fails
+    validate: () => false
   }
 }
+await skema({rules}).parse({foo: 1, bar: 1})
+// {foo: 1, bar: 1}, skipped
 
-skema({rules}).parse({foo: 1})
-// {foo: 1}
+await skema({rules}).parse({foo: 1, bar: 10})  // Error thrown
+```
+
+### Restrain object properties by using `options.clean`
+
+```js
+const rules = {
+  // We can simply use an empty TypeDefinition to
+  // prevent the value to be purified out
+  foo: {},
+  bar: {default: 1}
+}
+const data = {foo: 1, baz: 2}
+// The properties that not defined in the rules will be removed.
+await skema({rules, clean: true}).parse(data)
+// {foo: 1, bar: 1}, baz is purified away
+console.log(data) // {foo: 1, baz: 2}, `data` remains unchanged.
+```
+
+### skema.JS_TYPES
+
+The built-in types:
+
+- string: both `'string'` and `String` are ok.
+- number: `'number'` and `Number`, if the given value is not a number, an error will be rejected
+- boolean: `'boolean'` and `Boolean`
+- date: `'date'` and `Date`, if the given value is not a date, an error will be rejected.
+
+```js
+const rules = {
+  foo: {type: Number}
+}
+await skema({
+  rules,
+  types: skema.JS_TYPES
+}).parse({foo: 'a'})  // Not a number, error thrown
 ```
 
 ## Access to the given value from helper functions

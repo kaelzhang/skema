@@ -23,11 +23,11 @@ class Skema {
     this._parallel = parallel
 
     Object.keys(rules).forEach(name => {
-      this.add(name, rules[name])
+      this.rule(name, rules[name])
     })
   }
 
-  add (name, rule) {
+  rule (name, rule) {
     if (!('type' in rule)) {
       return this._add(name, rule)
     }
@@ -37,7 +37,8 @@ class Skema {
       throw error('UNKNOWN_TYPE', rule.type, name)
     }
 
-    return this._add(name, rule, type)
+    this._add(name, rule, type)
+    return this
   }
 
   _add (name, rule, type) {
@@ -48,7 +49,7 @@ class Skema {
     define.type = type || new Type()
   }
 
-  register (type, property) {
+  type (type, property) {
     this._type.register(type, property)
     return this
   }
