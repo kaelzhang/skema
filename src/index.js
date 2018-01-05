@@ -15,9 +15,10 @@ class Skema {
     types,
     clean = false,
     parallel = true
-  }) {
+  } = {}) {
 
     this._rules = Object.create(null)
+    // Handles types first, or there will be 'UNKNOWN_TYPE' errors
     this._type = new Types(types)
     this._clean = clean
     this._parallel = parallel

@@ -6,7 +6,9 @@ module.exports = {
     type: String,
     set (value) {
       // Everything could convert to a string, so no checking
-      return String(value) || ''
+      return value === undefined
+        ? ''
+        : String(value) || ''
     }
   },
 
@@ -26,15 +28,6 @@ module.exports = {
   boolean: {
     type: Boolean,
     set: Boolean
-  },
-
-  function: {
-    type: Function,
-    validate (value) {
-      if (typeof value !== 'function') {
-        return Promise.reject(error('ERR_NOT_A_FUNCTION', value))
-      }
-    }
   },
 
   date: {

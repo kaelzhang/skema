@@ -11,6 +11,7 @@ function isRegExp (subject) {
 
 const symbol = typeof Symbol === 'function'
   ? Symbol.for
+  /* istanbul ignore next */
   : x => x
 
 function defineProperty (data, key, value, rules = {}) {

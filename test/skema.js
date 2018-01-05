@@ -19,6 +19,11 @@ const RULES = {
     d: 'default value'
   },
 
+  a1: {
+    output: undefined,
+    d: 'undefined and no default'
+  },
+
   b: {
     default: () => {
       return 1
@@ -58,6 +63,13 @@ const RULES = {
       return v > 1
     },
     d: 'validate fail'
+  },
+
+  f2: {
+    input: 1,
+    error: 'invalid value "1" for key "f2"',
+    validate: /\d{2}/,
+    d: 'validate(regexp) fail'
   },
 
   g: {
@@ -132,6 +144,13 @@ const RULES = {
     d: '"string" type'
   },
 
+  n2: {
+    input: undefined,
+    type: String,
+    output: '',
+    d: 'undefined string type'
+  },
+
   o: {
     input: 1,
     type: String,
@@ -151,6 +170,20 @@ const RULES = {
     type: Number,
     output: 1,
     d: 'Number type'
+  },
+
+  q2: {
+    input: '2018-01-01',
+    type: Date,
+    output: new Date('2018-01-01'),
+    d: 'Date type'
+  },
+
+  q3: {
+    input: '2018-01xxx01',
+    type: Date,
+    error: '"2018-01xxx01" is not a valid date',
+    d: 'invalid Date'
   },
 
   r: {
@@ -230,6 +263,8 @@ Object.keys(RULES).forEach((key) => {
           t.fail()
           return
         }
+
+        t.is(isCleanObject(value), true, 'object is not clean')
 
         const v = value[rule.key || key]
 
@@ -544,3 +579,121 @@ test('when', t => {
     t.deepEqual(result, {a: 1, x: 0})
   })
 })
+
+test('literal when', async t => {
+  const result = await skema({
+    rules: {
+      foo: {
+        when: false,
+        validate: () => false
+      }
+    }
+  }).parse({foo: 1})
+
+  t.is(result.foo, 1)
+})
+
+test('.type()', async t => {
+  const result = await skema()
+  .type('number', {
+    set (v) {
+      return Number(v) || 0
+    }
+  })
+  .rule('foo', {
+    type: 'number'
+  })
+  .parse({foo: '100'})
+
+  t.is(result.foo, 100)
+})
+
+test('.type() with Type', async t => {
+  const result = await skema()
+  .type('number', new skema.Type({
+    set (v) {
+      return Number(v) || 0
+    }
+  }))
+  .rule('foo', {
+    type: 'number'
+  })
+  .parse({foo: '100'})
+
+  t.is(result.foo, 100)
+})
+
+test('.type() with Types', async t => {
+  const types = new skema.Types({
+    number: {
+      set (v) {
+        return Number(v) || 0
+      }
+    }
+  })
+  const result = await skema({types})
+  .rule('foo', {
+    type: 'number'
+  })
+  .parse({foo: '100'})
+
+  t.is(result.foo, 100)
+})
+
+test('invalid setter', async t => {
+  try {
+    skema({rules: {
+      foo: {set: 1}
+    }})
+  } catch (e) {
+    t.is(e.code, 'INVALID_SETTER')
+    return
+  }
+
+  t.fail('should throw')
+})
+
+test('invalid validator', async t => {
+  try {
+    skema({rules: {
+      foo: {validate: 1}
+    }})
+  } catch (e) {
+    t.is(e.code, 'INVALID_VALIDATOR')
+    return
+  }
+
+  t.fail('should throw')
+})
+
+test('property priority', async t => {
+  const result = await skema({
+    rules: {
+      foo: {
+        type: 'a',
+        enumerable: true
+      },
+      bar: {
+        type: 'a'
+      }
+    },
+    types: {
+      a: {
+        enumerable: false
+      }
+    }
+  }).parse({foo: 1, bar: 2})
+
+  t.is(result.foo, 1, 'foo')
+  t.is(result.bar, 2, 'bar')
+  t.is(isEnumerable(result, 'foo'), true)
+  t.is(isEnumerable(result, 'bar'), false)
+})
+
+function isEnumerable (obj, key) {
+  return Object.prototype.propertyIsEnumerable.call(obj, key)
+}
+
+function isCleanObject (obj) {
+  return obj.toString === undefined
+}

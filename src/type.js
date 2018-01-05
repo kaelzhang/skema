@@ -27,14 +27,6 @@ class Types {
   }
 
   get (type) {
-    if (!type) {
-      return
-    }
-
-    if (isType(type)) {
-      return type
-    }
-
     return Types.get(type, this._types)
   }
 
