@@ -23,10 +23,43 @@
 - [API References](#skemaoptions)
 - [Many Examples](#examples)
 
-## Usage
+## Basic Usage
 
 ```js
 import skema from 'skema'
+
+const Profile = skema({
+  name: String,
+  birth: Date
+})
+
+const User = skema({
+  id: {
+    type: Number,
+    enumerable: false
+  },
+  profile: Profile
+})
+
+const user = await User.from({
+  id: "1",
+  profile: {
+    name: 'Steve',
+    birth: '2017-01-01'
+  }
+})
+
+user.id // 1
+user.profile.name // Steve
+user.profile.birth // Date('2017-01-01')
+JSON.stringify(user, null, 2)
+// {
+//   "profile": {
+//     "name": "Steve",
+//     "birth": "2017-01-01T00:00:00.000Z"
+//   }
+// }
+// `user.id` is not enumerable
 
 const rules = {
   foo: {
