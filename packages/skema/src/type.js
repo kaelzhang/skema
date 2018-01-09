@@ -48,6 +48,8 @@ export class TypeIterable extends Type {
   }
 }
 
+export const TYPE_METHODS = []
+
 export class TypeDefinition {
   constructor (definition) {
     // Empty TypeDefinition is allowed

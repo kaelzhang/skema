@@ -1,30 +1,25 @@
-const make_array = require('make-array')
-const {error} = require('./error')
+import make_array from 'make-array'
+import {error} from './error'
 
-function isFunction (subject) {
+export function isFunction (subject) {
   return typeof subject === 'function'
 }
 
-function isRegExp (subject) {
+export function isRegExp (subject) {
   return !!subject && typeof subject.test === 'function'
 }
 
-const symbol = typeof Symbol === 'function'
-  ? Symbol.for
-  /* istanbul ignore next */
-  : x => x
-
-function defineProperty (data, key, value, rules = {}) {
+export function defineProperty (data, key, value, rules = {}) {
   rules.value = value
   Object.defineProperty(data, key, rules)
 }
 
-function simpleClone (object) {
+export function simpleClone (object) {
   return Object.assign(Object.create(null), object)
 }
 
 // See "schema design"
-function parseValidator (validator) {
+export function parseValidator (validator) {
   if (isFunction(validator)) {
     return validator
   }
@@ -36,14 +31,14 @@ function parseValidator (validator) {
   throw error('INVALID_VALIDATOR')
 }
 
-function parseValidators (validators) {
+export function parseValidators (validators) {
   if (!validators) {
     return
   }
   return make_array(validators).map(parseValidator)
 }
 
-function parseSetters (setters) {
+export function parseSetters (setters) {
   if (!setters) {
     return
   }
@@ -57,7 +52,7 @@ function parseSetters (setters) {
   })
 }
 
-function parseWhen (when) {
+export function parseWhen (when) {
   if (isFunction(when)) {
     return when
   }
@@ -69,7 +64,7 @@ function parseWhen (when) {
   // Then true
 }
 
-function parseDefault (_default) {
+export function parseDefault (_default) {
   if (_default === undefined) {
     return
   }
@@ -79,16 +74,4 @@ function parseDefault (_default) {
   }
 
   return () => _default
-}
-
-module.exports = {
-  isFunction,
-  isRegExp,
-  symbol,
-  defineProperty,
-  simpleClone,
-  parseValidators,
-  parseSetters,
-  parseWhen,
-  parseDefault
 }
