@@ -1,5 +1,6 @@
 # babel dist
 /lib
+/packages/*/lib
 
 # Numerous always-ignore extensions
 *.bak

@@ -1,13 +1,17 @@
 const {series, waterfall} = require('promise.extra')
+const FakePromise = require('promise-faker')
 const {error} = require('./error')
 const {
   defineProperty
 } = require('./util')
 
 module.exports = class Processor {
-  constructor (options) {
+  constructor (options, async) {
     Object.assign(this, options)
     this.value = this.data[this.key]
+    this._promise = async
+      ? Promise
+      : FakePromise
   }
 
   process () {

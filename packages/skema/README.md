@@ -15,7 +15,11 @@
 
 # skema
 
-`skema` is the collection of common abstract methods for validatiors and setters. All validators and setters could be normal synchronous functions or es7 async funtions or functions which returns `Promise`'s
+`skema` provides a handy and composable way to validate and transform JavaScript objects:
+
+- **Fully customizable error objects.**
+- **Supports both async and sync flows.** Skema has two working modes
+- **Pluggable basic types and custom types.**
 
 ## Table of Contents
 
@@ -41,7 +45,7 @@ const User = skema({
   profile: Profile
 })
 
-const user = await User.from({
+const user = User.from({
   id: "1",
   profile: {
     name: 'Steve',
@@ -59,7 +63,9 @@ JSON.stringify(user, null, 2)
 //     "birth": "2017-01-01T00:00:00.000Z"
 //   }
 // }
-// `user.id` is not enumerable
+// Notice that `user.id` is not enumerable
+```
+
 
 const rules = {
   foo: {
@@ -94,7 +100,7 @@ console.log(parsed.baz)
 // 'i am innocent', the script tag has been stripped
 
 // It will throw because not writable
-value.baz = 'i am evil'   
+value.baz = 'i am evil'
 ```
 
 ## skema(options)
