@@ -5,7 +5,7 @@ const {
   defineProperty
 } = require('./util')
 
-module.exports = class Processor {
+export class AbstractProcessor {
   constructor (options, async) {
     Object.assign(this, options)
     this.value = this.data[this.key]

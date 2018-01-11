@@ -1,3 +1,7 @@
+export {skema} from './skema-factory'
+export * from './compose'
+
+
 module.exports = skema
 
 const {series} = require('promise.extra')

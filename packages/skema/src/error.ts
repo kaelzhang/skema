@@ -1,4 +1,4 @@
-const {Errors} = require('err-object')
+import {Errors} from 'err-object'
 const {E, error, i18n} = new Errors()
 
 E('ERR_NOT_A_NUMBER', {

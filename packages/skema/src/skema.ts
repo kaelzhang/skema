@@ -1,5 +1,27 @@
-class Skema {
+export class Skema {
   constructor () {
+
+  }
+
+  isOptional (): Boolean {
+
+  }
+
+  // Creates a new Skema based on the current one, but the new one is optional
+  optional (): Skema {
+
+  }
+
+  isRequired (): Boolean {
+
+  }
+
+  // Creates a new Skema based on the current one, but the new one is required
+  required (): Skema {
+
+  }
+
+  from (raw, args, context) {
 
   }
 
@@ -27,11 +49,19 @@ class Skema {
 
   }
 
-  hasSetters () {
+  hasSetters (): boolean {
 
   }
 
   set (value, args, context) {
+
+  }
+
+  iterable () {
+
+  }
+
+  [Symbol.iterator] () {
 
   }
 }

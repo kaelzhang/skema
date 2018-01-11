@@ -1,6 +1,7 @@
 # babel dist
 /lib
 /packages/*/lib
+/packages/skema/src/*.js
 
 # Numerous always-ignore extensions
 *.bak
