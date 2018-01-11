@@ -1,5 +1,8 @@
 import make_array from 'make-array'
 import {error} from './error'
+import instanceOf from 'graceful-instanceof'
+
+export const typeSkema = instanceOf('skema')
 
 export function isFunction (subject) {
   return typeof subject === 'function'

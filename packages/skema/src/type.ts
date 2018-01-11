@@ -3,25 +3,15 @@ const {
   parseValidators,
   parseSetters,
   parseWhen,
-  parseDefault
+  parseDefault,
+  typeSkema
 } = require('./util')
-
-import {
-  iterator,
-  mustSupportsSymbol
-} from './future'
-
-import {
-  IS_TYPE
-} from './constants'
 
 const {error} = require('./error')
 
-const isType = type => !!(type && type[IS_TYPE])
-
 export class Type {
   constructor (definition) {
-    if (isType(definition)) {
+    if (typeSkema.is(definition)) {
       return definition
     }
 
