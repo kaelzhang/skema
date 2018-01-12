@@ -1,20 +1,12 @@
-const {series, waterfall} = require('promise.extra')
-const FakePromise = require('promise-faker')
-const {error} = require('./error')
-const {
-  defineProperty
-} = require('./util')
+// Processor to run the flow async or sync
+///////////////////////////////////////////////////////////
+import {Options} from './options'
 
 export class AbstractProcessor {
   constructor (options, async) {
-    Object.assign(this, options)
-    this.value = this.data[this.key]
-    this._promise = async
-      ? Promise
-      : FakePromise
   }
 
-  process () {
+  from () {
     return Promise.resolve(this.processWhen())
     .then(hit => {
       if (!hit) {

@@ -24,5 +24,3 @@ import {arrayOf} from 'skema'
 
 const UserList2 = arrayOf(User)
 // The same effect as `UserList`
-
-import 

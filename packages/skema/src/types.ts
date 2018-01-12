@@ -1,3 +1,5 @@
+// Default Basic Types
+///////////////////////////////////////////////////////////
 const isTypes = types => !!(types && types[IS_TYPES])
 class Types {
   constructor (types = {}) {

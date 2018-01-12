@@ -1,6 +1,24 @@
-export class Skema {
-  constructor () {
+// Skema Base
+///////////////////////////////////////////////////////////
+import {AbstractProcessor} from './processor'
+import {IExpandedTypeDefinition} from './interfaces'
+import {TypeDefinition} from './type'
 
+export class Skema implements ISkema {
+  constructor ({
+    type,
+    when,
+    default: _default
+    validate,
+    set,
+    enumerable,
+    configurable,
+    writable,
+  }: IPExpandedTypeDefinition) {
+    this._type = type
+    this._when = when
+    this._default = _default
+    this._validate = validate
   }
 
   isOptional (): Boolean {
@@ -58,10 +76,6 @@ export class Skema {
   }
 
   iterable () {
-
-  }
-
-  [Symbol.iterator] () {
 
   }
 }

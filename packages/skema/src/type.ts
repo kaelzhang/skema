@@ -1,47 +1,9 @@
-const {
-  defineProperty,
-  parseValidators,
-  parseSetters,
-  parseWhen,
-  parseDefault,
-  typeSkema
-} = require('./util')
+// Type Definition
+///////////////////////////////////////////////////////////
+import {IExpandedTypeDefinition} from './interfaces'
 
-const {error} = require('./error')
-
-export class Type {
-  constructor (definition) {
-    if (typeSkema.is(definition)) {
-      return definition
-    }
-
-    this._def = new TypeDefinition(definition)
-  }
-
-  //
-  [iterator] () {
-    mustSupportsSymbol()
-
-    throw 'not iterable'
-  }
-
-  optional () {
-    this._def.default =
-  }
-}
-
-export class TypeIterable extends Type {
-  [iterator] () {
-    mustSupportsSymbol()
-
-
-  }
-}
-
-export const TYPE_METHODS = []
-
-export class TypeDefinition {
-  constructor (definition) {
+export class TypeDefinition implements IExpandedTypeDefinition {
+  constructor (definition: object) {
     // Empty TypeDefinition is allowed
     if (!definition || Object.keys(definition).length === 0) {
       return
@@ -55,6 +17,8 @@ export class TypeDefinition {
       configurable,
       enumerable,
       writable,
+      optional,
+      required,
       type
     } = definition
 
@@ -65,6 +29,8 @@ export class TypeDefinition {
     this.configurable = configurable
     this.enumerable = enumerable
     this.writable = writable
+    this.optional = optional
+    this.required = required
     this.type = type
   }
 }

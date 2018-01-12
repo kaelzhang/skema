@@ -36,6 +36,8 @@ const User = s({
       if (!~GENDERS.indexOf(gender)) {
         throw new Error(`invalid gender ${gender}`)
       }
+
+      return gender
     }
   }
 })

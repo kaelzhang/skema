@@ -39,4 +39,4 @@ const bar = D.from({
   },
   d: 'a'
 })
-//
+// Will throw, because 
