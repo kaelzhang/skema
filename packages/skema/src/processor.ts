@@ -7,19 +7,7 @@ export class AbstractProcessor {
   }
 
   from () {
-    return Promise.resolve(this.processWhen())
-    .then(hit => {
-      if (!hit) {
-        return
-      }
-
-      return Promise.resolve(this.processDefault())
-      .then(() => this.processValidator(this.type.validate))
-      .then(() => this.processValidator(this.rule.validate))
-      .then(() => this.processSetter(this.type.set))
-      .then(() => this.processSetter(this.rule.set))
-      .then(() => this.processDone())
-    })
+    
   }
 
   processWhen () {

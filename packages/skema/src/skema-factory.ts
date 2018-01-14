@@ -1,12 +1,8 @@
 // The Factory of Skema according to user preset
 ///////////////////////////////////////////////////////////
-import {Skema, ITypeDefinition} from './skema'
-import {IAsyncOrSyncFunc} from './interfaces'
+import {Skema} from './skema'
+import {IAsyncOrSyncFunc, IPTypeDefinition, IObjectSkema} from './interfaces'
 import {Options} from './options'
-
-interface IObjectSkema {
-  [propName: string]: ITypeDefinition
-}
 
 const METHODS = [
   'shape',
@@ -30,7 +26,12 @@ class SkemaFactory {
   }
 
   // The one that has everything inside
-  skema () {
+  skema (): Skema {
+
+  }
+
+  // Create a single rule
+  formula (definition: IPTypeDefinition): Skema {
 
   }
 
@@ -39,23 +40,29 @@ class SkemaFactory {
 
   }
 
-  // Enum
-  oneOf (array: any[]): Skema {
+  array (array: IPTypeDefinition[]): Skema {
 
   }
 
+  // Enum
+  oneOf (array: any[]): Skema {
+    return this.skema({
+
+    })
+  }
+
   // An array of a certain type
-  arrayOf (type: ITypeDefinition): Skema {
+  arrayOf (type: IPTypeDefinition): Skema {
 
   }
 
   // One of many types
-  oneOfType (array: ITypeDefinition[]): Skema {
+  oneOfType (array: IPTypeDefinition[]): Skema {
 
   }
 
   // An object with property values of a certain type
-  objectOf (type: ITypeDefinition[]): Skema {
+  objectOf (type: IPTypeDefinition[]): Skema {
 
   }
 
@@ -69,7 +76,6 @@ class SkemaFactory {
   // - shape
   // - oneOf
   // - oneOfType
-  // - objectOf
   compose (...types: ITypeDefinition[]): Skema {
 
   }

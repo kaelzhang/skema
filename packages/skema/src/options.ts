@@ -1,15 +1,22 @@
 import FakePromise from 'promise-faker'
-import {Skema} from './interfaces'
+import promiseExtra from 'promise.extra'
 
 export class Options {
   promise: Function
+  promiseExtra: object
+  types: object
 
   constructor ({
-    async: _async = false
+    async: _async = false,
+    types
   }) {
 
     this.promise = _async
       ? Promise
       : FakePromise
+
+    this.promiseExtra = _async
+      ? promiseExtra
+      : factory(FakePromise)
   }
 }

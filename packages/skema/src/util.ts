@@ -1,28 +1,40 @@
 import make_array from 'make-array'
 import {error} from './error'
-import instanceOf from 'graceful-instanceof'
+import symbol from 'symbol-for'
+import {
+  IAsyncOrSyncFunc,
+  IPWhen, IWhen,
+  IPDefault, IDefault,
+  IPValidator, IValidators, IPSingleValidator
+  IPSetter, ISetters
+} from ''
 
-export const typeSkema = instanceOf('skema')
+export const TYPE_SKEMA = symbol.for('skema')
+export function isSkema (subject: any): boolean {
+  return !!subject && subject[TYPE_SKEMA] === true
+}
 
-export function isFunction (subject) {
+export function isFunction (subject: any): boolean {
   return typeof subject === 'function'
 }
 
-export function isRegExp (subject) {
+export function isRegExp (subject: any): boolean {
   return !!subject && typeof subject.test === 'function'
 }
 
-export function defineProperty (data, key, value, rules = {}) {
+export function defineProperty (data, key, value, rules = {}): void {
   rules.value = value
   Object.defineProperty(data, key, rules)
 }
 
-export function simpleClone (object) {
+export function simpleClone (object: object): object {
   return Object.assign(Object.create(null), object)
 }
 
 // See "schema design"
-export function parseValidator (validator) {
+export function parseValidator (
+  validator: IPSingleValidator
+): IAsyncOrSyncFunc {
   if (isFunction(validator)) {
     return validator
   }
@@ -34,14 +46,14 @@ export function parseValidator (validator) {
   throw error('INVALID_VALIDATOR')
 }
 
-export function parseValidators (validators) {
+export function parseValidators (validators: IPValidator): IValidators {
   if (!validators) {
     return
   }
   return make_array(validators).map(parseValidator)
 }
 
-export function parseSetters (setters) {
+export function parseSetters (setters: IPSetter): ISetters {
   if (!setters) {
     return
   }
@@ -55,7 +67,7 @@ export function parseSetters (setters) {
   })
 }
 
-export function parseWhen (when) {
+export function parseWhen (when: IPWhen): IWhen {
   if (isFunction(when)) {
     return when
   }
@@ -67,7 +79,7 @@ export function parseWhen (when) {
   // Then true
 }
 
-export function parseDefault (_default) {
+export function parseDefault (_default: IPDefault): IDefault {
   if (_default === undefined) {
     return
   }

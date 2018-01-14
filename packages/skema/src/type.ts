@@ -1,8 +1,8 @@
 // Type Definition
 ///////////////////////////////////////////////////////////
-import {IExpandedTypeDefinition} from './interfaces'
+import {ITypeDefinition} from './interfaces'
 
-export class TypeDefinition implements IExpandedTypeDefinition {
+export class TypeDefinition implements ITypeDefinition {
   constructor (definition: object) {
     // Empty TypeDefinition is allowed
     if (!definition || Object.keys(definition).length === 0) {
