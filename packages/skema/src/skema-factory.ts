@@ -3,6 +3,7 @@
 import {Skema} from './skema'
 import {IAsyncOrSyncFunc, IPTypeDefinition, IObjectSkema} from './interfaces'
 import {Options} from './options'
+import {isArray, isObject} from './util'
 
 const METHODS = [
   'shape',
@@ -26,8 +27,19 @@ class SkemaFactory {
   }
 
   // The one that has everything inside
-  skema (): Skema {
+  skema (subject: any): Skema {
+    if (isArray(subject)) {
+      if (subject.length === 0) {
+        throw 'empty array'
+      }
+      return this.arrayOf(subject[0])
+    }
 
+    if (isObject(subject)) {
+      return this.shape(subject)
+    }
+
+    throw 'invalid argument'
   }
 
   // Create a single rule
@@ -40,29 +52,13 @@ class SkemaFactory {
 
   }
 
-  array (array: IPTypeDefinition[]): Skema {
+  // An object with property values of a certain type
+  objectOf (type: IPTypeDefinition[]): Skema {
 
-  }
-
-  // Enum
-  oneOf (array: any[]): Skema {
-    return this.skema({
-
-    })
   }
 
   // An array of a certain type
   arrayOf (type: IPTypeDefinition): Skema {
-
-  }
-
-  // One of many types
-  oneOfType (array: IPTypeDefinition[]): Skema {
-
-  }
-
-  // An object with property values of a certain type
-  objectOf (type: IPTypeDefinition[]): Skema {
 
   }
 
@@ -74,8 +70,6 @@ class SkemaFactory {
   // Compose several types which are all composable and within the same type.
   // The following types are composable:
   // - shape
-  // - oneOf
-  // - oneOfType
   compose (...types: ITypeDefinition[]): Skema {
 
   }

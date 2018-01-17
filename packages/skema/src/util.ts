@@ -22,6 +22,12 @@ export function isRegExp (subject: any): boolean {
   return !!subject && typeof subject.test === 'function'
 }
 
+export function isObject (subject: any): boolean {
+  return subject && Object(subject) === subject
+}
+
+export const isArray = Array.isArray
+
 export function defineProperty (data, key, value, rules = {}): void {
   rules.value = value
   Object.defineProperty(data, key, rules)
@@ -90,3 +96,5 @@ export function parseDefault (_default: IPDefault): IDefault {
 
   return () => _default
 }
+
+export const UNDEFINED = undefined

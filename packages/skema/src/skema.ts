@@ -3,9 +3,9 @@
 // import {AbstractProcessor} from './processor'
 import {IPExpandedTypeDefinition} from './interfaces'
 import {Options} from './options'
-import {TYPE_SKEMA} from './util'
+import {TYPE_SKEMA, UNDEFINED} from './util'
 
-const UNDEFINED = undefined
+type GetterOrFactory = Skema | boolean
 
 export class Skema implements ISkema {
   [TYPE_SKEMA]: boolean
@@ -25,15 +25,48 @@ export class Skema implements ISkema {
       _optional: true
     })
   }
-
-  isRequired (): Boolean {
-    return this._required === true
-  }
-
   // Creates a new Skema based on the current one, but the new one is required
   required (): Skema {
     return this._derive({
-      _required: true
+      _optional: false,
+      _default: UNDEFINED
+    })
+  }
+
+  _getConfig (key) {
+    const value = this['_' + key]
+    return value !== UNDEFINED
+      ? value
+      : this._type[key]()
+  }
+
+  enumerable (value?: boolean): GetterOrFactory {
+    if (value === UNDEFINED) {
+      return this._getConfig('enumerable')
+    }
+
+    return this._derive({
+      _enumerable: !!value
+    })
+  }
+
+  configurable (value?: boolean): GetterOrFactory {
+    if (value === UNDEFINED) {
+      return this._getConfig('configurable')
+    }
+
+    return this._derive({
+      _configurable: !!value
+    })
+  }
+
+  writable (value?: boolean) {
+    if (value === UNDEFINED) {
+      return this._getConfig('writable')
+    }
+
+    return this._derive({
+      _writable: !!value
     })
   }
 
@@ -47,25 +80,11 @@ export class Skema implements ISkema {
   }
 
   from (raw, args, context): any {
-
-    return this._options.promise.resolve(this.processWhen())
-    .then(hit => {
-      if (!hit) {
-        return
-      }
-
-      return Promise.resolve(this.processDefault())
-      .then(() => this.processValidator(this.type.validate))
-      .then(() => this.processValidator(this.rule.validate))
-      .then(() => this.processSetter(this.type.set))
-      .then(() => this.processSetter(this.rule.set))
-      .then(() => this.processDone())
-    })
   }
 
   hasWhen (): boolean {
     return this._type && this._type.hasWhen()
-      || this._when !== undefined
+      || this._when !== UNDEFINED
   }
 
   when (args, context) {
@@ -73,7 +92,7 @@ export class Skema implements ISkema {
   }
 
   hasDefault (): boolean {
-    return  this._default !== UNDEFINED
+    return this._default !== UNDEFINED
   }
 
   default (args, context) {
@@ -81,7 +100,7 @@ export class Skema implements ISkema {
   }
 
   hasValidators (): boolean {
-
+    return !!this._validate.length
   }
 
   validate (value, args, context): boolean {
@@ -89,14 +108,10 @@ export class Skema implements ISkema {
   }
 
   hasSetters (): boolean {
-
+    return !!this._set.length
   }
 
   set (value, args, context) {
-
-  }
-
-  iterable () {
 
   }
 }

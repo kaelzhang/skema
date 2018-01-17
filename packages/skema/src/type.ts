@@ -1,14 +1,10 @@
 // Type Definition
 ///////////////////////////////////////////////////////////
 import {ITypeDefinition} from './interfaces'
+import {UNDEFINED} from './util'
 
 export class TypeDefinition implements ITypeDefinition {
-  constructor (definition: object) {
-    // Empty TypeDefinition is allowed
-    if (!definition || Object.keys(definition).length === 0) {
-      return
-    }
-
+  constructor (definition: IPExpandedTypeDefinition) {
     const {
       default: _default,
       set,
@@ -18,19 +14,20 @@ export class TypeDefinition implements ITypeDefinition {
       enumerable,
       writable,
       optional,
-      required,
       type
     } = definition
 
-    this.default = parseDefault(_default)
-    this.set = parseSetters(set)
-    this.validate = parseValidators(validate)
-    this.when = parseWhen(when)
-    this.configurable = configurable
-    this.enumerable = enumerable
-    this.writable = writable
-    this.optional = optional
-    this.required = required
-    this.type = type
+    this._default = parseDefault(_default)
+    this._set = parseSetters(set)
+    this._validate = parseValidators(validate)
+    this._when = parseWhen(when)
+    this._configurable = configurable
+    this._enumerable = enumerable
+    this._writable = writable
+    this._optional = this._default !== UNDEFINED
+      ? true
+      // By default, optional is false
+      : optional !== true
+    this._type = type
   }
 }

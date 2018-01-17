@@ -14,16 +14,12 @@ class Context {
     origin: any = null,
     path: IPath = []
   ) {
-    this._value = value
-    this._context = {
+    this.value = value
+    this.context = {
       origin,
       key,
       path
     }
-  }
-
-  context (): IContext {
-    return this._context
   }
 
   descend (key): Context {

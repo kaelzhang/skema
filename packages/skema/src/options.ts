@@ -5,10 +5,12 @@ export class Options {
   promise: Function
   promiseExtra: object
   types: object
+  clean: boolean
 
   constructor ({
     async: _async = false,
-    types
+    types,
+    clean = false
   }) {
 
     this.promise = _async
@@ -18,5 +20,7 @@ export class Options {
     this.promiseExtra = _async
       ? promiseExtra
       : factory(FakePromise)
+
+    this.clean = !!clean
   }
 }

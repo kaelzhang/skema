@@ -64,7 +64,7 @@ export interface IObjectSkema {
   [propName: string]: IPTypeDefinition
 }
 
-export interface ISkema {
+export interface ITypeDefinition {
   readonly _type: ISkema,
   readonly _when: IWhen,
   readonly _default: IDefault,
@@ -73,10 +73,18 @@ export interface ISkema {
   readonly _enumerable: IBooleanOrUndefined,
   readonly _configurable: IBooleanOrUndefined,
   readonly _writable: IBooleanOrUndefined,
-  readonly _writable: IBooleanOrUndefined,
   readonly _optional: IBooleanOrUndefined,
   readonly _required: IBooleanOrUndefined,
-  readonly _options: Options
+}
+
+export interface IComposable {
+  
+}
+
+export interface ISkema {
+  ...ITypeDefinition,
+  readonly _options: Options,
+  readonly _composable?: IComposable
 }
 
 export type IKey = number | string

@@ -1,98 +1,173 @@
 // Processor to run the flow async or sync
 ///////////////////////////////////////////////////////////
 import {Options} from './options'
+import {UNDEFINED} from './util'
 
-export class AbstractProcessor {
-  constructor (options, async) {
+export class Processor {
+  constructor (options) {
+    Object.assign(this, options)
+
+    const {
+      key,
+      origin
+    } = this.context.context
+    this._isDefault = key in origin
   }
 
-  from () {
-    
-  }
+  process () {
+    return this.options.promise.resolve()
+    .then(() => this.shouldSkip())
+    .then(skip => {
+      if (skip) {
+        return
+      }
 
-  processWhen () {
-    const when = this.rule.when || this.type.when
-    if (!when) {
-      return true
-    }
+      const {
+        value,
+        context
+      } = this.context
 
-    return when.apply(this.context, this.args)
-  }
+      return this.skema.validate(value, this.args, context)
+      .then(valid => {
+        if (!valid) {
+          // Other errors are rejected
+          throw 'validate fail'
+        }
 
-  processDefault () {
-    const isDefault = !(this.key in this.data)
-    if (!isDefault) {
-      return
-    }
-
-    const _default = this.rule.default || this.type.default
-
-    if (!_default) {
-      return
-    }
-
-    return Promise.resolve(_default.apply(this.context, this.args))
-    .then(value => this.value = value)
-  }
-
-  processValidator (validator) {
-    if (!validator) {
-      return
-    }
-
-    return series.call(this, validator, runValidate)
-  }
-
-  processSetter (setter) {
-    if (!setter) {
-      return
-    }
-
-    return waterfall.call(this, setter, this.value, runSetter)
-    .then(value => this.value = value)
+        return this.skema.set(value, this.args, context)
+      })
+      .then(value => {
+        this.context.value = value
+      })
+    })
   }
 
   processDone () {
-    const {key, value} = this
+    const {
+      values,
+      skema
+    } = this
 
-    if (!this.parallel) {
-      this.context[key] = value
-    }
+    const {value} = this.context
+    const {key} = this.context.context
 
-    const {type, rule} = this
     const config = Object.create(null)
-    configure(config, 'configurable', type, rule)
-    configure(config, 'enumerable', type, rule)
-    configure(config, 'writable', type, rule)
+    configure(config, 'configurable', skema)
+    configure(config, 'enumerable', skema)
+    configure(config, 'writable', skema)
 
     defineProperty(this.values, key, value, config)
   }
-}
 
-function runValidate (validator) {
-  return Promise.resolve(
-    validator.call(this.context, this.value, this.args)
-  )
-  .then(pass => {
-    if (!pass) {
-      throw error('VALIDATE_FAILS', this.value, this.key)
+  // Returns whether we should skip checking
+  shouldSkip () {
+    const {skema} = this
+
+    if (!skema.hasWhen()) {
+      return this._shouldSkip()
     }
-  })
-}
 
-function runSetter (prev, setter) {
-  return setter.call(this.context, prev, this.args)
-}
+    return skema.when(this.args, this.context.context)
+    .then(hit => {
+      if (!hit) {
+        // Skip
+        return true
+      }
 
-function configure (config, name, type, rule) {
-  let value = rule[name]
-  if (value !== undefined) {
-    config[name] = value
-    return
+      return this._shouldSkip()
+    })
   }
 
-  value = type[name]
-  if (value !== undefined) {
+  _shouldSkip () {
+    const {skema} = this
+
+    // has the key
+    if (!this._isDefault) {
+      // not skip
+      return false
+    }
+
+    // If the key is required,
+    // optional and default are mutual exclusive,
+    // so we simply check optional first.
+    if (!skema.isOptional()) {
+      throw 'is not optional'
+    }
+
+    if (!skema.hasDefault()) {
+      // skip
+      return true
+    }
+
+    return skema.default(this.args, this.context.context)
+    .then(value => {
+      this.context.value = value
+      return false
+    })
+  }
+
+  // processWhen () {
+  //   const when = this.rule.when || this.type.when
+  //   if (!when) {
+  //     return true
+  //   }
+  //
+  //   return when.apply(this.context, this.args)
+  // }
+  //
+  // processDefault () {
+  //   const isDefault = !(this.key in this.data)
+  //   if (!isDefault) {
+  //     return
+  //   }
+  //
+  //   const _default = this.rule.default || this.type.default
+  //
+  //   if (!_default) {
+  //     return
+  //   }
+  //
+  //   return Promise.resolve(_default.apply(this.context, this.args))
+  //   .then(value => this.value = value)
+  // }
+  //
+  // processValidator (validator) {
+  //   if (!validator) {
+  //     return
+  //   }
+  //
+  //   return series.call(this, validator, runValidate)
+  // }
+  //
+  // processSetter (setter) {
+  //   if (!setter) {
+  //     return
+  //   }
+  //
+  //   return waterfall.call(this, setter, this.value, runSetter)
+  //   .then(value => this.value = value)
+  // }
+}
+
+// function runValidate (validator) {
+//   return Promise.resolve(
+//     validator.call(this.context, this.value, this.args)
+//   )
+//   .then(pass => {
+//     if (!pass) {
+//       throw error('VALIDATE_FAILS', this.value, this.key)
+//     }
+//   })
+// }
+//
+// function runSetter (prev, setter) {
+//   return setter.call(this.context, prev, this.args)
+// }
+
+function configure (config, name, skema) {
+  const value = skema[name]()
+
+  if (value !== UNDEFINED) {
     config[name] = value
     return
   }
