@@ -4,9 +4,9 @@
   "description": "Skema provides a handy and composable way to validate and transform JavaScript objects.",
   "main": "index.js",
   "scripts": {
-    "build": "../../node_modules/.bin/babel src --out-dir lib",
-    "test": "../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s",
-    "test-no-cov": "../../node_modules/.bin/ava --verbose --timeout=10s",
+    "build": "BABEL_ENV=babel ../../node_modules/.bin/babel src --out-dir lib",
+    "test": "BABEL_ENV=ava ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s",
+    "test-no-cov": "BABEL_ENV=ava ../../node_modules/.bin/ava --verbose --timeout=10s",
     "prepublish": "npm run build",
     "report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
@@ -40,7 +40,7 @@
   "dependencies": {
     "err-object": "^2.0.3",
     "make-array": "^1.0.1",
-    "promise-faker": "^1.2.0",
+    "promise-faker": "^1.2.2",
     "promise.extra": "^2.1.0",
     "symbol-for": "^1.0.0"
   }

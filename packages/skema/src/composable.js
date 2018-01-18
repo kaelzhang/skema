@@ -12,7 +12,7 @@ class Composable {
 
   from (context: Context, options: Options, args) {
     const values = this._create(context, options)
-    const tasks = this._tasks(context).map(([context, skema])) =>
+    const tasks = this._tasks(context).map(([context, skema]) =>
       new Processor({
         options,
         skema,
@@ -59,6 +59,16 @@ export class TypeArrayComposable {
   }
 
   _tasks (context) {
-    return context.value.map((v, i) => [context.descend(i), this._rule])
+    const tasks = []
+    const {value} = context
+    const {length} = value
+    let i = 0
+
+    // Iterate every array item
+    for (; i < length; i ++) {
+      tasks.push([context.descend(i), this._rule])
+    }
+
+    return tasks
   }
 }

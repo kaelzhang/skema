@@ -7,6 +7,10 @@ export function isSkema (subject): boolean {
   return !!subject && subject[TYPE_SKEMA] === true
 }
 
+export function isString (subject): boolean {
+  return typeof subject === 'string'
+}
+
 export function isFunction (subject): boolean {
   return typeof subject === 'function'
 }
@@ -34,9 +38,8 @@ export function defineValues (object, values) {
   Object.keys(values).forEach(key => defineValue(object, key, values[key]))
 }
 
-export function getIsKey (key) {
-  return 'is' + key[0].toUpperCase() + key.slice(1)
-}
+const hypenate = key => key[0].toUpperCase() + key.slice(1)
+export const getKey = (key, prefix) => prefix + hypenate(key)
 
 export function simpleClone (object) {
   return Object.assign(Object.create(null), object)

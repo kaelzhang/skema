@@ -3,9 +3,6 @@
 // 2. descend 'a': value: {b: 1}, key: 'a', origin: data, path: ['a']
 // 3. descend 'b': value: 1, key: 'b', origin: {b: 1}, path: ['a', 'b']
 export class Context {
-  _context: IContext
-  _value: any
-
   constructor (
     value,
     key = null,
@@ -29,6 +26,8 @@ export class Context {
   }
 
   error (code): Error {
-    return new Error(code)
+    const error = new Error(code)
+    Object.assign(error, this.context)
+    return error
   }
 }

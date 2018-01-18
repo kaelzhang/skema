@@ -17,6 +17,6 @@ export {
   shape,
   arrayOf,
   objectOf,
-  any
+  any,
   defaults
 }
