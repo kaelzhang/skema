@@ -8,6 +8,7 @@
     "babel-plugin-transform-class-properties": "^6.16.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.16.0",
     "babel-plugin-transform-exponentiation-operator": "^6.8.0",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -16,7 +17,6 @@
     "babel-runtime": "^6.26.0",
     "codecov": "^3.0.0",
     "lerna": "^2.6.0",
-    "nyc": "^11.1.0",
-    "typescript": "^2.6.2"
+    "nyc": "^11.1.0"
   }
 }

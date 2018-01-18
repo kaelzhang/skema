@@ -1,24 +1,26 @@
 // The Factory of Skema according to user preset
 ///////////////////////////////////////////////////////////
 import {Skema} from './skema'
-import {IAsyncOrSyncFunc, IPTypeDefinition, IObjectSkema} from './interfaces'
 import {Options} from './options'
 import {isArray, isObject} from './util'
 import {TypeDefinition} from './type'
+import {
+  ShapeComposable,
+  TypeObjectComposable,
+  TypeArrayComposable
+} from './composable'
 
 const METHODS = [
+  'skema',
+  'formula',
   'shape',
-  'oneOf',
-  'arrayOf',
-  'oneOfType',
   'objectOf',
+  'arrayOf',
   'any'
 ]
 
 class SkemaFactory {
-  _options: Options
-
-  constructor (options: object) {
+  constructor (options) {
     METHODS.forEach(method => {
       this[method] = this[method].bind(this)
     })
@@ -27,7 +29,7 @@ class SkemaFactory {
   }
 
   // The one that has everything inside
-  skema (subject: any): Skema {
+  skema (subject): Skema {
     if (isArray(subject)) {
       if (subject.length === 0) {
         throw 'empty array'
@@ -43,7 +45,7 @@ class SkemaFactory {
   }
 
   // Create a single rule
-  formula (definition: IPTypeDefinition): Skema {
+  formula (definition): Skema {
 
   }
 
@@ -53,21 +55,25 @@ class SkemaFactory {
   }
 
   // An object with property values of a certain type
-  objectOf (type: IPTypeDefinition[]): Skema {
+  objectOf (type): Skema {
 
   }
 
   // An array of a certain type
-  arrayOf (type: IPTypeDefinition): Skema {
+  arrayOf (type): Skema {
 
   }
 
   // Anything that is ok
   any (): Skema {
-
+    return new Skema(Object.create(null))
   }
 }
 
-export function factory (options: object = {}): SkemaFactory {
+function makeSureSkema () {
+
+}
+
+export function factory (options = {}) {
   return new SkemaFactory(options)
 }

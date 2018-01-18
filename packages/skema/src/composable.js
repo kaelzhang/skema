@@ -1,84 +1,64 @@
 import {simpleClone} from './util'
 import {Processor} from './processor'
 
+export const SHAPE = 'SHAPE'
+export const TYPE_OBJECT = 'TYPE_OBJECT'
+export const TYPE_ARRAY = 'TYPE_ARRAY'
+
 class Composable {
-  _type: IComposableType
-  constructor (type: IComposableType, rule: any) {
-    this._type = type
+  constructor (rule) {
     this._rule = rule
   }
 
-  from (context, options, args) {
+  from (context: Context, options: Options, args) {
+    const values = this._create(context, options)
+    const tasks = this._tasks(context).map(([context, skema])) =>
+      new Processor({
+        options,
+        skema,
+        args,
+        context,
+        values
+      })
+      .process()
+    )
 
+    return options.promise.all(tasks)
+    .then(() => values)
   }
 }
 
-const RULES = {
-  [SHAPE]: {
-    composable: true,
-    iterator (rules, args, context, options) { // TODO: check object
-      const values = options.clean
-        ? Object.create(null)
-        : simpleClone(context.value)
+export class ShapeComposable {
+  _create (context, options) {
+    return options.clean
+      ? Object.create(null)
+      : simpleClone(context.value)
+  }
 
-      const tasks = Object.keys(rules)
-      .map(key => {
-        const c = context.descend(key)
-        const skema = rules[key]
+  _tasks (context) {
+    const shape = this._rule
+    return Object.keys(shape)
+    .map(key => [context.descend(key), shape[key]])
+  }
+}
 
-        return new Processor({
-          options,
-          skema,
-          args,
-          context: c,
-          values
-        })
-        .process()
-      })
+export class TypeObjectComposable {
+  _create () {
+    return Object.create(null)
+  }
 
-      return options.promise.all(tasks)
-    }
-  },
+  _tasks (context) {
+    return Object.keys(context.value)
+    .map(key => [context.descend(key), this._rule])
+  }
+}
 
-  [TYPE_OBJECT]: {
-    composable: false,
-    iterator (skema, args, context, options) { // TODO: check object
-      const values = Object.create(null)
+export class TypeArrayComposable {
+  _create () {
+    return []
+  }
 
-      const tasks = Object.keys(context.value)
-      .map(key => {
-        const c = context.descend(key)
-
-        return new Processor({
-          options,
-          skema,
-          args,
-          context: c,
-          values
-        })
-      })
-
-      return options.promise.all(tasks)
-    }
-  },
-
-  [TYPE_ARRAY]: {
-    composable: false,
-    iterator (skema, args, context, options) {  // TODO: check array
-      const values = []
-      const tasks = context.value.map((v, i) => {
-        const c = context.descend(i)
-
-        return new Processor({
-          options,
-          skema,
-          args,
-          context: c,
-          values
-        })
-      })
-
-      return options.promise.all(tasks)
-    }
+  _tasks (context) {
+    return context.value.map((v, i) => [context.descend(i), this._rule])
   }
 }

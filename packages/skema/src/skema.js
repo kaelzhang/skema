@@ -1,22 +1,17 @@
 // Skema Base
 ///////////////////////////////////////////////////////////
 // import {AbstractProcessor} from './processor'
-import {IPExpandedTypeDefinition} from './interfaces'
 import {Options} from './options'
-import {TYPE_SKEMA, UNDEFINED} from './util'
+import {Context} from './context'
+import {
+  TYPE_SKEMA, UNDEFINED,
+  defineValue, defineValues, getIsKey
+} from './util'
 
-type GetterOrFactory = Skema | boolean
-
-export class Skema implements ISkema {
-  [TYPE_SKEMA]: boolean
-
-  constructor (options: ISkema) {
+export class Skema {
+  constructor (options) {
     Object.assign(this, options)
-    this[TYPE_SKEMA] = true
-  }
-
-  isOptional (): Boolean {
-    return this._optional === true
+    defineValue(this, TYPE_SKEMA, true)
   }
 
   // Creates a new Skema based on the current one, but the new one is optional
@@ -33,89 +28,93 @@ export class Skema implements ISkema {
     })
   }
 
-  _getConfig (key) {
-    const value = this['_' + key]
-    return value !== UNDEFINED
-      ? value
-      : this._type[key]()
-  }
-
-  enumerable (value?: boolean): GetterOrFactory {
-    if (value === UNDEFINED) {
-      return this._getConfig('enumerable')
-    }
-
+  enumerable (value?: boolean) {
     return this._derive({
       _enumerable: !!value
     })
   }
 
-  configurable (value?: boolean): GetterOrFactory {
-    if (value === UNDEFINED) {
-      return this._getConfig('configurable')
-    }
-
+  configurable (value?: boolean): Skema {
     return this._derive({
       _configurable: !!value
     })
   }
 
   writable (value?: boolean) {
-    if (value === UNDEFINED) {
-      return this._getConfig('writable')
-    }
-
     return this._derive({
       _writable: !!value
     })
   }
 
-  _derive (extra) {
-    const options = Object.assign({}, this, extra)
-    return new Skema(options)
-  }
-
-  _ensureContext () {
-
-  }
-
   from (raw, args, context): any {
-    if (true) {
-
+    if (!context) {
+      context = new Context(raw)
     }
+
+    
   }
+}
+
+defineValues(Skema.prototype, {
+  isConfigurable () {
+    return this._getConfig('configurable')
+  },
+
+  isEnumberable () {
+    return this._getConfig('enumerable')
+  },
+
+  isWritable () {
+    return this._getConfig('writable')
+  },
+
+  _getConfig (key) {
+    const value = this['_' + key]
+    return value !== UNDEFINED
+      ? value
+      : this._type[getIsKey(key)]()
+  },
+
+  isOptional (): Boolean {
+    return this._optional === true
+  },
+
+  _derive (extra) {
+    const options = Object.assign(Object.create(null), this, extra)
+    return new Skema(options)
+  },
 
   hasWhen (): boolean {
     return this._type && this._type.hasWhen()
       || this._when !== UNDEFINED
-  }
+  },
 
   when (args, context) {
 
-  }
+  },
 
   hasDefault (): boolean {
     return this._default !== UNDEFINED
-  }
+  },
 
   default (args, context) {
 
-  }
+  },
 
   hasValidators (): boolean {
     return !!this._validate.length
-  }
+  },
 
   // Only test against validators
-  test (value, args, context): boolean {
+  _applyValidators (args, context): boolean {
 
-  }
+  },
 
   hasSetters (): boolean {
     return !!this._set.length
-  }
+  },
 
-  set (value, args, context) {
+  _applySetters (args, context) {
 
   }
-}
+})

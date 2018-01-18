@@ -1,10 +1,11 @@
 // Type Definition
 ///////////////////////////////////////////////////////////
-import {ITypeDefinition} from './interfaces'
 import {UNDEFINED} from './util'
 
-export class TypeDefinition implements ITypeDefinition {
-  constructor (definition: IPExpandedTypeDefinition) {
+export class TypeDefinition {
+  _type: Skema
+
+  constructor (definition) {
     const {
       default: _default,
       set,

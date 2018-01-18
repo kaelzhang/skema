@@ -1,46 +1,49 @@
 import make_array from 'make-array'
 import {error} from './error'
 import symbol from 'symbol-for'
-import {
-  IAsyncOrSyncFunc,
-  IPWhen, IWhen,
-  IPDefault, IDefault,
-  IPValidator, IValidators, IPSingleValidator
-  IPSetter, ISetters
-} from ''
 
 export const TYPE_SKEMA = symbol.for('skema')
-export function isSkema (subject: any): boolean {
+export function isSkema (subject): boolean {
   return !!subject && subject[TYPE_SKEMA] === true
 }
 
-export function isFunction (subject: any): boolean {
+export function isFunction (subject): boolean {
   return typeof subject === 'function'
 }
 
-export function isRegExp (subject: any): boolean {
+export function isRegExp (subject): boolean {
   return !!subject && typeof subject.test === 'function'
 }
 
-export function isObject (subject: any): boolean {
+export function isObject (subject): boolean {
   return subject && Object(subject) === subject
 }
 
 export const isArray = Array.isArray
 
-export function defineProperty (data, key, value, rules = {}): void {
+export function defineProperty (object, key, value, rules = {}) {
   rules.value = value
-  Object.defineProperty(data, key, rules)
+  Object.defineProperty(object, key, rules)
 }
 
-export function simpleClone (object: object): object {
+export function defineValue (object, key, value) {
+  Object.defineProperty(object, key, {value})
+}
+
+export function defineValues (object, values) {
+  Object.keys(values).forEach(key => defineValue(object, key, values[key]))
+}
+
+export function getIsKey (key) {
+  return 'is' + key[0].toUpperCase() + key.slice(1)
+}
+
+export function simpleClone (object) {
   return Object.assign(Object.create(null), object)
 }
 
 // See "schema design"
-export function parseValidator (
-  validator: IPSingleValidator
-): IAsyncOrSyncFunc {
+export function parseValidator (validator) {
   if (isFunction(validator)) {
     return validator
   }
@@ -52,14 +55,14 @@ export function parseValidator (
   throw error('INVALID_VALIDATOR')
 }
 
-export function parseValidators (validators: IPValidator): IValidators {
+export function parseValidators (validators) {
   if (!validators) {
     return
   }
   return make_array(validators).map(parseValidator)
 }
 
-export function parseSetters (setters: IPSetter): ISetters {
+export function parseSetters (setters) {
   if (!setters) {
     return
   }
@@ -73,7 +76,7 @@ export function parseSetters (setters: IPSetter): ISetters {
   })
 }
 
-export function parseWhen (when: IPWhen): IWhen {
+export function parseWhen (when) {
   if (isFunction(when)) {
     return when
   }
@@ -85,7 +88,7 @@ export function parseWhen (when: IPWhen): IWhen {
   // Then true
 }
 
-export function parseDefault (_default: IPDefault): IDefault {
+export function parseDefault (_default) {
   if (_default === undefined) {
     return
   }

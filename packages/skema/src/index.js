@@ -2,25 +2,21 @@ export {factory} from './skema-factory'
 
 const {
   skema,
+  formula,
   shape,
-  oneOf,
   arrayOf,
-  oneOfType,
   objectOf,
-  any,
-  compose
+  any
 } = factory()
 
 const defaults = factory
 
 export {
   skema,
+  formula,
   shape,
-  oneOf,
   arrayOf,
-  oneOfType,
   objectOf,
-  any,
-  compose,
+  any
   defaults
 }

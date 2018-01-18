@@ -4,9 +4,7 @@
   "description": "Skema provides a handy and composable way to validate and transform JavaScript objects.",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build-ts && npm run build-js",
-    "build-ts": "../../node_modules/.bin/tsc",
-    "build-js": "../../node_modules/.bin/babel src --out-dir lib",
+    "build": "../../node_modules/.bin/babel src --out-dir lib",
     "test": "../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s",
     "test-no-cov": "../../node_modules/.bin/ava --verbose --timeout=10s",
     "prepublish": "npm run build",
