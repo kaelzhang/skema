@@ -25,7 +25,7 @@ class Types {
 
   // @param {String} type
   // @param {Object} types
-  static get = function (type, types) {
+  static get (type, types) {
     if (typeof type === 'string') {
       type = type.toLowerCase()
       const rule = types && types[type]

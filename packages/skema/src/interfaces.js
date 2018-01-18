@@ -64,6 +64,18 @@ export interface IObjectSkema {
   [propName: string]: IPTypeDefinition
 }
 
+export const SHAPE = 'SHAPE'
+export const TYPE_OBJECT = 'TYPE_OBJECT'
+export const TYPE_ARRAY = 'TYPE_ARRAY'
+
+export type IComposableType = SHAPE | TYPE_OBJECT | TYPE_ARRAY
+export type IComposableRule = IObjectSkema | 
+
+export interface IComposable {
+  _type: IComposableType,
+  _rule:
+}
+
 export interface ITypeDefinition {
   readonly _type: ISkema,
   readonly _when: IWhen,
@@ -75,10 +87,7 @@ export interface ITypeDefinition {
   readonly _writable: IBooleanOrUndefined,
   readonly _optional: IBooleanOrUndefined,
   readonly _required: IBooleanOrUndefined,
-}
-
-export interface IComposable {
-  
+  readonly _composable: IComposable
 }
 
 export interface ISkema {

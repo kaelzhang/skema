@@ -4,6 +4,7 @@ import {Skema} from './skema'
 import {IAsyncOrSyncFunc, IPTypeDefinition, IObjectSkema} from './interfaces'
 import {Options} from './options'
 import {isArray, isObject} from './util'
+import {TypeDefinition} from './type'
 
 const METHODS = [
   'shape',
@@ -11,8 +12,7 @@ const METHODS = [
   'arrayOf',
   'oneOfType',
   'objectOf',
-  'any',
-  'compose'
+  'any'
 ]
 
 class SkemaFactory {
@@ -64,13 +64,6 @@ class SkemaFactory {
 
   // Anything that is ok
   any (): Skema {
-
-  }
-
-  // Compose several types which are all composable and within the same type.
-  // The following types are composable:
-  // - shape
-  compose (...types: ITypeDefinition[]): Skema {
 
   }
 }

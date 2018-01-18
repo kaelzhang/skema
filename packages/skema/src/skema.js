@@ -80,6 +80,9 @@ export class Skema implements ISkema {
   }
 
   from (raw, args, context): any {
+    if (true) {
+
+    }
   }
 
   hasWhen (): boolean {
@@ -103,7 +106,8 @@ export class Skema implements ISkema {
     return !!this._validate.length
   }
 
-  validate (value, args, context): boolean {
+  // Only test against validators
+  test (value, args, context): boolean {
 
   }
 

@@ -2,6 +2,10 @@ const test = require('ava')
 const skema = require('../src')
 const {JS_TYPES} = skema
 
+
+
+///////////////////////////////////////////////////////////////////////
+
 function delay (delay, value) {
   return new Promise((resolve) => {
     setTimeout(() => {

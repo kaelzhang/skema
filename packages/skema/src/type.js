@@ -24,6 +24,8 @@ export class TypeDefinition implements ITypeDefinition {
     this._configurable = configurable
     this._enumerable = enumerable
     this._writable = writable
+
+    // If there is a default value, it IS optional.
     this._optional = this._default !== UNDEFINED
       ? true
       // By default, optional is false
