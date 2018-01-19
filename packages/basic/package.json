@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/kaelzhang/node-skema.git"
+    "url": "git://github.com/kaelzhang/skema.git"
   },
   "keywords": [
     "skema",
@@ -30,7 +30,7 @@
   "author": "kaelzhang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kaelzhang/node-skema/issues"
+    "url": "https://github.com/kaelzhang/skema/issues"
   },
   "ava": {
     "require": "babel-register",

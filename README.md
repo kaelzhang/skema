@@ -1,21 +1,9 @@
-[![Build Status](https://travis-ci.org/kaelzhang/node-skema.svg?branch=master)](https://travis-ci.org/kaelzhang/node-skema)
-[![Coverage](https://codecov.io/gh/kaelzhang/node-skema/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/node-skema)
-<!-- optional appveyor tst
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/kaelzhang/node-skema?branch=master&svg=true)](https://ci.appveyor.com/project/kaelzhang/node-skema)
--->
-<!-- optional npm version
-[![NPM version](https://badge.fury.io/js/skema.svg)](http://badge.fury.io/js/skema)
--->
-<!-- optional npm downloads
-[![npm module downloads per month](http://img.shields.io/npm/dm/skema.svg)](https://www.npmjs.org/package/skema)
--->
-<!-- optional dependency status
-[![Dependency Status](https://david-dm.org/kaelzhang/node-skema.svg)](https://david-dm.org/kaelzhang/node-skema)
--->
+[![Build Status](https://travis-ci.org/kaelzhang/skema.svg?branch=master)](https://travis-ci.org/kaelzhang/skema)
+[![Coverage](https://codecov.io/gh/kaelzhang/skema/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/skema)
 
 # skema
 
-`skema` provides a handy and composable way to validate and transform JavaScript objects:
+`skema` provides a handy and composable way to validate/transform JavaScript variables:
 
 - **Fully customizable error objects.**
 - **Supports both async and sync flows.** Skema has two working modes
@@ -30,7 +18,7 @@
 ## Basic Usage
 
 ```js
-import skema from 'skema'
+import {skema} from 'skema'
 
 const Profile = skema({
   name: String,
@@ -38,10 +26,7 @@ const Profile = skema({
 })
 
 const User = skema({
-  id: {
-    type: Number,
-    enumerable: false
-  },
+  id: Number,
   profile: Profile
 })
 
@@ -53,17 +38,9 @@ const user = User.from({
   }
 })
 
-user.id // 1
-user.profile.name // Steve
-user.profile.birth // Date('2017-01-01')
-JSON.stringify(user, null, 2)
-// {
-//   "profile": {
-//     "name": "Steve",
-//     "birth": "2017-01-01T00:00:00.000Z"
-//   }
-// }
-// Notice that `user.id` is not enumerable
+user.id             // 1
+user.profile.name   // Steve
+user.profile.birth  // Date('2017-01-01')
 ```
 
 
