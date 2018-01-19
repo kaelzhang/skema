@@ -1,0 +1,47 @@
+{
+  "name": "@skema/basic",
+  "version": "1.0.0",
+  "description": "Basic types for skema",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "scripts": {
+    "build": "BABEL_ENV=babel ../../node_modules/.bin/babel src --out-dir lib",
+    "test": "BABEL_ENV=ava ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s",
+    "test-no-cov": "BABEL_ENV=ava ../../node_modules/.bin/ava --verbose --timeout=10s",
+    "prepublish": "npm run build",
+    "report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kaelzhang/node-skema.git"
+  },
+  "keywords": [
+    "skema",
+    "schema",
+    "type",
+    "primative",
+    "javascript",
+    "loose",
+    "strict"
+  ],
+  "engines": {
+    "node": ">=4"
+  },
+  "author": "kaelzhang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kaelzhang/node-skema/issues"
+  },
+  "ava": {
+    "require": "babel-register",
+    "babel": {
+      "babelrc": true
+    }
+  },
+  "devDependencies": {
+    "skema": "^8.0.0"
+  },
+  "dependencies": {
+    "core-util-is": "^1.0.2"
+  }
+}
