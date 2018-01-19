@@ -28,7 +28,7 @@ class Composable {
   }
 }
 
-export class ShapeComposable {
+export class ShapeComposable extends Composable {
   _create (context, options) {
     return options.clean
       ? Object.create(null)
@@ -42,7 +42,7 @@ export class ShapeComposable {
   }
 }
 
-export class TypeObjectComposable {
+export class TypeObjectComposable extends Composable {
   _create () {
     return Object.create(null)
   }
@@ -53,7 +53,7 @@ export class TypeObjectComposable {
   }
 }
 
-export class TypeArrayComposable {
+export class TypeArrayComposable extends Composable {
   _create () {
     return []
   }

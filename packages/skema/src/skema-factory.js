@@ -4,7 +4,8 @@ import {Skema} from './skema'
 import {Options} from './options'
 import {
   UNDEFINED,
-  isSkema, isString, isArray, isObject
+  isSkema, isString, isArray, isObject,
+  defineValues
 } from './util'
 import {TypeDefinition} from './type'
 import {
@@ -38,6 +39,28 @@ class Types {
       this._types.set(object, skema)
     }
   }
+}
+
+function getType (name, types, thrown) {
+  const skema = types.get(name)
+  if (thrown && !skema) {
+    throw 'type not found'
+  }
+
+  return skema
+}
+
+const REGEX_ENDS_QUESTION_MARK = /\?$/
+
+// Trim and validate type name
+function parseTypeName (name) {
+  name = name.trim()
+
+  if (REGEX_ENDS_QUESTION_MARK.test(name)) {
+    throw 'invalid name'
+  }
+
+  return name
 }
 
 class SkemaFactory {
@@ -86,27 +109,27 @@ class SkemaFactory {
 
   // Create a single rule
   formula (definition): Skema {
-    return parseSkema(definition, this._types)
+    return parseSkema(definition, this._types, this._options)
   }
 
   // An object taking on a particular shape
   shape (shape: IObjectSkema): Skema {
-    return new Skema({
-      _composable: new ShapeComposable(parseShape(shape, this._types))
+    return this._create({
+      _composable: new ShapeComposable(this._parseShape(shape, this._types))
     })
   }
 
   // An object with property values of a certain type
   objectOf (type): Skema {
-    return new Skema({
-      _composable: new TypeObjectComposable(parseSkema(type, this._types))
+    return this._create({
+      _composable: new TypeObjectComposable(this._parseSkema(type, this._types))
     })
   }
 
   // An array of a certain type
   arrayOf (type): Skema {
-    return new Skema({
-      _composable: new TypeArrayComposable(parseSkema(type, this._types))
+    return this._create({
+      _composable: new TypeArrayComposable(this._parseSkema(type, this._types))
     })
   }
 
@@ -117,7 +140,7 @@ class SkemaFactory {
 
   type (name, skema, object = UNDEFINED) {
     name = parseTypeName(name)
-    skema = parseSkemaObject(skema)
+    skema = this._parseObjectSkema(skema, true)
 
     this._types.register(name, skema, object)
 
@@ -125,85 +148,77 @@ class SkemaFactory {
   }
 }
 
-function parseShape (object, types) {
-  const skemaMap = {}
-  Object.keys(object).forEach(key => {
-    skemaMap[key] = parseSkema(object[key])
-  })
+defineValues(SkemaFactory.prototype, {
+  _create (definition) {
+    definition._options = this._options
+    return new Skema(definition)
+  },
 
-  return skemaMap
-}
+  _parseShape (shape) {
+    const skemaMap = {}
+    Object.keys(shape).forEach(key => {
+      skemaMap[key] = this._parseSkema(shape[key])
+    })
 
-function parseSkema (subject, types) {
-  if (isString(subject)) {
-    return parseStringSkema(subject, types)
+    return skemaMap
+  },
+
+  _parseSkema (subject) {
+    if (isString(subject)) {
+      return this._parseStringSkema(subject)
+    }
+
+    return this._parseObjectSkema(subject)
+  },
+
+  // {...} -> Skema
+  _parseObjectSkema (object, noSearchTypes): Skema {
+    if (isSkema(object)) {
+      return object
+    }
+
+    if (!noSearchTypes) {
+      const skema = getType(object, this._types)
+      if (skema) {
+        return skema
+      }
+    }
+
+    const definition = new TypeDefinition(object)
+    if (definition._type) {
+      definition._type = this._parseSkemaType(definition._type)
+    }
+
+    return this._create(definition)
+  },
+
+  _parseSkemaType (type) {
+    if (isSkema(type)) {
+      return type
+    }
+
+    return getType(type, this._types, true)
+  },
+
+  // 'number' -> Skema
+  _parseStringSkema (string): Skema {
+    string = string.trim()
+    const hasOptionalMark = REGEX_ENDS_QUESTION_MARK.test(string)
+    if (hasOptionalMark) {
+      // 'number?' -> 'number'
+      // 'number ?' -> 'number'
+      string = string.slice(0, string.length - 1).trimRight()
+    }
+
+    const skema = getType(string, this._types, true)
+
+    return hasOptionalMark
+      ? skema.isOptional()
+        ? skema
+        : skema.optional()
+      : skema
   }
-
-  return parseObjectSkema(subject, types)
-}
-
-// {...} -> Skema
-function parseObjectSkema (object, types): Skema {
-  if (isSkema(object)) {
-    return object
-  }
-
-  const definition = new TypeDefinition(object)
-  if (definition._type) {
-    definition._type = parseSkemaType(type, types)
-  }
-
-  return new Skema(definition)
-}
-
-function getType (name, types) {
-  const skema = types.get(name)
-  if (!skema) {
-    throw 'type not found'
-  }
-
-  return skema
-}
-
-function parseSkemaType (type, types) {
-  if (isSkema(type)) {
-    return type
-  }
-
-  return getType(type, types)
-}
-
-const REGEX_ENDS_QUESTION_MARK = /\?$/
-
-// 'number' -> Skema
-function parseStringSkema (string, types): Skema {
-  string = string.trim()
-  const hasOptionalMark = REGEX_ENDS_QUESTION_MARK.test(string)
-  if (hasOptionalMark) {
-    // 'number?' -> 'number'
-    // 'number ?' -> 'number'
-    string = string.slice(0, string.length - 1).trimRight()
-  }
-
-  const skema = getType(string, types)
-
-  return hasOptionalMark
-    ? skema.isOptional()
-      ? skema
-      : skema.optional()
-    : skema
-}
-
-// Trim and validate type name
-function parseTypeName (name) {
-  name = name.trim()
-
-  if (REGEX_ENDS_QUESTION_MARK.test(name)) {
-    throw 'invalid name'
-  }
-
-  return name
-}
+})
 
 export function factory (options = {}) {
   return new SkemaFactory(options)

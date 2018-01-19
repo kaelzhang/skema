@@ -1,6 +1,9 @@
 // Type Definition
 ///////////////////////////////////////////////////////////
-import {UNDEFINED} from './util'
+import {
+  UNDEFINED,
+  parseDefault, parseSetters, parseValidators, parseWhen
+} from './util'
 
 export class TypeDefinition {
   _type: Skema

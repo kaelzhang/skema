@@ -2,26 +2,17 @@ import make_array from 'make-array'
 import {error} from './error'
 import symbol from 'symbol-for'
 
+export const UNDEFINED = undefined
+
 export const TYPE_SKEMA = symbol.for('skema')
-export function isSkema (subject): boolean {
-  return !!subject && subject[TYPE_SKEMA] === true
-}
+export const isSkema = subject => !!subject && subject[TYPE_SKEMA] === true
+export const isString = subject => typeof subject === 'string'
+export const isFunction = subject => typeof subject === 'function'
+export const isRegExp = subject =>
+  !!subject && typeof subject.test === 'function'
 
-export function isString (subject): boolean {
-  return typeof subject === 'string'
-}
-
-export function isFunction (subject): boolean {
-  return typeof subject === 'function'
-}
-
-export function isRegExp (subject): boolean {
-  return !!subject && typeof subject.test === 'function'
-}
-
-export function isObject (subject): boolean {
-  return subject && Object(subject) === subject
-}
+export const isObject = subject => !!subject && Object(subject) === subject
+export const isDefined = subject => subject !== UNDEFINED
 
 export const isArray = Array.isArray
 
@@ -102,5 +93,3 @@ export function parseDefault (_default) {
 
   return () => _default
 }
-
-export const UNDEFINED = undefined

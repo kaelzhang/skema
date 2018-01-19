@@ -5,6 +5,7 @@ import {Options} from './options'
 import {Context} from './context'
 import {
   TYPE_SKEMA, UNDEFINED,
+  isDefined,
   defineValue, defineValues, getKey
 } from './util'
 
@@ -50,21 +51,27 @@ export class Skema {
   }
 
   from (raw, args = [], context): any {
-    if (!context) {
+    const noContext = !context
+
+    if (noContext) {
       context = new Context(raw)
     }
 
-    const result = this.validate(args, context)
-    .then(() => this.set(args, context))
+    const result = isDefined(this._composable)
+      ? this._composable.from(context, this._options, args)
+      : this.validate(args, context)
+        .then(() => this.set(args, context))
 
-    return this._options.promise.resolve(result, true)
+    return noContext
+      ? this._options.promise.resolve(result, true)
+      : result
   }
 }
 
 defineValues(Skema.prototype, {
   _getConfig (key) {
     const value = this['_' + key]
-    return value !== UNDEFINED
+    return isDefined(value)
       ? value
       : this._type[getKey(key, PREFIX_IS)]()
   },
@@ -74,10 +81,18 @@ defineValues(Skema.prototype, {
     return new Skema(options)
   },
 
+  _hasOwn (key) {
+    const value = this['_' + key]
+    return isDefined(value) && value.length !== 0
+  },
+
   _has (key) {
-    return this._type && this._type[getKey(key, PREFIX_HAS)]()
-      || this['_' + key] !== UNDEFINED
-  }
+    if (this._type && this._type[getKey(key, PREFIX_HAS)]()) {
+      return true
+    }
+
+    return this._hasOwn(key)
+  },
 
   isConfigurable () {
     return this._getConfig('configurable')
@@ -100,7 +115,7 @@ defineValues(Skema.prototype, {
   },
 
   when (args, context) {
-    if (this._when !== UNDEFINED) {
+    if (isDefined(this._when)) {
       return this._options.promise.resolve(
         this._when.apply(context.context, args))
     }
@@ -115,7 +130,7 @@ defineValues(Skema.prototype, {
   },
 
   default (args, context) {
-    if (this._default !== UNDEFINED) {
+    if (isDefined(this._default)) {
       return this._options.promise.resolve(
         this._default.apply(context.context, args))
     }
@@ -128,8 +143,7 @@ defineValues(Skema.prototype, {
   // Only test against validators
   validate (args, context): boolean {
     const {
-      value,
-      context
+      value
     } = context
     const {promise} = this._options
 
@@ -139,12 +153,16 @@ defineValues(Skema.prototype, {
 
     return start
     .then(pass => {
-      if (!pass || this._validate === UNDEFINED) {
+      if (!pass || !this._hasOwn('validate')) {
         return pass
       }
 
       return this._options.promiseExtra
-      .series.call(context, value, ...args)
+      .series.call(context.context, this._validate, value,
+        function (prev, factory) {
+          return factory.call(this, prev, ...args)
+        }
+      )
       .then(
         pass => {
           if (pass === false) {
@@ -162,8 +180,7 @@ defineValues(Skema.prototype, {
 
   set (args, context) {
     const {
-      value,
-      context
+      value
     } = context
     const {promise} = this._options
 
@@ -171,10 +188,18 @@ defineValues(Skema.prototype, {
       ? this._type.set(args, context)
       : promise.resolve(value)
 
+    if (!this._hasOwn('set')) {
+      return start
+    }
+
     return start
     .then(value => {
       return this._options.promiseExtra
-      .waterfall.call(context, value, ...args)
+      .waterfall.call(context.context, this._set, value,
+        function (prev, factory) {
+          return factory.call(this, prev, ...args)
+        }
+      )
       .catch(error => promise.reject(context.error(error)))
     })
   }

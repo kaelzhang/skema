@@ -18,9 +18,9 @@ export class Context {
   }
 
   descend (key): Context {
-    const path = this._context.path.concat(key)
-    const origin = this._value
-    const value = this._value[key]
+    const path = this.context.path.concat(key)
+    const origin = this.value
+    const value = this.value[key]
 
     return new Context(value, key, origin, path)
   }

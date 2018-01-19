@@ -11,7 +11,7 @@ export class Processor {
       key,
       origin
     } = this.context.context
-    this._isDefault = key in origin
+    this._isDefault = !(key in origin)
   }
 
   process () {
@@ -22,12 +22,8 @@ export class Processor {
         return
       }
 
-      const {
-        value,
-        context
-      } = this.context
-
-      return this.skema.from(value, this.args, context)
+      const {value} = this.context
+      return this.skema.from(value, this.args, this.context)
       .then(value => {
         this.context.value = value
       })

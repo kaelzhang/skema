@@ -1,4 +1,4 @@
-export {factory} from './skema-factory'
+import {factory} from './skema-factory'
 
 const {
   skema,

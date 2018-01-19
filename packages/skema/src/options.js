@@ -1,5 +1,5 @@
 import FakePromise from 'promise-faker'
-import promiseExtra from 'promise.extra'
+import promiseExtra, {factory} from 'promise.extra'
 
 export class Options {
   constructor ({
