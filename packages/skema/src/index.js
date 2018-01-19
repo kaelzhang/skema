@@ -1,4 +1,5 @@
 import {factory} from './skema-factory'
+import {LOOSE} from '@skema/basic'
 
 const {
   skema,
@@ -7,7 +8,9 @@ const {
   arrayOf,
   objectOf,
   any
-} = factory()
+} = factory({
+  types: LOOSE
+})
 
 const defaults = factory
 

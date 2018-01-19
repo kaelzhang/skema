@@ -2,7 +2,8 @@
   "name": "skema",
   "version": "8.0.0",
   "description": "Skema provides a handy and composable way to validate and transform JavaScript objects.",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "src/index.js",
   "scripts": {
     "build": "BABEL_ENV=babel ../../node_modules/.bin/babel src --out-dir lib",
     "test": "BABEL_ENV=ava ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s",
@@ -38,6 +39,7 @@
     }
   },
   "dependencies": {
+    "@skema/basic": "^1.0.0",
     "err-object": "^2.0.3",
     "make-array": "^1.0.1",
     "promise-faker": "^1.2.2",

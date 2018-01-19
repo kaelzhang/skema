@@ -32,12 +32,20 @@ class Types {
     return this._types.get(type)
   }
 
-  register (name, skema, object) {
-    this._types.set(name, skema)
-
-    if (object) {
-      this._types.set(object, skema)
+  set (name, skema) {
+    if (this._types.has(name)) {
+      throw 'redefine a type'
     }
+
+    this._types.set(name, skema)
+  }
+
+  register (name, skema, alias) {
+    this.set(name, skema)
+
+    alias.forEach(name => {
+      this.set(name, skema)
+    })
   }
 }
 
@@ -83,11 +91,11 @@ class SkemaFactory {
 
     Object.keys(types).forEach(name => {
       const {
-        type,
-        skema
+        alias = [],
+        definition
       } = types[name] || {}
 
-      this.type(name, skema, type)
+      this.declare(name, definition, ...alias)
     })
   }
 
@@ -107,8 +115,8 @@ class SkemaFactory {
     throw 'invalid argument'
   }
 
-  // Create a single rule
-  formula (definition): Skema {
+  // Create a single type
+  type (definition): Skema {
     return parseSkema(definition, this._types, this._options)
   }
 
@@ -138,11 +146,12 @@ class SkemaFactory {
     return new Skema(Object.create(null))
   }
 
-  type (name, skema, object = UNDEFINED) {
+  // Declare a basic type
+  declare (name, definition, ...alias) {
     name = parseTypeName(name)
-    skema = this._parseObjectSkema(skema, true)
+    const skema = this._parseObjectSkema(definition, true)
 
-    this._types.register(name, skema, object)
+    this._types.register(name, skema, alias)
 
     return this
   }

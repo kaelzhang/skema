@@ -1,6 +1,7 @@
 # babel dist
 /lib
 /packages/*/lib
+/packages/skema/README.md
 
 # Numerous always-ignore extensions
 *.bak
