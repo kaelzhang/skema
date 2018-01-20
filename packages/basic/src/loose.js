@@ -29,7 +29,7 @@ export const LOOSE = {
           throw new TypeError('not a number')
         }
 
-        return value
+        return num
       }
     }
   },
