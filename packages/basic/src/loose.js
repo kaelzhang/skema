@@ -1,8 +1,10 @@
 import {
+  isNumber,
   isFunction,
   isRegExp,
   isString,
-  isError
+  isError,
+  isSymbol
 } from 'core-util-is'
 
 export const LOOSE = {
@@ -45,6 +47,10 @@ export const LOOSE = {
     alias: Date,
     definition: {
       set (value) {
+        if (isNumber(value) && value >= 0) {
+          return new Date(value)
+        }
+
         const date = Date.parse(value)
 
         if (date !== date) {
@@ -59,7 +65,13 @@ export const LOOSE = {
   'function': {
     alias: Function,
     definition: {
-      validate: isFunction
+      validate (value) {
+        if (isFunction(value)) {
+          return true
+        }
+
+        throw new TypeError('not a function')
+      }
     }
   },
 
@@ -67,7 +79,7 @@ export const LOOSE = {
     alias: RegExp,
     definition: {
       set (value) {
-        if (isRegExp) {
+        if (isRegExp(value)) {
           return value
         }
 
@@ -75,7 +87,7 @@ export const LOOSE = {
           return new RegExp(value)
         }
 
-        throw new Error('not a regular expression')
+        throw new TypeError('not a regular expression')
       }
     }
   },
@@ -105,7 +117,13 @@ if (typeof Symbol !== 'undefined') {
   LOOSE.symbol = {
     alias: Symbol,
     definition: {
-      set: Symbol
+      set (value) {
+        if (isSymbol(value)) {
+          return value
+        }
+
+        return Symbol(value)
+      }
     }
   }
 }
