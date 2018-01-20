@@ -3,11 +3,12 @@ import {LOOSE} from '@skema/basic'
 
 const {
   skema,
-  formula,
+  type,
   shape,
   arrayOf,
   objectOf,
-  any
+  any,
+  declare
 } = factory({
   types: LOOSE
 })
@@ -16,10 +17,11 @@ const defaults = factory
 
 export {
   skema,
-  formula,
+  type,
   shape,
   arrayOf,
   objectOf,
   any,
+  declare,
   defaults
 }

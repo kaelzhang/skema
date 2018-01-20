@@ -2,6 +2,7 @@
 ///////////////////////////////////////////////////////////
 import {Skema} from './skema'
 import {Options} from './options'
+import makeArray from 'make-array'
 import {
   UNDEFINED,
   isSkema, isString, isArray, isObject,
@@ -16,11 +17,12 @@ import {
 
 const METHODS = [
   'skema',
-  'formula',
+  'type',
   'shape',
   'objectOf',
   'arrayOf',
-  'any'
+  'any',
+  'declare'
 ]
 
 class Types {
@@ -91,11 +93,11 @@ class SkemaFactory {
 
     Object.keys(types).forEach(name => {
       const {
-        alias = [],
+        alias,
         definition
       } = types[name] || {}
 
-      this.declare(name, definition, ...alias)
+      this.declare(name, definition, ...makeArray(alias))
     })
   }
 
@@ -117,7 +119,7 @@ class SkemaFactory {
 
   // Create a single type
   type (definition): Skema {
-    return parseSkema(definition, this._types, this._options)
+    return this._parseSkema(definition, this._types, this._options)
   }
 
   // An object taking on a particular shape
