@@ -158,11 +158,9 @@ defineValues(Skema.prototype, {
       }
 
       return this._options.promiseExtra
-      .series.call(context.context, this._validate, value,
-        function (prev, factory) {
-          return factory.call(this, prev, ...args)
-        }
-      )
+      .series.call(context.context, this._validate, function (factory) {
+        return factory.call(this, value, ...args)
+      })
       .then(
         pass => {
           if (pass === false) {

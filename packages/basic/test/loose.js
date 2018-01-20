@@ -1,3 +1,4 @@
+import {LOOSE} from '../src'
 import {run} from './lib/runner'
 
 const CASES = [
@@ -10,4 +11,4 @@ const CASES = [
   ['string', String, {toString: () => 'foo'}, 'foo']
 ]
 
-CASES.forEach(run)
+CASES.forEach(run(LOOSE))
