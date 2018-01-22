@@ -64,7 +64,8 @@ export class Processor {
     // optional and default are mutual exclusive,
     // so we simply check optional first.
     if (!skema.isOptional()) {
-      throw 'is not optional'
+      throw this.context.error(
+        'NOT_OPTIONAL', this.context.context.key)
     }
 
     if (!skema.hasDefault()) {

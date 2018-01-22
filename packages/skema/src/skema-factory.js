@@ -3,6 +3,7 @@
 import {Skema} from './skema'
 import {Options} from './options'
 import makeArray from 'make-array'
+import {error} from './error'
 import {
   UNDEFINED,
   isSkema, isString, isArray, isObject,
@@ -25,6 +26,10 @@ const METHODS = [
   'declare'
 ]
 
+const getTypeName = name => isObject(name)
+  ? name.name || name
+  : name
+
 class Types {
   constructor () {
     this._types = new Map
@@ -36,7 +41,7 @@ class Types {
 
   set (name, skema) {
     if (this._types.has(name)) {
-      throw 'redefine a type'
+      throw error('REDEFINE_TYPE', getTypeName(name))
     }
 
     this._types.set(name, skema)
@@ -54,7 +59,7 @@ class Types {
 function getType (name, types, thrown) {
   const skema = types.get(name)
   if (thrown && !skema) {
-    throw 'type not found'
+    throw error('UNKNOWN_TYPE', getTypeName(name))
   }
 
   return skema
@@ -64,10 +69,10 @@ const REGEX_ENDS_QUESTION_MARK = /\?$/
 
 // Trim and validate type name
 function parseTypeName (name) {
-  name = name.trim()
-
-  if (REGEX_ENDS_QUESTION_MARK.test(name)) {
-    throw 'invalid name'
+  if (!isString(name)
+    || REGEX_ENDS_QUESTION_MARK.test(name = name.trim())
+  ) {
+    throw error('INVALID_TYPE_NAME', name)
   }
 
   return name
@@ -88,7 +93,7 @@ class SkemaFactory {
     this._types = new Types
 
     if (Object(types) !== types) {
-      throw 'invalid types'
+      throw error('NON_OBJECT_TYPES')
     }
 
     Object.keys(types).forEach(name => {
@@ -118,7 +123,7 @@ class SkemaFactory {
       return this.shape(subject)
     }
 
-    throw 'invalid argument'
+    throw error('INVALID_SKEMA')
   }
 
   // Create a single type

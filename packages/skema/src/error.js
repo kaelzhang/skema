@@ -1,24 +1,39 @@
 import {Errors} from 'err-object'
-const {E, error, i18n} = new Errors()
+const {E, error} = new Errors()
 
-E('ERR_NOT_A_NUMBER', {
-  message: '"%s" is not a number',
-  ctor: TypeError
+E('NOT_OPTIONAL', {
+  message: 'key "%s" is not optional',
+  ctor: Error
 })
 
-E('ERR_NOT_A_DATE', {
-  message: '"%s" is not a valid date',
-  ctor: TypeError
-})
-
-E('ERR_NOT_A_FUNCTION', {
-  message: '"%s" is not a function',
-  ctor: TypeError
+E('REDEFINE_TYPE', {
+  message: 'type "%s" should be defined again',
+  ctor: Error
 })
 
 E('UNKNOWN_TYPE', {
-  message: 'unknown type of "%s" for "%s"',
+  message: 'unknown type "%s"',
   ctor: RangeError
+})
+
+E('INVALID_TYPE_NAME', {
+  message: 'invalid type name "%s"',
+  ctor: TypeError
+})
+
+E('NON_OBJECT_TYPES', {
+  message: 'types must be an object',
+  ctor: TypeError
+})
+
+E('EMPTY_ARRAY_TYPE', {
+  message: 'empty type array',
+  ctor: TypeError
+})
+
+E('INVALID_SKEMA', {
+  message: 'invalid skema definition',
+  ctor: TypeError
 })
 
 E('INVALID_SETTER', {
@@ -31,13 +46,8 @@ E('INVALID_VALIDATOR', {
   ctor: TypeError
 })
 
-E('NOT_FUNCTION', {
-  message: '%s must be a function',
-  ctor: TypeError
-})
-
 E('VALIDATE_FAILS', {
   message: 'invalid value "%s" for key "%s"'
 })
 
-module.exports = {error, i18n}
+export {error}

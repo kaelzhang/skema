@@ -1,3 +1,5 @@
+import {error} from './error'
+
 // data = {a: {b: 1}}
 // 1. value: data, key: null, parent: null, path: []
 // 2. descend 'a': value: {b: 1}, key: 'a', parent: data, path: ['a']
@@ -25,9 +27,14 @@ export class Context {
     return new Context(value, key, parent, path)
   }
 
-  error (code): Error {
-    const error = new Error(code)
-    Object.assign(error, this.context)
-    return error
+  error (code, ...args): Error {
+    const err = code instanceof Error
+      ? code
+      : error(code, ...args)
+
+    Object.assign(err, this.context)
+    err.args = args
+    err.value = value
+    return err
   }
 }
