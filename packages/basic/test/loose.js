@@ -32,3 +32,8 @@ const CASES = [
 ]
 
 CASES.forEach(run(LOOSE))
+
+
+import {ids, check} from './lib/check'
+
+ids.forEach(check(LOOSE))

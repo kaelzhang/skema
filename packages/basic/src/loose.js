@@ -11,7 +11,6 @@ export const LOOSE = {
   string: {
     alias: String,
     definition: {
-      default: '',
       set (value) {
         // Everything could convert to a string, so no checking
         return value === undefined
