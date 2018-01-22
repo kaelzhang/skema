@@ -33,7 +33,7 @@ export class TypeDefinition {
     this._optional = this._default !== UNDEFINED
       ? true
       // By default, optional is false
-      : optional === true
+      : optional
     this._type = type
   }
 }

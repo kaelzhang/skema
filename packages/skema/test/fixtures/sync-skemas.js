@@ -146,6 +146,19 @@ export const factory = ({
     }
   })
 
+  cases.push({
+    d: 'parent default value',
+    s: skema({
+      a: {
+        type: TypeDefault
+      }
+    }),
+    input: {},
+    output: {
+      a: 1
+    }
+  })
+
   const TypeWhen = type({
     when () {
       return !!this.parent.b

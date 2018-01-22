@@ -68,6 +68,12 @@ export class Skema {
       ? this._options.promise.resolve(result, true)
       : result
   }
+
+  options (options) {
+    return this._derive({
+      _options: options
+    })
+  }
 }
 
 defineValues(Skema.prototype, {
@@ -109,7 +115,10 @@ defineValues(Skema.prototype, {
   },
 
   isOptional (): Boolean {
-    return this._optional === true
+    return this._optional === true || (
+      this._optional !== false &&
+      this._type &&
+      this._type.isOptional())
   },
 
   hasWhen (): boolean {
@@ -184,7 +193,7 @@ defineValues(Skema.prototype, {
     } = context
     const {promise} = options
 
-    const start = this._type && this._type.hasSet()
+    const start = this._type
       ? this._type.set(args, context, options)
       : promise.resolve(value)
 
@@ -202,9 +211,5 @@ defineValues(Skema.prototype, {
       )
       .catch(error => promise.reject(context.error(error)))
     })
-  },
-
-  options (options) {
-    this._options = options
   }
 })

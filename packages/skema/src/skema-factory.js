@@ -104,7 +104,7 @@ class SkemaFactory {
   // The one that has everything inside
   skema (subject): Skema {
     if (isSkema(subject)) {
-      return subject
+      return this._recreate(subject)
     }
 
     if (isArray(subject)) {
@@ -164,6 +164,14 @@ class SkemaFactory {
 }
 
 defineValues(SkemaFactory.prototype, {
+  _recreate (skema) {
+    if (skema._options === this._options) {
+      return skema
+    }
+
+    return skema.options(this._options)
+  },
+
   _create (definition) {
     definition._options = this._options
     return new Skema(definition)

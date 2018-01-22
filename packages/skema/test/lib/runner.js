@@ -43,7 +43,7 @@ export function run (skemaOptions = {}) {
     only
   }, i) => {
     getTest(only)(`${i}: clean:${!!skemaOptions.clean}, ${d}`, async t => {
-      return tryCatch(
+      await tryCatch(
         () => s.from(input),
         o => {
           if (e) {
@@ -59,7 +59,7 @@ export function run (skemaOptions = {}) {
           t.is(o, output, 'result not match')
         },
 
-        e => {
+        error => {
           if (!e) {
             console.log('unexpected error:', error.stack || error)
             t.fail('should not fail')
