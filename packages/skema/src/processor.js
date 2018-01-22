@@ -9,9 +9,9 @@ export class Processor {
 
     const {
       key,
-      origin
+      parent
     } = this.context.context
-    this._isDefault = !(key in origin)
+    this._isDefault = !(key in parent)
   }
 
   process () {
@@ -39,7 +39,8 @@ export class Processor {
       return this._shouldSkip()
     }
 
-    return skema.when(this.args, this.context.context)
+    return skema.when(
+      this.args, this.context, this.options)
     .then(hit => {
       if (!hit) {
         // Skip
@@ -71,7 +72,8 @@ export class Processor {
       return true
     }
 
-    return skema.default(this.args, this.context.context)
+    return skema.default(
+      this.args, this.context, this.options)
     .then(value => {
       this.context.value = value
       return false

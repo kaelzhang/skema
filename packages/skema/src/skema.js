@@ -83,7 +83,7 @@ defineValues(Skema.prototype, {
     return new Skema(options)
   },
 
-  _hasOwn (key) {
+  _hasOwnArray (key) {
     const value = this['_' + key]
     return isDefined(value) && value.length !== 0
   },
@@ -93,7 +93,7 @@ defineValues(Skema.prototype, {
       return true
     }
 
-    return this._hasOwn(key)
+    return isDefined(this['_' + key])
   },
 
   isConfigurable () {
@@ -148,33 +148,34 @@ defineValues(Skema.prototype, {
       value
     } = context
     const {promise} = options
+    const {resolve} = promise
 
     const start = this._type
       ? this._type.validate(args, context, options)
-      : promise.resolve(true)
+      : resolve(true)
 
     return start
     .then(pass => {
-      if (!pass || !this._hasOwn('validate')) {
+      if (!pass || !this._hasOwnArray('validate')) {
         return pass
       }
 
       return options.promiseExtra
       .series.call(context.context, this._validate, function (factory) {
-        return factory.call(this, value, ...args)
+        return resolve(factory.call(this, value, ...args))
+        .then(
+          pass => {
+            if (pass === false) {
+              throw context.error('validate fail')
+            }
+
+            return true
+          },
+
+          // Ensure that the context information is attached to the error object
+          error => promise.reject(context.error(error))
+        )
       })
-      .then(
-        pass => {
-          if (pass === false) {
-            throw context.error('validate fail')
-          }
-
-          return true
-        },
-
-        // Ensure that the context information is attached to the error object
-        error => promise.reject(context.error(error))
-      )
     })
   },
 
@@ -188,7 +189,7 @@ defineValues(Skema.prototype, {
       ? this._type.set(args, context, options)
       : promise.resolve(value)
 
-    if (!this._hasOwn('set')) {
+    if (!this._hasOwnArray('set')) {
       return start
     }
 

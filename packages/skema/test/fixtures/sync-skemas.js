@@ -23,7 +23,8 @@ export const factory = ({
 
   const {
     skema,
-    type
+    type,
+    declare
   } = defaults({
     async,
     types
@@ -121,6 +122,71 @@ export const factory = ({
     output: {
       a: 1
     }
+  })
+
+  const TypeDefault = type({
+    default: 1
+  })
+
+  const Depth1WithTypeDefault = skema({
+    a: TypeDefault
+  })
+
+  // 5
+  cases.push({
+    d: 'default value',
+    s: Depth1WithTypeDefault,
+    input: {},
+    output: {
+      a: 1
+    }
+  })
+
+  const TypeWhen = type({
+    when () {
+      return !!this.parent.b
+    }
+  })
+
+  const TypeWhenAndAlwaysFail = type({
+    when () {
+      return this.parent.b > 1
+    },
+    validate () {
+      return false
+    }
+  })
+
+  // 6
+  cases.push({
+    d: 'when and skip',
+    s: skema({
+      a: TypeWhenAndAlwaysFail
+    }),
+    input: {
+      a: 1,
+      b: 1
+    },
+    output: clean
+      ? {}
+      : {
+        a: 1,
+        b: 1
+      }
+  })
+
+  // 7
+  cases.push({
+    d: 'when and not skip, fails',
+    s: skema({
+      a: TypeWhenAndAlwaysFail
+    }),
+    input: {
+      a: 1,
+      b: 2
+    },
+    output: 'error todo',
+    e: true
   })
 
   return {

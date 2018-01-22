@@ -32,18 +32,23 @@ const User = {
   profile: Profile
 }
 
-// Then use these definitions to purify out data.
+// Then use these definitions to purify our data.
 const user = skema(User).from({
-  id: "1",
+  id: '1',
   profile: {
     name: 'Steve',
     birth: '2017-01-01'
   }
 })
 
-user.id             // 1
-user.profile.name   // Steve
-user.profile.birth  // Date('2017-01-01')
+console.log(user)
+// {
+//   id: 1,
+//   profile: {
+//     name: 'Steve',
+//     birth: Date<'2017-01-01'>  // Date object
+//   }
+// }
 ```
 
 
