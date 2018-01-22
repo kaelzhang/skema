@@ -1,4 +1,5 @@
 import {Errors} from 'err-object'
+import util from 'util'
 const {E, error} = new Errors()
 
 E('NOT_OPTIONAL', {
@@ -47,7 +48,14 @@ E('INVALID_VALIDATOR', {
 })
 
 E('VALIDATE_FAILS', {
-  message: 'invalid value "%s" for key "%s"'
+  message (value, key) {
+    value = util.inspect(value)
+    if (key) {
+      return util.format('invalid value %s for key "%s"', value, key)
+    }
+
+    return util.format('invalid value %s', value)
+  }
 })
 
 export {error}

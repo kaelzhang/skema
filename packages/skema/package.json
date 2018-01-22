@@ -43,7 +43,7 @@
     "err-object": "^2.0.3",
     "make-array": "^1.0.2",
     "promise-faker": "^1.2.2",
-    "promise.extra": "^2.1.0",
+    "promise.extra": "^2.1.1",
     "symbol-for": "^1.0.0"
   }
 }

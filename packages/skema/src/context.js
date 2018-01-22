@@ -27,14 +27,26 @@ export class Context {
     return new Context(value, key, parent, path)
   }
 
-  error (code, ...args): Error {
-    const err = code instanceof Error
-      ? code
-      : error(code, ...args)
+  _wrap (error) {
+    Object.assign(error, this.context)
+    error.value = this.value
 
-    Object.assign(err, this.context)
+    return error
+  }
+
+  makeError (error) {
+    const err = error instanceof Error
+      ? error
+      : new Error(error)
+    err.code = 'CUSTOM_ERROR'
+
+    return this._wrap(err)
+  }
+
+  errorByCode (code, ...args): Error {
+    const err = error(code, ...args)
     err.args = args
-    err.value = value
-    return err
+
+    return this._wrap(err)
   }
 }

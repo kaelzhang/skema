@@ -174,7 +174,7 @@ defineValues(Skema.prototype, {
         .then(
           pass => {
             if (pass === false) {
-              throw context.error(
+              throw context.errorByCode(
                 'VALIDATE_FAILS', value, context.context.key)
             }
 
@@ -182,7 +182,7 @@ defineValues(Skema.prototype, {
           },
 
           // Ensure that the context information is attached to the error object
-          error => promise.reject(context.error(error))
+          error => promise.reject(context.makeError(error))
         )
       })
     })
@@ -210,7 +210,7 @@ defineValues(Skema.prototype, {
           return factory.call(this, prev, ...args)
         }
       )
-      .catch(error => promise.reject(context.error(error)))
+      .catch(error => promise.reject(context.makeError(error)))
     })
   }
 })

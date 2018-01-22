@@ -1,7 +1,6 @@
 import make_array from 'make-array'
 import {error} from './error'
 import symbol from 'symbol-for'
-
 export const UNDEFINED = undefined
 
 export const TYPE_SKEMA = symbol.for('skema')

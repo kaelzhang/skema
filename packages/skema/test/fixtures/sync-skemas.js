@@ -87,7 +87,16 @@ export const factory = ({
       a: 1,
       b: 2
     },
-    output: 'error todo',
+    output: {
+      code: 'NOT_OPTIONAL',
+      message: 'key "c" is not optional',
+      path: ['c'],
+      parent: {
+        a: 1,
+        b: 2
+      },
+      args: ['c']
+    },
     e: true
   })
 
@@ -202,7 +211,13 @@ export const factory = ({
       a: 1,
       b: 2
     },
-    output: 'error todo',
+    output: {
+      code: 'VALIDATE_FAILS',
+      message: 'invalid value 1 for key "a"',
+      args: [1, 'a'],
+      value: 1,
+      path: ['a']
+    },
     e: true
   })
 
@@ -251,7 +266,9 @@ export const factory = ({
     d: 'function validator, fails',
     s: TypeFunctionValidator,
     input: 0,
-    output: 'error todo',
+    output: {
+      message: 'invalid value 0'
+    },
     e: true
   })
 
@@ -270,7 +287,9 @@ export const factory = ({
     d: 'regexp validator, fails',
     s: TypeRegExpValidator,
     input: 'abc1',
-    output: 'error todo',
+    output: {
+      message: 'invalid value \'abc1\''
+    },
     e: true
   })
 
@@ -291,23 +310,26 @@ export const factory = ({
     d: 'array validators, fails 0',
     s: TypeArrayValidator,
     input: 0,
-    output: 'error todo',
+    output: {
+      code: 'VALIDATE_FAILS',
+      message: 'invalid value 0',
+      path: [],
+      value: 0
+    },
     e: true
   })
 
   cases.push({
-    d: 'array validators, fails 0',
-    s: TypeArrayValidator,
-    input: 0,
-    output: 'error todo',
-    e: true
-  })
-
-  cases.push({
+    only,
     d: 'array validators, fails 1',
     s: TypeArrayValidator,
     input: 1,
-    output: 'foo',
+    output: {
+      code: 'CUSTOM_ERROR',
+      message: 'foo',
+      path: [],
+      value: 1
+    },
     e: true
   })
 

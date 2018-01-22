@@ -7,7 +7,6 @@ const getTest = only => only
 
 const tryCatchSync = (func, success, fail) => {
   let o
-
   try {
     o = func()
   } catch (error) {
@@ -39,8 +38,11 @@ export function run (skemaOptions = {}) {
     input,
     // output value
     output,
+    // error
     e,
-    only
+    only,
+    // special match: only match values, but do not use deepEqual
+    sm
   }, i) => {
     getTest(only)(`${i}: clean:${!!skemaOptions.clean}, ${d}`, async t => {
       await tryCatch(
@@ -51,25 +53,37 @@ export function run (skemaOptions = {}) {
             return
           }
 
-          if (Object(output) === output) {
-            t.deepEqual(o, output, 'result not match')
-            return
-          }
-
-          t.is(o, output, 'result not match')
+          typeof output === 'function'
+            ? output(t)
+            : sm
+              ? sMatch(t, o, output)
+              : match(t, o, output)
         },
-
         error => {
           if (!e) {
             console.log('unexpected error:', error.stack || error)
             t.fail('should not fail')
             return
           }
-          // TODO
-          t.pass()
-          // t.is(output, error.message, 'error message not match')
+
+          sMatch(t, error, output, 'error: ')
         }
       )
     })
   }
+}
+
+function match (t, value, expect, prefix = '') {
+  if (Object(expect) === expect) {
+    t.deepEqual(value, expect, `${prefix}result not match`)
+    return
+  }
+
+  t.is(value, expect, `${prefix}result not match`)
+}
+
+function sMatch (t, value, expect, prefix = '') {
+  Object.keys(expect).forEach(key => {
+    match(t, value[key], expect[key], prefix + key + ': ')
+  })
 }
