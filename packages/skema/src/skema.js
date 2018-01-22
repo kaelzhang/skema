@@ -148,11 +148,10 @@ defineValues(Skema.prototype, {
       value
     } = context
     const {promise} = options
-    const {resolve} = promise
 
     const start = this._type
       ? this._type.validate(args, context, options)
-      : resolve(true)
+      : promise.resolve(true)
 
     return start
     .then(pass => {
@@ -162,7 +161,7 @@ defineValues(Skema.prototype, {
 
       return options.promiseExtra
       .series.call(context.context, this._validate, function (factory) {
-        return resolve(factory.call(this, value, ...args))
+        return promise.resolve(factory.call(this, value, ...args))
         .then(
           pass => {
             if (pass === false) {

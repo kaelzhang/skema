@@ -2,13 +2,16 @@ import test from 'ava'
 import {factory} from './fixtures/sync-skemas'
 import {run} from './lib/runner'
 
-const {
-  cases
-} = factory({
+function go (options) {
+  factory(options).cases.forEach(run(options))
+}
+
+go({
   async: false,
   clean: false
 })
 
-const runner = run()
-
-cases.forEach(runner)
+go({
+  async: false,
+  clean: true
+})

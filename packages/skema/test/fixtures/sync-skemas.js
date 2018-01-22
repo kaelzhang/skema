@@ -24,9 +24,12 @@ export const factory = ({
   const {
     skema,
     type,
+    objectOf,
+    arrayOf,
     declare
   } = defaults({
     async,
+    clean,
     types
   })
 
@@ -36,6 +39,7 @@ export const factory = ({
     c: Boolean
   })
 
+  // 0
   cases.push({
     d: 'structure',
     s: Depth1,
@@ -187,6 +191,164 @@ export const factory = ({
     },
     output: 'error todo',
     e: true
+  })
+
+  // 8
+  cases.push({
+    d: 'when and not skip, not fails',
+    s: skema({
+      a: TypeWhen
+    }),
+    input: {
+      a: 1,
+      b: 2
+    },
+    output: clean
+      ? {
+        a: 1
+      }
+      : {
+        a: 1,
+        b: 2
+      }
+  })
+
+  // 9
+  cases.push({
+    d: 'just TypeWhen, when is invalid if no parent',
+    s: TypeWhen,
+    input: 1,
+    output: 1
+  })
+
+  const TypeFunctionValidator = type({
+    validate: v => v > 0
+  })
+
+  // 9
+  cases.push({
+    d: 'function validator',
+    s: TypeFunctionValidator,
+    input: 1,
+    output: 1
+  })
+
+  // 9
+  cases.push({
+    d: 'function validator, fails',
+    s: TypeFunctionValidator,
+    input: 0,
+    output: 'error todo',
+    e: true
+  })
+
+  const TypeRegExpValidator = type({
+    validate: /^[a-z]+$/
+  })
+
+  cases.push({
+    d: 'regexp validator',
+    s: TypeRegExpValidator,
+    input: 'abc',
+    output: 'abc'
+  })
+
+  cases.push({
+    d: 'regexp validator, fails',
+    s: TypeRegExpValidator,
+    input: 'abc1',
+    output: 'error todo',
+    e: true
+  })
+
+  const TypeArrayValidator = type({
+    validate: [
+      v => v > 0,
+      v => {
+        if (v > 1) {
+          return true
+        }
+
+        throw 'foo'
+      }
+    ]
+  })
+
+  cases.push({
+    d: 'array validators, fails 0',
+    s: TypeArrayValidator,
+    input: 0,
+    output: 'error todo',
+    e: true
+  })
+
+  cases.push({
+    d: 'array validators, fails 0',
+    s: TypeArrayValidator,
+    input: 0,
+    output: 'error todo',
+    e: true
+  })
+
+  cases.push({
+    d: 'array validators, fails 1',
+    s: TypeArrayValidator,
+    input: 1,
+    output: 'foo',
+    e: true
+  })
+
+  cases.push({
+    d: 'array validators, not fails',
+    s: TypeArrayValidator,
+    input: 2,
+    output: 2
+  })
+
+  const TypeObjectOf = objectOf(String)
+  cases.push({
+    d: 'object of String',
+    s: TypeObjectOf,
+    input: {
+      a: '1',
+      b: 1,
+      c: {toString: () => 'foo'}
+    },
+    output: {
+      a: '1',
+      b: '1',
+      c: 'foo'
+    }
+  })
+
+  const TypeArrayOf = arrayOf(String)
+  cases.push({
+    d: 'array of String',
+    s: TypeArrayOf,
+    input: [1, '1', {toString: () => 'foo'}],
+    output: ['1', '1', 'foo']
+  })
+
+  const createSparseArray = (i, value) => {
+    const sparseArray = []
+    sparseArray[i] = value
+    return sparseArray
+  }
+
+
+  cases.push({
+    d: 'sparse array of String, fails due to required',
+    s: TypeArrayOf,
+    input: createSparseArray(2, 1),
+    output: 'error todo',
+    e: true
+  })
+
+  cases.push({
+    d: 'sparse array of string, optional',
+    s: arrayOf(type(String).optional()),
+    input: createSparseArray(2, 1),
+    output: createSparseArray(2, '1')
   })
 
   return {

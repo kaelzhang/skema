@@ -7,7 +7,6 @@ export class Options {
     types,
     clean = false
   }) {
-
     this.promise = _async
       ? Promise
       : FakePromise
