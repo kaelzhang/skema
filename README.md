@@ -5,9 +5,9 @@
 
 `skema` provides a handy and composable way to validate/transform JavaScript variables:
 
-- **Fully customizable error objects.**
 - **Supports both async and sync flows.** Skema has two working modes
 - **Pluggable basic types and custom types.**
+- **Fully customizable error objects.**
 
 ## Table of Contents
 
@@ -20,17 +20,20 @@
 ```js
 import {skema} from 'skema'
 
-const Profile = skema({
+// Schema definitions have nothing to do with `skema`,
+// they are ONLY objects.
+const Profile = {
   name: String,
   birth: Date
-})
+}
 
-const User = skema({
+const User = {
   id: Number,
   profile: Profile
-})
+}
 
-const user = User.from({
+// Then use these definitions to purify out data.
+const user = skema(User).from({
   id: "1",
   profile: {
     name: 'Steve',

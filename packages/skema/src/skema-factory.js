@@ -103,6 +103,10 @@ class SkemaFactory {
 
   // The one that has everything inside
   skema (subject): Skema {
+    if (isSkema(subject)) {
+      return subject
+    }
+
     if (isArray(subject)) {
       if (subject.length === 0) {
         throw 'empty array'
@@ -119,20 +123,20 @@ class SkemaFactory {
 
   // Create a single type
   type (definition): Skema {
-    return this._parseSkema(definition, this._types, this._options)
+    return this._parseSkema(definition)
   }
 
   // An object taking on a particular shape
   shape (shape: IObjectSkema): Skema {
     return this._create({
-      _composable: new ShapeComposable(this._parseShape(shape, this._types))
+      _composable: new ShapeComposable(this._parseShape(shape))
     })
   }
 
   // An object with property values of a certain type
   objectOf (type): Skema {
     return this._create({
-      _composable: new TypeObjectComposable(this._parseSkema(type, this._types))
+      _composable: new TypeObjectComposable(this._parseSkema(type))
     })
   }
 

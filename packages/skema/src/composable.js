@@ -10,7 +10,7 @@ class Composable {
     this._rule = rule
   }
 
-  from (context: Context, options: Options, args) {
+  from (args, context: Context, options: Options) {
     const values = this._create(context, options)
     const tasks = this._tasks(context).map(([context, skema]) =>
       new Processor({

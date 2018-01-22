@@ -1,14 +1,14 @@
 import test from 'ava'
-import {defaults, skema} from '../src'
+import {factory} from './fixtures/sync-skemas'
+import {run} from './lib/runner'
 
-test.only('skema', async t => {
-  const User = skema({
-    id: Number
-  })
-
-  const user = User.from({
-    id: '1'
-  })
-
-  t.deepEqual(user, {id: 1})
+const {
+  cases
+} = factory({
+  async: false,
+  clean: false
 })
+
+const runner = run()
+
+cases.forEach(runner)
