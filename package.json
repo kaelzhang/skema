@@ -17,5 +17,9 @@
     "codecov": "^3.0.0",
     "lerna": "^2.6.0",
     "nyc": "^11.1.0"
+  },
+  "scripts": {
+    "cp-readme": "cp ./README.md ./packages/skema",
+    "publish": "lerna publish -- --access=public"
   }
 }

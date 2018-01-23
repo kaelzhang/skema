@@ -5,9 +5,8 @@
 
 `skema` provides a handy and composable way to validate/transform JavaScript variables:
 
-- **Supports both async and sync flows.** Skema has two working modes
-- **Pluggable basic types and custom types.**
-- **Fully customizable error objects.**
+- **Supports both async and sync flows.** `skema` has two working modes to supports both async or sync validators, setters, etc.
+- **Pluggable basic types and custom types.** Even basic types such as `Number` could also be specified if using `skema`, so that `skema` could be used as either type checker or data transformer/purifier.
 
 ## Table of Contents
 
