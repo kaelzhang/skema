@@ -1,0 +1,49 @@
+{
+  "name": "skema",
+  "version": "8.0.1",
+  "description": "Skema provides a handy and composable way to validate and transform JavaScript objects.",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "scripts": {
+    "build": "BABEL_ENV=babel ../../node_modules/.bin/babel src --out-dir lib",
+    "test": "BABEL_ENV=ava ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
+    "test-no-cov": "BABEL_ENV=ava ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
+    "prepublish": "npm run build",
+    "report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kaelzhang/skema.git"
+  },
+  "keywords": [
+    "skema",
+    "schema",
+    "validators",
+    "default",
+    "setters",
+    "check",
+    "validate"
+  ],
+  "engines": {
+    "node": ">=4"
+  },
+  "author": "kaelzhang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kaelzhang/skema/issues"
+  },
+  "ava": {
+    "require": "babel-register",
+    "babel": {
+      "babelrc": true
+    }
+  },
+  "dependencies": {
+    "@skema/basic": "^1.0.1",
+    "err-object": "^2.0.3",
+    "make-array": "^1.0.2",
+    "promise-faker": "^1.2.2",
+    "promise.extra": "^2.1.1",
+    "symbol-for": "^1.0.0"
+  }
+}

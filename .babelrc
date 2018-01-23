@@ -1,17 +1,57 @@
 {
-  "presets": [
-    "es2015"
-  ],
-  "plugins": [
-    "transform-class-properties",
-    "transform-object-rest-spread",
-    "transform-exponentiation-operator",
-    "syntax-trailing-function-commas",
-    "transform-inline-environment-variables",
-    "transform-es2015-modules-commonjs",
-    "transform-async-to-generator",
-    ["transform-runtime", {
-      "regenerator": true
-    }]
-  ]
+  "parserOpts": {
+    // Allow returns in the module
+    "allowReturnOutsideFunction": true
+  },
+
+  "env": {
+    "babel": {
+      "plugins": [
+        "transform-decorators-legacy",
+        "transform-flow-strip-types",
+        "transform-es2015-modules-commonjs",
+        "transform-class-properties",
+        "transform-object-rest-spread",
+        "transform-exponentiation-operator",
+        "transform-async-to-generator",
+        "syntax-trailing-function-commas",
+        "transform-inline-environment-variables"
+      ]
+    },
+
+    "ava": {
+      "plugins": [
+        "transform-decorators-legacy",
+        "transform-flow-strip-types",
+        "transform-es2015-modules-commonjs",
+        "transform-class-properties",
+        "transform-object-rest-spread",
+        "transform-exponentiation-operator",
+        "transform-async-to-generator",
+        "syntax-trailing-function-commas",
+        "transform-inline-environment-variables", [
+          "transform-runtime", {
+            "regenerator": true
+          }
+        ]
+      ]
+    },
+
+    "rollup": {
+      "plugins": [
+        "transform-decorators-legacy",
+        "transform-flow-strip-types",
+        "transform-class-properties",
+        "transform-object-rest-spread",
+        "transform-exponentiation-operator",
+        "transform-async-to-generator",
+        "syntax-trailing-function-commas",
+        "transform-inline-environment-variables", [
+          "transform-runtime", {
+            "regenerator": true
+          }
+        ]
+      ]
+    }
+  }
 }

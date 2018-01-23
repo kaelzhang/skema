@@ -1,21 +1,12 @@
-[![Build Status](https://travis-ci.org/kaelzhang/node-skema.svg?branch=master)](https://travis-ci.org/kaelzhang/node-skema)
-[![Coverage](https://codecov.io/gh/kaelzhang/node-skema/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/node-skema)
-<!-- optional appveyor tst
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/kaelzhang/node-skema?branch=master&svg=true)](https://ci.appveyor.com/project/kaelzhang/node-skema)
--->
-<!-- optional npm version
-[![NPM version](https://badge.fury.io/js/skema.svg)](http://badge.fury.io/js/skema)
--->
-<!-- optional npm downloads
-[![npm module downloads per month](http://img.shields.io/npm/dm/skema.svg)](https://www.npmjs.org/package/skema)
--->
-<!-- optional dependency status
-[![Dependency Status](https://david-dm.org/kaelzhang/node-skema.svg)](https://david-dm.org/kaelzhang/node-skema)
--->
+[![Build Status](https://travis-ci.org/kaelzhang/skema.svg?branch=master)](https://travis-ci.org/kaelzhang/skema)
+[![Coverage](https://codecov.io/gh/kaelzhang/skema/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/skema)
 
 # skema
 
-`skema` is the collection of common abstract methods for validatiors and setters. All validators and setters could be normal synchronous functions or es7 async funtions or functions which returns `Promise`'s
+`skema` provides a handy and composable way to validate/transform JavaScript variables:
+
+- **Supports both async and sync flows.** `skema` has two working modes to supports both async or sync validators, setters, etc.
+- **Pluggable basic types and custom types.** Even basic types such as `Number` could also be specified if using `skema`, so that `skema` could be used as either type checker or data transformer/purifier.
 
 ## Table of Contents
 
@@ -23,10 +14,40 @@
 - [API References](#skemaoptions)
 - [Many Examples](#examples)
 
-## Usage
+## Basic Usage
 
 ```js
-import skema from 'skema'
+import {skema} from 'skema'
+
+// Schema definitions have nothing to do with `skema`,
+// they are ONLY objects.
+const User = {
+  id: Number,
+  profile: {
+    name: String,
+    birth: Date
+  }
+}
+
+// Then use these definitions to purify our data.
+const user = skema(User).from({
+  id: '1',
+  profile: {
+    name: 'Steve',
+    birth: '2017-01-01'
+  }
+})
+
+console.log(user)
+// {
+//   id: 1,
+//   profile: {
+//     name: 'Steve',
+//     birth: Date<'2017-01-01'>  // Date object
+//   }
+// }
+```
+
 
 const rules = {
   foo: {
@@ -61,7 +82,7 @@ console.log(parsed.baz)
 // 'i am innocent', the script tag has been stripped
 
 // It will throw because not writable
-value.baz = 'i am evil'   
+value.baz = 'i am evil'
 ```
 
 ## skema(options)
