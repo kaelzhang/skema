@@ -26,7 +26,8 @@ export const factory = ({
     type,
     objectOf,
     arrayOf,
-    declare
+    declare,
+    any
   } = defaults({
     async,
     clean,
@@ -54,8 +55,6 @@ export const factory = ({
       c: true
     }
   })
-
-  const Depth2 =
 
   // 1
   cases.push({
@@ -149,6 +148,18 @@ export const factory = ({
     }
   })
 
+  cases.push({
+    d: 'optional skema required again',
+    s: () => skema({
+      a: skema(Number).optional().required()
+    }),
+    input: {},
+    output: {
+      code: 'NOT_OPTIONAL'
+    },
+    e: true
+  })
+
   const TypeDefault = () => type({
     default: 1
   })
@@ -170,6 +181,21 @@ export const factory = ({
     s: () => skema({
       a: type({
         type: TypeDefault()
+      })
+    }),
+    input: {},
+    output: {
+      a: 1
+    }
+  })
+
+  cases.push({
+    d: 'function default',
+    s: () => skema({
+      a: type({
+        default () {
+          return 1
+        }
       })
     }),
     input: {},
@@ -211,6 +237,25 @@ export const factory = ({
       }
   })
 
+  cases.push({
+    d: 'when and skip, parent',
+    s: () => skema({
+      a: type({
+        type: TypeWhenAndAlwaysFail()
+      })
+    }),
+    input: {
+      a: 1,
+      b: 1
+    },
+    output: clean
+      ? {}
+      : {
+        a: 1,
+        b: 1
+      }
+  })
+
   // 7
   cases.push({
     d: 'when and not skip, fails',
@@ -229,6 +274,22 @@ export const factory = ({
       path: ['a']
     },
     e: true
+  })
+
+  cases.push({
+    d: 'always skip with when:false',
+    s: () => skema({
+      a: type({
+        when: false,
+        validate: () => false
+      })
+    }),
+    input: {
+      a: 1
+    },
+    output: clean
+      ? {}
+      : {a: 1}
   })
 
   // 8
@@ -373,6 +434,19 @@ export const factory = ({
     output: 2
   })
 
+  cases.push({
+    d: 'invalid validator',
+    s: () => skema({
+      a: type({
+        validate: 1
+      })
+    }),
+    output: {
+      code: 'INVALID_VALIDATOR'
+    },
+    se: true
+  })
+
   const TypeSetter = () => type({
     set () {
       return 1
@@ -425,6 +499,19 @@ export const factory = ({
     output: {
       a: 2
     }
+  })
+
+  cases.push({
+    d: 'invalid setter',
+    s: () => skema({
+      a: type({
+        set: 1
+      })
+    }),
+    output: {
+      code: 'INVALID_SETTER'
+    },
+    se: true
   })
 
   const TypeObjectOf = () => objectOf(String)
@@ -557,6 +644,131 @@ export const factory = ({
       code: 'INVALID_TYPE_NAME'
     },
     se: true
+  })
+
+  cases.push({
+    d: 'invalid skema',
+    s: () => skema(1),
+    output: {
+      code: 'INVALID_SKEMA'
+    },
+    se: true
+  })
+
+  cases.push({
+    d: 'any',
+    s: () => skema({
+      a: any(),
+      b: any(),
+      c: any()
+    }),
+    input: {
+      a: 1,
+      b: '2',
+      c: false,
+      d: 3
+    },
+    output: clean
+      ? {
+        a: 1,
+        b: '2',
+        c: false
+      }
+      : {
+        a: 1,
+        b: '2',
+        c: false,
+        d: 3
+      }
+  })
+
+  cases.push({
+    d: 'invalid types error',
+    s: () => defaults({
+      types: true
+    }),
+    output: {
+      code: 'NON_ARRAY_TYPES'
+    },
+    se: true
+  })
+
+  cases.push({
+    d: 'unknown type error',
+    s: () => skema({a: 'unknown'}),
+    output: {
+      code: 'UNKNOWN_TYPE'
+    },
+    se: true
+  })
+
+  cases.push({
+    d: 're-declare type error',
+    s: () => declare('string', skema(String)),
+    output: {
+      code: 'REDECLARE_TYPE'
+    },
+    se: true
+  })
+
+  cases.push({
+    d: 're-declare type error',
+    s: () => declare(String, skema(String)),
+    output: {
+      code: 'REDECLARE_TYPE'
+    },
+    se: true
+  })
+
+  const TypeDescriptor = () => type({
+    writable: false,
+    configurable: false,
+    enumerable: false
+  })
+
+  const TypeDescriptorOutput = ({
+    enumerable,
+    configurable,
+    writable
+  } = {}) => (t, o) => {
+    const descriptor = Object.getOwnPropertyDescriptor(o, 'a')
+
+    t.deepEqual(descriptor, {
+      value: 1,
+      enumerable: !!enumerable,
+      configurable: !!configurable,
+      writable: !!writable
+    })
+  }
+
+  cases.push({
+    d: 'descriptor',
+    s: () => skema({
+      a: TypeDescriptor()
+    }),
+    input: {
+      a: 1
+    },
+    output: TypeDescriptorOutput()
+  })
+
+  const properties = [
+    'enumerable',
+    'writable',
+    'configurable'
+  ]
+
+  properties.forEach(key => {
+    cases.push({
+      d: `descriptor, creator, ${key}`,
+      s: () => skema({
+        a: TypeDescriptor()[key](true)
+      }),
+      input: {
+        a: 1
+      },
+      output: TypeDescriptorOutput({[key]: true})
+    })
   })
 
   return {

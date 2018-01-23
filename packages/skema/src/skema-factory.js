@@ -59,7 +59,7 @@ class Types {
   }
 
   _redefine (name) {
-    throw error('REDEFINE_TYPE', getTypeName(name))
+    throw error('REDECLARE_TYPE', getTypeName(name))
   }
 
   _setHash (name, skema) {
@@ -223,7 +223,7 @@ defineValues(SkemaFactory.prototype, {
       return this.shape(subject)
     }
 
-    return getType(subject, this._types, true)
+    throw error('INVALID_SKEMA')
   },
 
   // Make sure the options are the latest given options

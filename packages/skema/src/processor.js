@@ -1,12 +1,12 @@
 // Processor to run the flow async or sync
 ///////////////////////////////////////////////////////////
 import {Options} from './options'
-import {UNDEFINED, defineProperty} from './util'
+import {UNDEFINED, defineProperty, getKey} from './util'
 
 export class Processor {
   constructor (options) {
     Object.assign(this, options)
-    
+
     const {
       key,
       parent
@@ -100,8 +100,7 @@ export class Processor {
 }
 
 function configure (config, name, skema) {
-  const value = skema[name]()
-
+  const value = skema[getKey(name, 'is')]()
   if (value !== UNDEFINED) {
     config[name] = value
     return

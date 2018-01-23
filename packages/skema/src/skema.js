@@ -5,11 +5,9 @@ import {Context} from './context'
 import {
   TYPE_SKEMA, UNDEFINED,
   isDefined,
-  defineValue, defineValues, getKey
+  defineValue, defineValues, getKey,
+  PREFIX_IS, PREFIX_HAS
 } from './util'
-
-const PREFIX_IS = 'is'
-const PREFIX_HAS = 'has'
 
 export class Skema {
   constructor (definition) {
@@ -81,7 +79,9 @@ defineValues(Skema.prototype, {
     const value = this['_' + key]
     return isDefined(value)
       ? value
-      : this._type[getKey(key, PREFIX_IS)]()
+      : this._type
+        ? this._type[getKey(key, PREFIX_IS)]()
+        : UNDEFINED
   },
 
   _derive (extra) {
@@ -106,7 +106,7 @@ defineValues(Skema.prototype, {
     return this._getConfig('configurable')
   },
 
-  isEnumberable () {
+  isEnumerable () {
     return this._getConfig('enumerable')
   },
 

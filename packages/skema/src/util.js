@@ -2,6 +2,8 @@ import make_array from 'make-array'
 import {error} from './error'
 import symbol from 'symbol-for'
 export const UNDEFINED = void 0
+export const PREFIX_IS = 'is'
+export const PREFIX_HAS = 'has'
 
 export const TYPE_SKEMA = symbol.for('skema')
 export const isSkema = subject => !!subject && subject[TYPE_SKEMA] === true

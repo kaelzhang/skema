@@ -2,8 +2,8 @@ import {Errors} from 'err-object'
 import util from 'util'
 const {E, error} = new Errors()
 
-E('REDEFINE_TYPE', {
-  message: 'type \'%s\' should not be defined again',
+E('REDECLARE_TYPE', {
+  message: 'type \'%s\' should not be declared again',
   ctor: Error
 })
 

@@ -56,7 +56,7 @@ export function run (skemaOptions = {}) {
             }
 
             typeof output === 'function'
-              ? output(t)
+              ? output(t, o)
               : sm
                 ? sMatch(t, o, output)
                 : match(t, o, output)
