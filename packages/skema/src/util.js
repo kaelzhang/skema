@@ -5,6 +5,10 @@ export const UNDEFINED = undefined
 
 export const TYPE_SKEMA = symbol.for('skema')
 export const isSkema = subject => !!subject && subject[TYPE_SKEMA] === true
+
+export const TYPE_ERROR = symbol.for('skema:error')
+export const isError = subject => !!subject && subject[TYPE_ERROR]
+
 export const isString = subject => typeof subject === 'string'
 export const isFunction = subject => typeof subject === 'function'
 export const isRegExp = subject =>

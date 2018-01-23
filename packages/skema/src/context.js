@@ -1,4 +1,5 @@
 import {error} from './error'
+import {TYPE_ERROR, isError, defineValue} from './util'
 
 // data = {a: {b: 1}}
 // 1. value: data, key: null, parent: null, path: []
@@ -30,11 +31,16 @@ export class Context {
   _wrap (error) {
     Object.assign(error, this.context)
     error.value = this.value
+    defineValue(error, TYPE_ERROR, true)
 
     return error
   }
 
   makeError (error) {
+    if (isError(error)) {
+      return error
+    }
+
     const err = error instanceof Error
       ? error
       : new Error(error)

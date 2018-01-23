@@ -171,20 +171,16 @@ defineValues(Skema.prototype, {
       return options.promiseExtra
       .series.call(context.context, this._validate, function (factory) {
         return promise.resolve(factory.call(this, value, ...args))
-        .then(
-          pass => {
-            if (pass === false) {
-              throw context.errorByCode(
-                'VALIDATE_FAILS', value, context.context.key)
-            }
+        .then(pass => {
+          if (pass === false) {
+            throw context.errorByCode(
+              'VALIDATE_FAILS', value, context.context.key)
+          }
 
-            return true
-          },
-
-          // Ensure that the context information is attached to the error object
-          error => promise.reject(context.makeError(error))
-        )
+          return true
+        })
       })
+      .catch(error => promise.reject(context.makeError(error)))
     })
   },
 

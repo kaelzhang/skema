@@ -200,6 +200,7 @@ defineValues(SkemaFactory.prototype, {
   },
 
   // {...} -> Skema
+  // TODO: duplicate with this.type
   _parseObjectSkema (object, noSearchTypes): Skema {
     if (isSkema(object)) {
       return object

@@ -10,11 +10,10 @@ const tryCatchSync = (func, success, fail) => {
   try {
     o = func()
   } catch (error) {
-    fail(error)
-    return
+    return fail(error)
   }
 
-  success(o)
+  return success(o)
 }
 
 const tryCatchAsync = (func, success, fail) => {
@@ -40,35 +39,59 @@ export function run (skemaOptions = {}) {
     output,
     // error
     e,
+    // skema create error
+    se,
     only,
     // special match: only match values, but do not use deepEqual
     sm
   }, i) => {
     getTest(only)(`${i}: clean:${!!skemaOptions.clean}, ${d}`, async t => {
-      await tryCatch(
-        () => s.from(input),
-        o => {
-          if (e) {
-            t.fail('should fail')
-            return
-          }
+      function from (s) {
+        return tryCatch(
+          () => s.from(input),
+          o => {
+            if (e) {
+              t.fail('should fail')
+              return
+            }
 
-          typeof output === 'function'
-            ? output(t)
-            : sm
-              ? sMatch(t, o, output)
-              : match(t, o, output)
-        },
-        error => {
-          if (!e) {
-            console.log('unexpected error:', error.stack || error)
-            t.fail('should not fail')
-            return
-          }
+            typeof output === 'function'
+              ? output(t)
+              : sm
+                ? sMatch(t, o, output)
+                : match(t, o, output)
+          },
+          error => {
+            if (!e) {
+              console.error('unexpected error:', error.stack || error)
+              t.fail('should not fail')
+              return
+            }
 
-          sMatch(t, error, output, 'error: ')
+            sMatch(t, error, output, 'error: ')
+          }
+        )
+      }
+
+      await tryCatchSync(() => {
+        return s()
+      }, s => {
+        if (se) {
+          t.fail('factory should fail')
+          return
         }
-      )
+
+        return from(s)
+
+      }, error => {
+        if (!se) {
+          console.error('unexpected factory error:', error.stack || error)
+          t.fail('factory should not fail')
+          return
+        }
+
+        sMatch(t, error, output, 'factory error: ')
+      })
     })
   }
 }

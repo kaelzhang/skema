@@ -33,7 +33,7 @@ export const factory = ({
     types
   })
 
-  const Depth1 = skema({
+  const Depth1 = () => skema({
     a: Number,
     b: 'string',
     c: Boolean
@@ -55,14 +55,16 @@ export const factory = ({
     }
   })
 
-  const Depth2 = skema({
-    d: Depth1
-  })
+  const Depth2 =
 
   // 1
   cases.push({
     d: 'structure depth:2',
-    s: Depth2,
+    s () {
+      return skema({
+        d: Depth1()
+      })
+    },
     input: {
       d: {
         a: 1,
@@ -89,7 +91,7 @@ export const factory = ({
     },
     output: {
       code: 'NOT_OPTIONAL',
-      message: 'key "c" is not optional',
+      message: 'key \'c\' is not optional',
       path: ['c'],
       parent: {
         a: 1,
@@ -100,35 +102,31 @@ export const factory = ({
     e: true
   })
 
-  const Depth1WithOptProp = skema({
-    a: Number,
-    b: {
-      type: String,
-      optional: true
-    }
-  })
-
   // 3
   cases.push({
     d: 'structure optional',
-    s: Depth1WithOptProp,
+    s: () => skema({
+      a: Number,
+      b: {
+        type: String,
+        optional: true
+      }
+    }),
     input: {
       a: 1
     },
     output: {
       a: 1
     }
-  })
-
-  const Depth1WithOptPropCreator = skema({
-    a: Number,
-    b: type(String).optional()
   })
 
   // 4
   cases.push({
     d: 'structure optional',
-    s: Depth1WithOptPropCreator,
+    s: () => skema({
+      a: Number,
+      b: type(String).optional()
+    }),
     input: {
       a: 1
     },
@@ -137,18 +135,16 @@ export const factory = ({
     }
   })
 
-  const TypeDefault = type({
+  const TypeDefault = () => type({
     default: 1
-  })
-
-  const Depth1WithTypeDefault = skema({
-    a: TypeDefault
   })
 
   // 5
   cases.push({
     d: 'default value',
-    s: Depth1WithTypeDefault,
+    s: () => skema({
+      a: TypeDefault()
+    }),
     input: {},
     output: {
       a: 1
@@ -157,9 +153,9 @@ export const factory = ({
 
   cases.push({
     d: 'parent default value',
-    s: skema({
+    s: () => skema({
       a: {
-        type: TypeDefault
+        type: TypeDefault()
       }
     }),
     input: {},
@@ -168,13 +164,13 @@ export const factory = ({
     }
   })
 
-  const TypeWhen = type({
+  const TypeWhen = () => type({
     when () {
       return !!this.parent.b
     }
   })
 
-  const TypeWhenAndAlwaysFail = type({
+  const TypeWhenAndAlwaysFail = () => type({
     when () {
       return this.parent.b > 1
     },
@@ -186,8 +182,8 @@ export const factory = ({
   // 6
   cases.push({
     d: 'when and skip',
-    s: skema({
-      a: TypeWhenAndAlwaysFail
+    s: () => skema({
+      a: TypeWhenAndAlwaysFail()
     }),
     input: {
       a: 1,
@@ -204,8 +200,8 @@ export const factory = ({
   // 7
   cases.push({
     d: 'when and not skip, fails',
-    s: skema({
-      a: TypeWhenAndAlwaysFail
+    s: () => skema({
+      a: TypeWhenAndAlwaysFail()
     }),
     input: {
       a: 1,
@@ -213,7 +209,7 @@ export const factory = ({
     },
     output: {
       code: 'VALIDATE_FAILS',
-      message: 'invalid value 1 for key "a"',
+      message: 'invalid value 1 for key \'a\'',
       args: [1, 'a'],
       value: 1,
       path: ['a']
@@ -224,8 +220,8 @@ export const factory = ({
   // 8
   cases.push({
     d: 'when and not skip, not fails',
-    s: skema({
-      a: TypeWhen
+    s: () => skema({
+      a: TypeWhen()
     }),
     input: {
       a: 1,
@@ -249,7 +245,7 @@ export const factory = ({
     output: 1
   })
 
-  const TypeFunctionValidator = type({
+  const TypeFunctionValidator = () => type({
     validate: v => v > 0
   })
 
@@ -272,7 +268,7 @@ export const factory = ({
     e: true
   })
 
-  const TypeRegExpValidator = type({
+  const TypeRegExpValidator = () => type({
     validate: /^[a-z]+$/
   })
 
@@ -293,7 +289,7 @@ export const factory = ({
     e: true
   })
 
-  const TypeArrayValidator = type({
+  const TypeArrayValidator = () => type({
     validate: [
       v => v > 0,
       v => {
@@ -320,7 +316,6 @@ export const factory = ({
   })
 
   cases.push({
-    only,
     d: 'array validators, fails 1',
     s: TypeArrayValidator,
     input: 1,
@@ -340,7 +335,61 @@ export const factory = ({
     output: 2
   })
 
-  const TypeObjectOf = objectOf(String)
+  const TypeSetter = () => type({
+    set () {
+      return 1
+    }
+  })
+
+  cases.push({
+    d: 'function setter',
+    s: TypeSetter,
+    input: 100,
+    output: 1
+  })
+
+  const TypeSetterThrows = () => type({
+    set () {
+      throw 'foo'
+    }
+  })
+
+  cases.push({
+    d: 'type setter that throws, with hierarchies',
+    s: () => skema({
+      a: skema({
+        b: TypeSetterThrows()
+      })
+    }),
+    input: {
+      a: {
+        b: 1
+      }
+    },
+    output: {
+      message: 'foo',
+      code: 'CUSTOM_ERROR',
+      path: ['a', 'b']
+    },
+    e: true
+  })
+
+  cases.push({
+    d: 'type array of setters',
+    s: () => skema({
+      a: {
+        set: [() => 1, i => i + 1]
+      }
+    }),
+    input: {
+      a: 100
+    },
+    output: {
+      a: 2
+    }
+  })
+
+  const TypeObjectOf = () => objectOf(String)
   cases.push({
     d: 'object of String',
     s: TypeObjectOf,
@@ -356,7 +405,7 @@ export const factory = ({
     }
   })
 
-  const TypeArrayOf = arrayOf(String)
+  const TypeArrayOf = () => arrayOf(String)
   cases.push({
     d: 'array of String',
     s: TypeArrayOf,
@@ -375,13 +424,16 @@ export const factory = ({
     d: 'sparse array of String, fails due to required',
     s: TypeArrayOf,
     input: createSparseArray(2, 1),
-    output: 'error todo',
+    output: {
+      message: 'key 0 is not optional',
+      key: 0
+    },
     e: true
   })
 
   cases.push({
     d: 'sparse array of string, optional',
-    s: arrayOf(type(String).optional()),
+    s: () => arrayOf(type(String).optional()),
     input: createSparseArray(2, 1),
     output: createSparseArray(2, '1')
   })
