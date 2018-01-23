@@ -14,7 +14,7 @@ export const STRICT = {}
 
 function D (name, Ctor, is, message) {
   STRICT[name] = {
-    alias: Ctor,
+    name: [name, Ctor],
     definition: {
       validate (value) {
         if (is(value)) {

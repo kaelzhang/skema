@@ -6,12 +6,12 @@ function go (options) {
   factory(options).cases.forEach(run(options))
 }
 
-// go({
-//   async: true,
-//   clean: false
-// })
-//
-// go({
-//   async: true,
-//   clean: true
-// })
+go({
+  async: true,
+  clean: false
+})
+
+go({
+  async: true,
+  clean: true
+})

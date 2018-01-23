@@ -6,7 +6,7 @@ import {UNDEFINED, defineProperty} from './util'
 export class Processor {
   constructor (options) {
     Object.assign(this, options)
-
+    
     const {
       key,
       parent
@@ -23,7 +23,7 @@ export class Processor {
       }
 
       const {value} = this.context
-      return this.skema.from(value, this.args, this.context)
+      return this.skema.from(value, this.args, this.context, this.options)
       .then(value => {
         this.context.value = value
       })

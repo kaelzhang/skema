@@ -11,7 +11,7 @@ go({
   clean: false
 })
 
-// go({
-//   async: false,
-//   clean: true
-// })
+go({
+  async: false,
+  clean: true
+})

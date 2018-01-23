@@ -69,14 +69,6 @@ class Types {
 
     this._hash[name] = skema
   }
-
-  register (name, skema, alias) {
-    this.set(name, skema)
-
-    alias.forEach(name => {
-      this.set(name, skema)
-    })
-  }
 }
 
 function getType (name, types, thrown) {
@@ -100,6 +92,10 @@ function parseTypeName (name) {
   return name
 }
 
+const validateTypeName = name => isObject(name)
+  ? name
+  : parseTypeName(name)
+
 // @decorator
 function memoize (target, key, descriptor) {
   const original = descriptor.value
@@ -107,6 +103,10 @@ function memoize (target, key, descriptor) {
     const value = this._types.get(arg)
     if (value !== UNDEFINED) {
       return value
+    }
+
+    if (Object.keys(arg).length === 0) {
+      throw error('EMPTY_SHAPE')
     }
 
     const created = original.call(this, arg)
@@ -124,24 +124,19 @@ class SkemaFactory {
     })
 
     const {
-      types = {},
+      types = [],
       ...others
     } = options
 
     this._options = new Options(others)
     this._types = new Types
 
-    if (Object(types) !== types) {
-      throw error('NON_OBJECT_TYPES')
+    if (!isArray(types)) {
+      throw error('NON_ARRAY_TYPES')
     }
 
-    Object.keys(types).forEach(name => {
-      const {
-        alias,
-        definition
-      } = types[name] || {}
-
-      this.declare(name, definition, ...makeArray(alias))
+    types.forEach(({name, definition}) => {
+      this.declare(name, definition)
     })
   }
 
@@ -200,13 +195,13 @@ class SkemaFactory {
   }
 
   // Declare a basic type
-  declare (name, definition, ...alias) {
-    name = parseTypeName(name)
+  declare (name, definition) {
+    const names = makeArray(name).map(validateTypeName)
     const skema = isSkema(definition)
       ? this._recreate(definition)
       : this.type(definition)
 
-    this._types.register(name, skema, alias)
+    names.forEach(name => this._types.set(name, skema))
 
     return this
   }
@@ -228,7 +223,7 @@ defineValues(SkemaFactory.prototype, {
       return this.shape(subject)
     }
 
-    throw error('INVALID_SKEMA')
+    return getType(subject, this._types, true)
   },
 
   // Make sure the options are the latest given options

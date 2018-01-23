@@ -12,8 +12,8 @@ class Shape {
 
   from (args, context: Context, options: Options) {
     const values = this._create(context, options)
-    const tasks = this._tasks(context).map(([context, skema]) =>
-      new Processor({
+    const tasks = this._tasks(context).map(([context, skema]) => {
+      return new Processor({
         options,
         skema,
         args,
@@ -21,7 +21,7 @@ class Shape {
         values
       })
       .process()
-    )
+    })
 
     return options.promise.all(tasks)
     .then(() => values)

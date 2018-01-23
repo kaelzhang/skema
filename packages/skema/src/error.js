@@ -3,7 +3,7 @@ import util from 'util'
 const {E, error} = new Errors()
 
 E('REDEFINE_TYPE', {
-  message: 'type \'%s\' should be defined again',
+  message: 'type \'%s\' should not be defined again',
   ctor: Error
 })
 
@@ -17,8 +17,8 @@ E('INVALID_TYPE_NAME', {
   ctor: TypeError
 })
 
-E('NON_OBJECT_TYPES', {
-  message: 'types must be an object',
+E('NON_ARRAY_TYPES', {
+  message: 'types must be an array',
   ctor: TypeError
 })
 
@@ -29,6 +29,11 @@ E('EMPTY_ARRAY_TYPE', {
 
 E('INVALID_SKEMA', {
   message: 'invalid skema definition',
+  ctor: TypeError
+})
+
+E('EMPTY_SHAPE', {
+  message: '`any()`` should be used instead of an empty shape, or type not found',
   ctor: TypeError
 })
 

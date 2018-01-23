@@ -9,15 +9,15 @@ export const factory = ({
   async,
   clean
 }) => {
-  const types = {
+  const types = [
     ...LOOSE,
-    path: {
-      type: path,
+    {
+      name: ['path', path],
       definition: {
         set: path.resolve
       }
     }
-  }
+  ]
 
   const cases = []
 
@@ -126,6 +126,20 @@ export const factory = ({
     s: () => skema({
       a: Number,
       b: skema(String).optional()
+    }),
+    input: {
+      a: 1
+    },
+    output: {
+      a: 1
+    }
+  })
+
+  cases.push({
+    d: 'structure optional, string syntax',
+    s: () => skema({
+      a: Number,
+      b: 'string?'
     }),
     input: {
       a: 1
@@ -303,7 +317,7 @@ export const factory = ({
   })
 
   cases.push({
-    d: 'array validators, fails 0',
+    d: 'array validators, fails 0, throw string',
     s: TypeArrayValidator,
     input: 0,
     output: {
@@ -318,6 +332,30 @@ export const factory = ({
   cases.push({
     d: 'array validators, fails 1',
     s: TypeArrayValidator,
+    input: 1,
+    output: {
+      code: 'CUSTOM_ERROR',
+      message: 'foo',
+      path: [],
+      value: 1
+    },
+    e: true
+  })
+
+  cases.push({
+    d: 'array validators, fails 1, throw error',
+    s: () => type({
+      validate: [
+        v => v > 0,
+        v => {
+          if (v > 1) {
+            return true
+          }
+
+          throw new Error('foo')
+        }
+      ]
+    }),
     input: 1,
     output: {
       code: 'CUSTOM_ERROR',
@@ -436,6 +474,89 @@ export const factory = ({
     s: () => arrayOf(skema(String).optional()),
     input: createSparseArray(2, 1),
     output: createSparseArray(2, '1')
+  })
+
+  cases.push({
+    d: 'array shape',
+    s: () => skema([String, Number]),
+    input: [1, '1'],
+    output: ['1', 1]
+  })
+
+  cases.push({
+    d: 'changes options',
+    s: () => {
+      const {
+        skema: _skema
+      } = defaults({
+        clean: true,
+        types: LOOSE
+      })
+
+      const s = _skema({
+        a: String
+      })
+
+      return skema(s)
+    },
+    input: {
+      a: 1,
+      b: 2
+    },
+    output: clean
+      ? {
+        a: '1'
+      }
+      : {
+        a: '1',
+        b: 2
+      }
+  })
+
+  cases.push({
+    d: 'type not found',
+    s: () => {
+      const {
+        skema
+      } = defaults()
+
+      return skema(Number)
+    },
+    output: {
+      code: 'EMPTY_SHAPE'
+    },
+    se: true
+  })
+
+  cases.push({
+    d: 'empty shape',
+    s: () => skema({}),
+    output: {
+      code: 'EMPTY_SHAPE'
+    },
+    se: true
+  })
+
+  cases.push({
+    d: 're-skema',
+    s: () => skema(skema({a: Number})),
+    input: {
+      a: '1'
+    },
+    output: {
+      a: 1
+    }
+  })
+
+  cases.push({
+    d: 'number type skema alias',
+    s: () => {
+      declare(1, skema(Number))
+    },
+    output: {
+      code: 'INVALID_TYPE_NAME'
+    },
+    se: true
   })
 
   return {
