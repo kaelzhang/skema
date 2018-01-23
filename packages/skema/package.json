@@ -1,7 +1,7 @@
 {
   "name": "skema",
   "version": "8.0.1",
-  "description": "Skema provides a handy and composable way to validate and transform JavaScript objects.",
+  "description": "JavaScript Data Checker and Purifier.",
   "main": "lib/index.js",
   "module": "src/index.js",
   "scripts": {
@@ -22,7 +22,8 @@
     "default",
     "setters",
     "check",
-    "validate"
+    "validate",
+    "type"
   ],
   "engines": {
     "node": ">=4"
