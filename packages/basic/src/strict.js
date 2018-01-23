@@ -10,10 +10,10 @@ import {
   isBuffer
 } from 'core-util-is'
 
-export const STRICT = {}
+export const STRICT = []
 
 function D (name, Ctor, is, message) {
-  STRICT[name] = {
+  STRICT.push({
     name: [name, Ctor],
     definition: {
       validate (value) {
@@ -24,7 +24,7 @@ function D (name, Ctor, is, message) {
         throw new TypeError(message)
       }
     }
-  }
+  })
 }
 
 D('string', String, isString, 'not a string')

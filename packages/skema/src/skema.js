@@ -102,19 +102,19 @@ defineValues(Skema.prototype, {
     return isDefined(this['_' + key])
   },
 
-  isConfigurable () {
+  isConfigurable (): Boolean | undefined {
     return this._getConfig('configurable')
   },
 
-  isEnumerable () {
+  isEnumerable (): Boolean | undefined {
     return this._getConfig('enumerable')
   },
 
-  isWritable () {
+  isWritable (): Boolean | undefined {
     return this._getConfig('writable')
   },
 
-  isOptional (): Boolean {
+  isOptional (): Boolean | undefined {
     return this._optional === true || (
       this._optional !== false &&
       this._type &&

@@ -2,15 +2,15 @@ import {defaults} from 'skema'
 import test from 'ava'
 
 export function check (types) {
-  const {type} = defaults({
+  const {skema} = defaults({
     types
   })
 
   return id => {
-    const s = type(id)
+    const s = skema(id)
 
     test(`check property: ${id.name || id}`, t => {
-      t.is(s.isOptional(), false, 'should not be optional')
+      t.is(!!s.isOptional(), false, 'should not be optional')
     })
   }
 }
