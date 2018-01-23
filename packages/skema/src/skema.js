@@ -59,8 +59,8 @@ export class Skema {
 
     options = options || this._options
 
-    const result = isDefined(this._composable)
-      ? this._composable.from(args, context, options)
+    const result = isDefined(this._shape)
+      ? this._shape.from(args, context, options)
       : this.validate(args, context, options)
         .then(() => this.set(args, context, options))
 

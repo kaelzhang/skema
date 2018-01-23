@@ -5,7 +5,7 @@ export const SHAPE = 'SHAPE'
 export const TYPE_OBJECT = 'TYPE_OBJECT'
 export const TYPE_ARRAY = 'TYPE_ARRAY'
 
-class Composable {
+class Shape {
   constructor (rule) {
     this._rule = rule
   }
@@ -28,7 +28,7 @@ class Composable {
   }
 }
 
-export class ShapeComposable extends Composable {
+export class ObjectShape extends Shape {
   _create (context, options) {
     return options.clean
       ? Object.create(null)
@@ -42,7 +42,19 @@ export class ShapeComposable extends Composable {
   }
 }
 
-export class TypeObjectComposable extends Composable {
+export class ArrayShape extends Shape {
+  _create (context, options) {
+    return options.clean
+      ? []
+      : [].concat(context.value)
+  }
+
+  _tasks (context) {
+    return this._rule.map((v, i) => [context.descend(i), v])
+  }
+}
+
+export class ObjectOfShape extends Shape {
   _create () {
     return Object.create(null)
   }
@@ -53,7 +65,7 @@ export class TypeObjectComposable extends Composable {
   }
 }
 
-export class TypeArrayComposable extends Composable {
+export class ArrayOfShape extends Shape {
   _create () {
     return []
   }

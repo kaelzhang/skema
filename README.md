@@ -22,14 +22,12 @@ import {skema} from 'skema'
 
 // Schema definitions have nothing to do with `skema`,
 // they are ONLY objects.
-const Profile = {
-  name: String,
-  birth: Date
-}
-
 const User = {
   id: Number,
-  profile: Profile
+  profile: {
+    name: String,
+    birth: Date
+  }
 }
 
 // Then use these definitions to purify our data.

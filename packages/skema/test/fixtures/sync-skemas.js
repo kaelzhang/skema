@@ -107,10 +107,10 @@ export const factory = ({
     d: 'structure optional',
     s: () => skema({
       a: Number,
-      b: {
+      b: type({
         type: String,
         optional: true
-      }
+      })
     }),
     input: {
       a: 1
@@ -122,10 +122,10 @@ export const factory = ({
 
   // 4
   cases.push({
-    d: 'structure optional',
+    d: 'structure optional, optional creator',
     s: () => skema({
       a: Number,
-      b: type(String).optional()
+      b: skema(String).optional()
     }),
     input: {
       a: 1
@@ -154,9 +154,9 @@ export const factory = ({
   cases.push({
     d: 'parent default value',
     s: () => skema({
-      a: {
+      a: type({
         type: TypeDefault()
-      }
+      })
     }),
     input: {},
     output: {
@@ -377,9 +377,9 @@ export const factory = ({
   cases.push({
     d: 'type array of setters',
     s: () => skema({
-      a: {
+      a: type({
         set: [() => 1, i => i + 1]
-      }
+      })
     }),
     input: {
       a: 100
@@ -433,7 +433,7 @@ export const factory = ({
 
   cases.push({
     d: 'sparse array of string, optional',
-    s: () => arrayOf(type(String).optional()),
+    s: () => arrayOf(skema(String).optional()),
     input: createSparseArray(2, 1),
     output: createSparseArray(2, '1')
   })

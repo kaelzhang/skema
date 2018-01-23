@@ -11,10 +11,11 @@ import {
 } from './util'
 import {TypeDefinition} from './type'
 import {
-  ShapeComposable,
-  TypeObjectComposable,
-  TypeArrayComposable
-} from './composable'
+  ObjectShape,
+  ArrayShape,
+  ObjectOfShape,
+  ArrayOfShape
+} from './shape'
 
 const METHODS = [
   'skema',
@@ -32,19 +33,41 @@ const getTypeName = name => isObject(name)
 
 class Types {
   constructor () {
-    this._types = new Map
+    // Use WeakMap so that it could be GCed
+    this._map = new WeakMap
+    this._hash = Object.create(null)
   }
 
   get (type) {
-    return this._types.get(type)
+    return isObject(type)
+      ? this._map.get(type)
+      : this._hash[type]
   }
 
-  set (name, skema) {
-    if (this._types.has(name)) {
-      throw error('REDEFINE_TYPE', getTypeName(name))
+  set (type, skema) {
+    isObject(type)
+      ? this._setMap(type, skema)
+      : this._setHash(type, skema)
+  }
+
+  _setMap (name, skema) {
+    if (this._map.has(name)) {
+      return this._redefine(name)
     }
 
-    this._types.set(name, skema)
+    this._map.set(name, skema)
+  }
+
+  _redefine (name) {
+    throw error('REDEFINE_TYPE', getTypeName(name))
+  }
+
+  _setHash (name, skema) {
+    if (name in this._hash) {
+      return this._redefine(name)
+    }
+
+    this._hash[name] = skema
   }
 
   register (name, skema, alias) {
@@ -66,7 +89,6 @@ function getType (name, types, thrown) {
 }
 
 const REGEX_ENDS_QUESTION_MARK = /\?$/
-
 // Trim and validate type name
 function parseTypeName (name) {
   if (!isString(name)
@@ -76,6 +98,23 @@ function parseTypeName (name) {
   }
 
   return name
+}
+
+// @decorator
+function memoize (target, key, descriptor) {
+  const original = descriptor.value
+  descriptor.value = function (arg) {
+    const value = this._types.get(arg)
+    if (value !== UNDEFINED) {
+      return value
+    }
+
+    const created = original.call(this, arg)
+    this._types.set(arg, created)
+    return created
+  }
+
+  return descriptor
 }
 
 class SkemaFactory {
@@ -106,49 +145,52 @@ class SkemaFactory {
     })
   }
 
-  // The one that has everything inside
-  skema (subject): Skema {
-    if (isSkema(subject)) {
-      return this._recreate(subject)
-    }
+  // StringType: 'number', 'number?', ... -> Skema
+  // Skema: User
+  // ShapeLeaf: Skema | StringType | Shape
+  // IPTypeDefinition: {set () {}, type: Skema | StringType} -> Skema
+  // ShapeDef: {a: ShapeLeaf} -> Skema
+  //    - ArrayShape: [ShapeLeaf, ...] -> Skema
+  //    - special: objectOf -> Skema
+  //    - special: arrayOf -> Skema
 
-    if (isArray(subject)) {
-      if (subject.length === 0) {
-        throw 'empty array'
-      }
-      return this.arrayOf(subject[0])
-    }
-
-    if (isObject(subject)) {
-      return this.shape(subject)
-    }
-
-    throw error('INVALID_SKEMA')
+  skema (subject: ShapeLeaf): Skema {
+    return this._skema(subject, true)
   }
 
   // Create a single type
-  type (definition): Skema {
-    return this._parseSkema(definition)
+  type (def: IPTypeDefinition): Skema {
+    const definition = new TypeDefinition(def)
+    if (definition._type) {
+      definition._type = this._skema(definition._type)
+    }
+
+    return this._create(definition)
   }
 
   // An object taking on a particular shape
-  shape (shape: IObjectSkema): Skema {
+  @memoize
+  shape (shape: ShapeDef): Skema {
     return this._create({
-      _composable: new ShapeComposable(this._parseShape(shape))
+      _shape: isArray(shape)
+        ? new ArrayShape(this._arrayShape(shape))
+        : new ObjectShape(this._objectShape(shape))
     })
   }
 
+  // `objectOf` and `arrayOf` are two special kinds of shapes.
+
   // An object with property values of a certain type
-  objectOf (type): Skema {
+  objectOf (type: IPTypeDefinition | Skema): Skema {
     return this._create({
-      _composable: new TypeObjectComposable(this._parseSkema(type))
+      _shape: new ObjectOfShape(this._skema(type))
     })
   }
 
   // An array of a certain type
   arrayOf (type): Skema {
     return this._create({
-      _composable: new TypeArrayComposable(this._parseSkema(type, this._types))
+      _shape: new ArrayOfShape(this._skema(type))
     })
   }
 
@@ -160,7 +202,9 @@ class SkemaFactory {
   // Declare a basic type
   declare (name, definition, ...alias) {
     name = parseTypeName(name)
-    const skema = this._parseObjectSkema(definition, true)
+    const skema = isSkema(definition)
+      ? this._recreate(definition)
+      : this.type(definition)
 
     this._types.register(name, skema, alias)
 
@@ -169,7 +213,26 @@ class SkemaFactory {
 }
 
 defineValues(SkemaFactory.prototype, {
-  _recreate (skema) {
+  _skema (subject, updateOptions: boolean) {
+    if (isSkema(subject)) {
+      return updateOptions
+        ? this._recreate(subject)
+        : subject
+    }
+
+    if (isString(subject)) {
+      return this._stringType(subject)
+    }
+
+    if (isObject(subject)) {
+      return this.shape(subject)
+    }
+
+    throw error('INVALID_SKEMA')
+  },
+
+  // Make sure the options are the latest given options
+  _recreate (skema: Skema): Skema {
     if (skema._options === this._options) {
       return skema
     }
@@ -177,60 +240,8 @@ defineValues(SkemaFactory.prototype, {
     return skema.options(this._options)
   },
 
-  _create (definition) {
-    definition._options = this._options
-    return new Skema(definition)
-  },
-
-  _parseShape (shape) {
-    const skemaMap = {}
-    Object.keys(shape).forEach(key => {
-      skemaMap[key] = this._parseSkema(shape[key])
-    })
-
-    return skemaMap
-  },
-
-  _parseSkema (subject) {
-    if (isString(subject)) {
-      return this._parseStringSkema(subject)
-    }
-
-    return this._parseObjectSkema(subject)
-  },
-
-  // {...} -> Skema
-  // TODO: duplicate with this.type
-  _parseObjectSkema (object, noSearchTypes): Skema {
-    if (isSkema(object)) {
-      return object
-    }
-
-    if (!noSearchTypes) {
-      const skema = getType(object, this._types)
-      if (skema) {
-        return skema
-      }
-    }
-
-    const definition = new TypeDefinition(object)
-    if (definition._type) {
-      definition._type = this._parseSkemaType(definition._type)
-    }
-
-    return this._create(definition)
-  },
-
-  _parseSkemaType (type) {
-    if (isSkema(type)) {
-      return type
-    }
-
-    return getType(type, this._types, true)
-  },
-
   // 'number' -> Skema
-  _parseStringSkema (string): Skema {
+  _stringType (string): Skema {
     string = string.trim()
     const hasOptionalMark = REGEX_ENDS_QUESTION_MARK.test(string)
     if (hasOptionalMark) {
@@ -246,6 +257,24 @@ defineValues(SkemaFactory.prototype, {
         ? skema
         : skema.optional()
       : skema
+  },
+
+  _arrayShape (array: Array): Skema {
+    return array.map(type => this._skema(type))
+  },
+
+  _objectShape (shape: Object): Skema {
+    const skemaMap = {}
+    Object.keys(shape).forEach(key => {
+      skemaMap[key] = this._skema(shape[key])
+    })
+
+    return skemaMap
+  },
+
+  _create (definition: TypeDefinition): Skema {
+    definition._options = this._options
+    return new Skema(definition)
   }
 })
 

@@ -6,9 +6,7 @@ import {
 } from './util'
 
 export class TypeDefinition {
-  _type: Skema
-
-  constructor (definition) {
+  constructor (definition: IPTypeDefinition) {
     const {
       default: _default,
       set,
