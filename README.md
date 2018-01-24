@@ -15,6 +15,12 @@
 
 - **Composable structures.** You could build a much bigger schema with the small ones into the whole world.
 
+## Install
+
+```sh
+npm i skema
+```
+
 ## Basic Usage
 
 ```js
@@ -54,12 +60,22 @@ console.log(user)
   - [Multiple Validators](./examples/multiple-validators.js)
   - [Basic Usage of Setters](./examples/setters.js)
   - [Inherit Another Type](./examples/type-inheritance.js)
-- **Skema Shape**
-
+- **Shape Definition**
 
 ## Documentations
 
-- References
+- [Installation](./doc/install.md)
+- API References
   - [APIs](./doc/apis.md)
   - [Builtin Types and How to Change Them](./doc/builtins.md)
 - [Shape Definition](./doc/shape.md)
+- [Error Handling](,/doc/errors.md)
+- [Contributing](./doc/contribute.md)
+
+## Related Packages
+
+- [@skema/basic](https://www.npmjs.com/package/@skema/basic) The default built-in types of skema.
+
+## License
+
+MIT
