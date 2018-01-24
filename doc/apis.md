@@ -1,5 +1,7 @@
 # API References
 
+The very detail and verbose references of the APIs.
+
 ## APIs
 
 ```js
@@ -29,16 +31,41 @@ And in all `AsyncOrSyncFunc`s, we could access
 - **this.key** `string | null` the corresponding property key of the current value.
 - **this.path** `Array<string>` the access path of from which way we get there.
 
+```js
+...
+when () {
+
+},
+...
+```
+
+And in all `AsyncOrSyncFunc`s, we could simply throw an error if something is wrong:
+
+```js
+...
+validate (v) {
+  if (v < 0) {
+    throw 'less than 0'
+  }
+
+  return true
+},
+...
+```
+
 ### struct `TypeDefinition`
 
-- **when** `?(AsyncOrSyncFunc()|false|any)` To indicate that whether we should process the value.
-  - If the value or return value is `false` or `Promise<false>`, then skip processing the current key;
-  - Otherwise, not skip.
-- **default** `?(AsyncOrSyncFunc()|any)` The default value to be used If the `key` is not included in the `parent`. It could either be a function that returns the default value or a Promise, or just a value. If you need the default value to be a function, `default` should be a function that returns a function.
+Used for value validation and transformation:
 - **validate** `?(Array<Validator>|Validator)` A `Validator` could be:
   - a `AsyncOrSyncFunc(v, ...args)` which accepts the given value of the key, and the "spreaded" `args` of the `.from(data, ...args)`
   - or a regular expression to test the value.
 - **set** `?(Array.<Setter>|Setter)` A `Setter` is a `AsyncOrSyncFunc()` which receives the value and extra args and returns the altered value or a `Promise`. If there are more than one setters, the previous value has been returned will be passed into the next setter.
+
+Used for traversing schema shape:
+- **when** `?(AsyncOrSyncFunc()|false|any)` To indicate that whether we should process the value.
+  - If the value or return value is `false` or `Promise<false>`, then skip processing the current key;
+  - Otherwise, not skip.
+- **default** `?(AsyncOrSyncFunc()|any)` The default value to be used If the `key` is not included in the `parent`. It could either be a function that returns the default value or a Promise, or just a value. If you need the default value to be a function, `default` should be a function that returns a function.
 - **enumerable** `?Boolean=true` defaults to `true`
 - **configurable** `?Boolean=true` defaults to `true`
 - **writable** `?Boolean=true` defaults to `true`
@@ -46,6 +73,40 @@ And in all `AsyncOrSyncFunc`s, we could access
 ## class `Skema`
 
 ### `.from(value [,...args]): any | Promise`
+
+## type()
+
+```js
+type(definition: TypeDefinition): Skema
+```
+
+A type is the minimum unit to describe a single variable. Method `type()` accepts an object of `TypeDefinition` and returns a `Skema`.
+
+A type defines two major kinds of things:
+- How we should manage the value:
+  - **validate**
+  - **set**
+- And how we should deal with it if it is a member of an object or an array. The following configurations do not have any effects if we test the type alone.  
+  - **when**
+  - **default**
+  - **enumerable**
+  - **writable**
+
+Validate a value:
+
+```js
+const TypeNumber = type({
+  validate: v => typeof v === 'number'
+})
+
+TypeNumber.from(1)    // 1
+TypeNumber.from('1')  // Error thrown
+```
+
+Examples:
+- [Basic Validation](../examples/basic-validation.js)
+- [Async Validation](../examples/async-validation.js)
+- [Multiple Validators](../examples/multiple-validators.js)
 
 ## declare()
 
@@ -99,12 +160,6 @@ arrayOf(subject: Skema | SkemaAlias)
 
 ```js
 skema(subject: array | object | string): Skema
-```
-
-## type()
-
-```js
-type(definition: TypeDefinition): Skema
 ```
 
 ## defaults(options)

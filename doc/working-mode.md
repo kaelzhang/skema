@@ -32,6 +32,7 @@ const UserName = type({
     })
   },
   set (name) {
+    // Oh, he is the admin, and make him different!
     return name === 'isaac'
       ? 'Isaac Z. Schlueter'
       : name
@@ -60,3 +61,5 @@ User.from({
 .then(console.log)
 // {name: 'Isaac Z. Schlueter'}
 ```
+
+## Working as the Type Checker

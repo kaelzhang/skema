@@ -267,7 +267,7 @@ export const factory = ({
       b: 2
     },
     output: {
-      code: 'VALIDATE_FAILS',
+      code: 'VALIDATION_FAILS',
       message: 'invalid value 1 for key \'a\'',
       args: [1, 'a'],
       value: 1,
@@ -382,7 +382,7 @@ export const factory = ({
     s: TypeArrayValidator,
     input: 0,
     output: {
-      code: 'VALIDATE_FAILS',
+      code: 'VALIDATION_FAILS',
       message: 'invalid value 0',
       path: [],
       value: 0

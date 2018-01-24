@@ -47,7 +47,7 @@ E('INVALID_VALIDATOR', {
   ctor: TypeError
 })
 
-E('VALIDATE_FAILS', {
+E('VALIDATION_FAILS', {
   message (value, key) {
     value = util.inspect(value)
     if (key) {

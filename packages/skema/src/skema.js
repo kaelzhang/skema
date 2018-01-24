@@ -174,7 +174,7 @@ defineValues(Skema.prototype, {
         .then(pass => {
           if (pass === false) {
             throw context.errorByCode(
-              'VALIDATE_FAILS', value, context.context.key)
+              'VALIDATION_FAILS', value, context.context.key)
           }
 
           return true

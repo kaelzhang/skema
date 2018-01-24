@@ -46,9 +46,11 @@ console.log(user)
 // }
 ```
 
+## Many Examples
+
+- [Type Definition]()
+
 ## Documentations
 
 - References
   - [APIs](./doc/apis.md)
-
-## Many Examples
