@@ -1,6 +1,12 @@
-import {skema} from 'skema'
+// A little more complicated example including:
+// - async/sync validators
+// - setters
+import {defaults} from 'skema'
 
-const s = skema.defaults({
+const {
+  skema,
+  type
+} = defaults({
   // Turn on async mode,
   // then the following properties will supports async functions:
   // - when
@@ -12,8 +18,8 @@ const s = skema.defaults({
 
 const GENDERS = ['MALE', 'FEMALE', 'SECRET']
 
-const User = s({
-  nickName: {
+const User = skema({
+  nickName: type({
     validate: name => {
       return new Promise((resolve, reject) => {
         checkUniqueFromRemoteServer(name, unique => {
@@ -25,9 +31,9 @@ const User = s({
         })
       })
     }
-  },
+  }),
 
-  gender: {
+  gender: type({
     set: gender => {
       if (typeof gender === 'number') {
         gender = GENDERS[gender]
@@ -39,7 +45,7 @@ const User = s({
 
       return gender
     }
-  }
+  })
 })
 
 ;(async () => {

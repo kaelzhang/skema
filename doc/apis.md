@@ -72,7 +72,11 @@ Used for traversing schema shape:
 
 ## class `Skema`
 
-### `.from(value [,...args]): any | Promise`
+### method `.from()`
+
+```js
+.from(value [,...args]): any | Promise
+```
 
 ## type()
 
@@ -86,13 +90,13 @@ A type defines two major kinds of things:
 - How we should manage the value:
   - **validate**
   - **set**
-- And how we should deal with it if it is a member of an object or an array. The following configurations do not have any effects if we test the type alone.  
+- And how we should deal with it if it is a member of an object or an array. The following configurations do not have any effects if we test against the type alone. And we will talk about these descriptors later with [`shape()`](#shape)
   - **when**
   - **default**
   - **enumerable**
   - **writable**
 
-Validate a value:
+Basic usage:
 
 ```js
 const TypeNumber = type({
@@ -103,10 +107,13 @@ TypeNumber.from(1)    // 1
 TypeNumber.from('1')  // Error thrown
 ```
 
-Examples:
+#### Examples
+
 - [Basic Validation](../examples/basic-validation.js)
 - [Async Validation](../examples/async-validation.js)
 - [Multiple Validators](../examples/multiple-validators.js)
+- [Basic Usage of Setters](../examples/setters.js)
+- [Inherit Another Type](../examples/type-inheritance.js)
 
 ## declare()
 

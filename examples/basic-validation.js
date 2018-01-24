@@ -19,8 +19,12 @@ TypeNumber.from('1')
 // You could just throw an error if something is wrong.
 // With this mechanism,
 // we could make our error reason verbose if necessary
-const Positive = type({
+const PositiveNumber = type({
   validate (v) {
+    if (typeof v !== 'number') {
+      return false
+    }
+
     if (v > 0) {
       return true
     }
@@ -31,8 +35,17 @@ const Positive = type({
   }
 })
 
-Positive.from(1)     // 1
-Positive.from(-1)    // Error thrown
-// Error
+PositiveNumber.from(1)     // 1
+PositiveNumber.from(-1)    // Error thrown
+// throw Error
 // - code: 'CUSTOM_ERROR'
 // - message: 'must be positive'
+
+
+// 3
+// Regular expression as a validator
+const Alphabets = type({
+  validate: /^[a-z]+$/i
+})
+
+Alphabets.from('123')  // Error thrown
