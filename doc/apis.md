@@ -115,6 +115,49 @@ TypeNumber.from('1')  // Error thrown
 - [Basic Usage of Setters](../examples/setters.js)
 - [Inherit Another Type](../examples/type-inheritance.js)
 
+## shape()
+
+```js
+shape(object: ShapeStructure): Skema
+```
+
+Defines a skema structure, and the `ShapeStructure` is:
+
+```ts
+interface ShapeStructure {
+  [string]: Skema | SkemaAlias
+}
+```
+
+There are 3 kinds of shapes, object, array and their combination.
+
+```js
+const Address = shape({
+  id: Number,
+  address: {
+    postCode: Number,
+    text: type({
+      set: v => v.slice(0, 20)
+    })
+  }
+})
+
+Address.from({
+  id: '123',
+  address: {
+    postCode: '210000',
+    text: 'a ..... very .... long .... address'
+  }
+})
+// {
+//   id: 123,
+//   address: {
+//     postCode: 210000,
+//     text: 'address of length less than 100'
+//   }
+// }
+```
+
 ## declare()
 
 ```js
@@ -143,12 +186,6 @@ README.from({
 // {
 //   pathname: '/path/to/skema/README.md'
 // }
-```
-
-## shape()
-
-```js
-shape(object): Skema
 ```
 
 ## arrayOf()

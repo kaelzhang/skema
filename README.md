@@ -48,9 +48,15 @@ console.log(user)
 
 ## Many Examples
 
-- [Type Definition]()
+- **Type Definition**
+  - [Basic Validation](../examples/basic-validation.js)
+  - [Async Validation](../examples/async-validation.js)
+  - [Multiple Validators](../examples/multiple-validators.js)
+  - [Basic Usage of Setters](../examples/setters.js)
+  - [Inherit Another Type](../examples/type-inheritance.js)
 
 ## Documentations
 
 - References
   - [APIs](./doc/apis.md)
+  - [Builtin Types]

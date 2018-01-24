@@ -21,4 +21,8 @@ PositiveBigNumber.from('10000')
 // - message: not a number
 // the error comes from `PositiveNumberVerbose`
 
+PositiveBigNumber.from(200)
+// throw Error
+// - message: too small
+
 PositiveBigNumber.from(10000)  // 10000
