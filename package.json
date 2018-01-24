@@ -20,6 +20,6 @@
   },
   "scripts": {
     "cp-readme": "cp ./README.md ./packages/skema",
-    "publish": "npm run cp-readme && lerna publish -- --access=public"
+    "publish": "npm run cp-readme && lerna publish --force-publish=* -- --access=public"
   }
 }
