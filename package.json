@@ -19,7 +19,10 @@
     "nyc": "^11.1.0"
   },
   "scripts": {
+    "test": "lerna run test",
+    "bootstrap": "lerna bootstrap",
     "cp-readme": "cp ./README.md ./packages/skema",
-    "publish": "npm run cp-readme && lerna publish --force-publish=skema -- --access=public"
+    "publish": "npm run cp-readme && lerna publish --force-publish=skema -- --access=public",
+    "report-cov": "lerna run report-cov"
   }
 }
