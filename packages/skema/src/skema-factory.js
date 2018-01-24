@@ -154,7 +154,11 @@ class SkemaFactory {
   }
 
   // Create a single type
-  type (def: IPTypeDefinition): Skema {
+  type (def: IPTypeDefinition | Skema): Skema {
+    if (isSkema(def)) {
+      return this._recreate(def)
+    }
+
     const definition = new TypeDefinition(def)
     if (definition._type) {
       definition._type = this._skema(definition._type)

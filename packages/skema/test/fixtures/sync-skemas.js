@@ -752,6 +752,22 @@ export const factory = ({
     output: TypeDescriptorOutput()
   })
 
+  cases.push({
+    d: 'recreate type',
+    s: () => {
+      const t = type({
+        set: x => x
+      })
+
+      if (type(t) !== t) {
+        throw 'type should equal'
+      }
+      return t
+    },
+    input: 1,
+    output: 1
+  })
+
   const properties = [
     'enumerable',
     'writable',
