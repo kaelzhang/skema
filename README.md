@@ -21,16 +21,16 @@
 import {skema} from 'skema'
 
 // Schema definitions are ONLY objects.
-const User = {
+const User = skema({
   id: Number,
   profile: {
     birth: 'date',   // `Date` is also ok
     name: 'string?', // name is optional
   }
-}
+})
 
 // Then use these definitions to purify our data.
-const user = skema(User).from({
+const user = User.from({
   id: '1',
   profile: {
     birth: '2017-01-01'
@@ -49,14 +49,17 @@ console.log(user)
 ## Many Examples
 
 - **Type Definition**
-  - [Basic Validation](../examples/basic-validation.js)
-  - [Async Validation](../examples/async-validation.js)
-  - [Multiple Validators](../examples/multiple-validators.js)
-  - [Basic Usage of Setters](../examples/setters.js)
-  - [Inherit Another Type](../examples/type-inheritance.js)
+  - [Basic Validation](./examples/basic-validation.js)
+  - [Async Validation](./examples/async-validation.js)
+  - [Multiple Validators](./examples/multiple-validators.js)
+  - [Basic Usage of Setters](./examples/setters.js)
+  - [Inherit Another Type](./examples/type-inheritance.js)
+- **Skema Shape**
+
 
 ## Documentations
 
 - References
   - [APIs](./doc/apis.md)
-  - [Builtin Types]
+  - [Builtin Types and How to Change Them](./doc/builtins.md)
+- [Shape Definition](./doc/shape.md)

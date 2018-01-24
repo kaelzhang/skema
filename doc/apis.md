@@ -31,14 +31,6 @@ And in all `AsyncOrSyncFunc`s, we could access
 - **this.key** `string | null` the corresponding property key of the current value.
 - **this.path** `Array<string>` the access path of from which way we get there.
 
-```js
-...
-when () {
-
-},
-...
-```
-
 And in all `AsyncOrSyncFunc`s, we could simply throw an error if something is wrong:
 
 ```js
@@ -66,6 +58,7 @@ Used for traversing schema shape:
   - If the value or return value is `false` or `Promise<false>`, then skip processing the current key;
   - Otherwise, not skip.
 - **default** `?(AsyncOrSyncFunc()|any)` The default value to be used If the `key` is not included in the `parent`. It could either be a function that returns the default value or a Promise, or just a value. If you need the default value to be a function, `default` should be a function that returns a function.
+- **optional** `?Boolean=false` Whether the property is optional. Notice that if the default value is provided, then it will always be optional. Defaults to `false`
 - **enumerable** `?Boolean=true` defaults to `true`
 - **configurable** `?Boolean=true` defaults to `true`
 - **writable** `?Boolean=true` defaults to `true`
@@ -77,6 +70,36 @@ Used for traversing schema shape:
 ```js
 .from(value [,...args]): any | Promise
 ```
+
+Processes (validating and transforming) the given `value`.
+
+### method `.optional()`
+
+```js
+.optional(): Skema
+```
+
+Creates a new `Skema` based on the current one but is optional.
+
+### method `.required()`
+
+```js
+.required(): Skema
+```
+
+Creates a new `Skema` based on the current one but is required.
+
+### method `.enumerable()`
+### method `.writable()`
+### method `.configurable()`
+
+```js
+.enumerable(enumerable: boolean): Skema
+.writable(writable: boolean): Skema
+.configurable(configurable: boolean): Skema
+```
+
+Creates a new `Skema` based on the current one but with the new property value of object descriptors.
 
 ## type()
 
@@ -90,9 +113,10 @@ A type defines two major kinds of things:
 - How we should manage the value:
   - **validate**
   - **set**
-- And how we should deal with it if it is a member of an object or an array. The following configurations do not have any effects if we test against the type alone. And we will talk about these descriptors later with [`shape()`](#shape)
+- And how we should deal with it if it is a member of an object or an array. The following configurations do not have any effects if we test against the type alone. And we will talk about these descriptors later with [shape definition](./shape.md)
   - **when**
   - **default**
+  - **optional**
   - **enumerable**
   - **writable**
 
@@ -125,11 +149,9 @@ Defines a skema structure, and the `ShapeStructure` is:
 
 ```ts
 interface ShapeStructure {
-  [string]: Skema | SkemaAlias
+  [string]: Skema | SkemaAlias | ShapeStructure
 }
 ```
-
-There are 3 kinds of shapes, object, array and their combination.
 
 ```js
 const Address = shape({
@@ -158,12 +180,18 @@ Address.from({
 // }
 ```
 
+The detail behavior how shape works, see [Skema Shape](./shape.md).
+
+#### Examples
+
 ## declare()
 
 ```js
 declare(name: SkemaAlias, skema: Skema): void
 declare(names: SkemaAlias[], skema: Skema): void
 ```
+
+Declares the alias for a certain skema, and the alias could be used directly in shape definition and `skema(skemaAlias)`
 
 - **SkemaAlias** `string | object`
 
@@ -177,33 +205,51 @@ declare(['path', path], Path)
 
 const README = skema({
   // And we could just use nodejs `path` object as the type
-  pathname: path
+  pathname: path,
+  // The `String` here is an alias of the built-in string type.
+  content: String
 })
 
 README.from({
-  pathname: '../README.md'
+  pathname: '../README.md',
+  content: '...'
 })
 // {
-//   pathname: '/path/to/skema/README.md'
+//   pathname: '/path/to/skema/README.md',
+//   content: '...'
 // }
 ```
 
 ## arrayOf()
 
 ```js
-arrayOf(subject: Skema | SkemaAlias)
+arrayOf(subject: Skema | SkemaAlias): Skema
 ```
+
+Creates a `Skema` which presents a special array [shape](./shape.md) that all of its items are of type `subject`.
 
 ## objectOf()
 
 ```js
-arrayOf(subject: Skema | SkemaAlias)
+objectOf(subject: Skema | SkemaAlias): Skema
 ```
+
+Creates a `Skema` which presents a special object [shape](./shape.md) that all of its property values are of type `subject`.
 
 ## skema()
 
 ```js
-skema(subject: array | object | string): Skema
+skema(subject: ShapeStructure | Skema | SkemaAlias): Skema
+```
+
+The over-for-all method to:
+
+- The alias of `.shape()`
+- Make sure an object is a `Skema`
+- Get the `Skema` object by its alias name.
+
+```js
+skema(Number).from('1')  // 1
 ```
 
 ## defaults(options)
@@ -219,6 +265,8 @@ const {
 } = defaults(options)
 ```
 
+Changes the default setting of skema, and creates
+
 - **options** `object`
-  - **clean** `?boolean=false`
-  - **async** `?boolean=false`
+  - **clean** `?boolean=false` If true, the properties that not defined in the shape will be purified out.
+  - **async** `?boolean=false` If true, skema will works in async mode.
