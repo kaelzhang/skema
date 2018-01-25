@@ -1,14 +1,14 @@
 // The Factory of Skema according to user preset
 ///////////////////////////////////////////////////////////
 import {Skema} from './skema'
+import {Types} from './future'
 import {Options} from './options'
 import makeArray from 'make-array'
 import {error} from './error'
 import {
-  UNDEFINED,
-  isSkema, isString, isArray, isObject,
-  defineValues
+  isString, isArray, isObject, isDefined
 } from './util'
+import {isSkema} from './future'
 import {TypeDefinition} from './type'
 import {
   ObjectShape,
@@ -18,7 +18,6 @@ import {
 } from './shape'
 
 const METHODS = [
-  'skema',
   'type',
   'shape',
   'objectOf',
@@ -27,62 +26,9 @@ const METHODS = [
   'declare'
 ]
 
-const getTypeName = name => isObject(name)
-  ? name.name || name
-  : name
-
-class Types {
-  constructor () {
-    // Use WeakMap so that it could be GCed
-    this._map = new WeakMap
-    this._hash = Object.create(null)
-  }
-
-  get (type) {
-    return isObject(type)
-      ? this._map.get(type)
-      : this._hash[type]
-  }
-
-  set (type, skema) {
-    isObject(type)
-      ? this._setMap(type, skema)
-      : this._setHash(type, skema)
-  }
-
-  _setMap (name, skema) {
-    if (this._map.has(name)) {
-      return this._redefine(name)
-    }
-
-    this._map.set(name, skema)
-  }
-
-  _redefine (name) {
-    throw error('REDECLARE_TYPE', getTypeName(name))
-  }
-
-  _setHash (name, skema) {
-    if (name in this._hash) {
-      return this._redefine(name)
-    }
-
-    this._hash[name] = skema
-  }
-}
-
-function getType (name, types, thrown) {
-  const skema = types.get(name)
-  if (thrown && !skema) {
-    throw error('UNKNOWN_TYPE', getTypeName(name))
-  }
-
-  return skema
-}
-
 const REGEX_ENDS_QUESTION_MARK = /\?$/
 // Trim and validate type name
-function parseTypeName (name) {
+const parseTypeName = name => {
   if (!isString(name)
     || REGEX_ENDS_QUESTION_MARK.test(name = name.trim())
   ) {
@@ -97,16 +43,16 @@ const validateTypeName = name => isObject(name)
   : parseTypeName(name)
 
 // @decorator
-function memoize (target, key, descriptor) {
+const memoize = (target, key, descriptor) => {
   const original = descriptor.value
   descriptor.value = function (arg) {
     const value = this._types.get(arg)
-    if (value !== UNDEFINED) {
+    if (isDefined(value)) {
       return value
     }
 
     if (Object.keys(arg).length === 0) {
-      throw error('EMPTY_SHAPE')
+      throw error('EMPTY_TYPE')
     }
 
     const created = original.call(this, arg)
@@ -140,104 +86,79 @@ class SkemaFactory {
     })
   }
 
-  // StringType: 'number', 'number?', ... -> Skema
-  // Skema: User
-  // ShapeLeaf: Skema | StringType | Shape
   // IPTypeDefinition: {set () {}, type: Skema | StringType} -> Skema
-  // ShapeDef: {a: ShapeLeaf} -> Skema
-  //    - ArrayShape: [ShapeLeaf, ...] -> Skema
-  //    - special: objectOf -> Skema
-  //    - special: arrayOf -> Skema
-
-  skema (subject: ShapeLeaf): Skema {
-    return this._skema(subject, true)
-  }
+  // SkemaAlias: string | object
+  // TypeDef: SkemaAlias | IPTypeDefinition | Skema
+  // ShapeDef: {[string]: TypeDef} -> Skema
+  //    - ArrayShape: TypeDef[TypeDef] -> Skema
+  //    - special: objectOf(TypeDef) -> Skema
+  //    - special: arrayOf(TypeDef) -> Skema
 
   // Create a single type
-  type (def: IPTypeDefinition | Skema): Skema {
+  type (def: TypeDef): Skema {
     if (isSkema(def)) {
-      return this._recreate(def)
+      return def
     }
 
+    if (isString(def)) {
+      return this._stringType(def)
+    }
+
+    if (isObject(def)) {
+      return this._type(def)
+    }
+
+    throw error('INVALID_TYPE')
+  }
+
+  @memoize
+  _type (def: TypeDef): Skema {
     const definition = new TypeDefinition(def)
     if (definition._type) {
-      definition._type = this._skema(definition._type)
+      definition._type = this.type(definition._type)
     }
 
     return this._create(definition)
   }
 
-  // An object taking on a particular shape
-  @memoize
-  shape (shape: ShapeDef): Skema {
+  shape (shape: ShapeDef, clean: boolean): Skema {
     return this._create({
       _shape: isArray(shape)
-        ? new ArrayShape(this._arrayShape(shape))
-        : new ObjectShape(this._objectShape(shape))
+        ? new ArrayShape(this._arrayShape(shape), clean)
+        : new ObjectShape(this._objectShape(shape), clean)
     })
   }
 
   // `objectOf` and `arrayOf` are two special kinds of shapes.
 
   // An object with property values of a certain type
-  objectOf (type: IPTypeDefinition | Skema): Skema {
+  objectOf (type: TypeDef): Skema {
     return this._create({
-      _shape: new ObjectOfShape(this._skema(type))
+      _shape: new ObjectOfShape(this.type(type))
     })
   }
 
   // An array of a certain type
-  arrayOf (type): Skema {
+  arrayOf (type: TypeDef): Skema {
     return this._create({
-      _shape: new ArrayOfShape(this._skema(type))
+      _shape: new ArrayOfShape(this.type(type))
     })
   }
 
   // Anything that is ok
   any (): Skema {
-    return new Skema(Object.create(null))
+    return this._create({
+      _any: true
+    })
   }
 
   // Declare a basic type
   declare (name, definition) {
     const names = makeArray(name).map(validateTypeName)
-    const skema = isSkema(definition)
-      ? this._recreate(definition)
-      : this.type(definition)
+    const skema = this.type(definition)
 
     names.forEach(name => this._types.set(name, skema))
-
-    return this
   }
-}
-
-defineValues(SkemaFactory.prototype, {
-  _skema (subject, updateOptions: boolean) {
-    if (isSkema(subject)) {
-      return updateOptions
-        ? this._recreate(subject)
-        : subject
-    }
-
-    if (isString(subject)) {
-      return this._stringType(subject)
-    }
-
-    if (isObject(subject)) {
-      return this.shape(subject)
-    }
-
-    throw error('INVALID_SKEMA')
-  },
-
-  // Make sure the options are the latest given options
-  _recreate (skema: Skema): Skema {
-    if (skema._options === this._options) {
-      return skema
-    }
-
-    return skema.options(this._options)
-  },
 
   // 'number' -> Skema
   _stringType (string): Skema {
@@ -249,34 +170,35 @@ defineValues(SkemaFactory.prototype, {
       string = string.slice(0, string.length - 1).trimRight()
     }
 
-    const skema = getType(string, this._types, true)
+    const skema = this._types.get(string, true)
 
     return hasOptionalMark
       ? skema.isOptional()
         ? skema
-        : skema.optional()
+        : this.type({
+          type: skema,
+          optional: true
+        })
       : skema
-  },
+  }
 
   _arrayShape (array: Array): Skema {
-    return array.map(type => this._skema(type))
-  },
+    return array.map(type => this.type(type))
+  }
 
   _objectShape (shape: Object): Skema {
     const skemaMap = {}
     Object.keys(shape).forEach(key => {
-      skemaMap[key] = this._skema(shape[key])
+      skemaMap[key] = this.type(shape[key])
     })
 
     return skemaMap
-  },
+  }
 
   _create (definition: TypeDefinition): Skema {
     definition._options = this._options
     return new Skema(definition)
   }
-})
-
-export function factory (options = {}) {
-  return new SkemaFactory(options)
 }
+
+export const factory = (options = {}) => new SkemaFactory(options)

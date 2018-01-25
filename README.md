@@ -24,32 +24,30 @@ npm i skema
 ## Basic Usage
 
 ```js
-import {skema} from 'skema'
+import {shape} from 'skema'
 
 // Schema definitions are ONLY objects.
-const User = skema({
-  id: Number,
-  profile: {
-    birth: 'date',   // `Date` is also ok
-    name: 'string?', // name is optional
-  }
+const User = shape({
+  id: 'number?',
+  name: String
 })
 
 // Then use these definitions to purify our data.
 const user = User.from({
   id: '1',
-  profile: {
-    birth: '2017-01-01'
-  }
+  name: 'Steve'
 })
 
 console.log(user)
 // {
 //   id: 1,
-//   profile: {
-//     birth: Date<'2017-01-01'>  // Date object
-//   }
+//   name: 'Steve'
 // }
+
+user.id = 'boooom!'
+// throw TypeError
+// - message: 'not a number'
+// - code: 'VALIDATION_FAILS'
 ```
 
 ## Many Examples

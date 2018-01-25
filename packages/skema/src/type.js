@@ -1,7 +1,7 @@
 // Type Definition
 ///////////////////////////////////////////////////////////
 import {
-  UNDEFINED,
+  isDefined,
   parseDefault, parseSetters, parseValidators, parseWhen
 } from './util'
 
@@ -28,7 +28,7 @@ export class TypeDefinition {
     this._writable = writable
 
     // If there is a default value, it IS optional.
-    this._optional = this._default !== UNDEFINED
+    this._optional = isDefined(this._default)
       ? true
       // By default, optional is false
       : optional

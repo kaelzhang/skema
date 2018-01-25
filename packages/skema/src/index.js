@@ -1,8 +1,9 @@
 import {factory} from './skema-factory'
 import {LOOSE} from '@skema/basic'
 
+import './error-meta'
+
 const {
-  skema,
   type,
   shape,
   arrayOf,
@@ -16,7 +17,6 @@ const {
 const defaults = factory
 
 export {
-  skema,
   type,
   shape,
   arrayOf,

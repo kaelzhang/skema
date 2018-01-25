@@ -3,11 +3,12 @@
 // import {AbstractProcessor} from './processor'
 import {Context} from './context'
 import {
-  TYPE_SKEMA, UNDEFINED,
+  UNDEFINED,
   isDefined,
-  defineValue, defineValues, getKey,
+  defineValue, getKey,
   PREFIX_IS, PREFIX_HAS
 } from './util'
+import {TYPE_SKEMA} from './future'
 
 export class Skema {
   constructor (definition) {
@@ -15,84 +16,37 @@ export class Skema {
     defineValue(this, TYPE_SKEMA, true)
   }
 
-  // Creates a new Skema based on the current one, but the new one is optional
-  optional (): Skema {
-    return this._derive({
-      _optional: true
-    })
+  from (raw, ...args): any {
+    const {_options} = this
+    return _options.promise.resolve(
+      this.f(raw, args, new Context(raw), _options),
+      true)
   }
 
-  // Creates a new Skema based on the current one, but the new one is required
-  required (): Skema {
-    return this._derive({
-      _optional: false,
-      _default: UNDEFINED
-    })
-  }
-
-  enumerable (value?: boolean) {
-    return this._derive({
-      _enumerable: !!value
-    })
-  }
-
-  configurable (value?: boolean): Skema {
-    return this._derive({
-      _configurable: !!value
-    })
-  }
-
-  writable (value?: boolean) {
-    return this._derive({
-      _writable: !!value
-    })
-  }
-
-  from (raw, args = [], context, options): any {
-    const noContext = !context
-
-    if (noContext) {
-      context = new Context(raw)
+  f (raw, args, context, options): any {
+    if (this._any) {
+      return options.promise.resolve(raw)
     }
 
-    options = options || this._options
-
-    const result = isDefined(this._shape)
+    return isDefined(this._shape)
       ? this._shape.from(args, context, options)
       : this.validate(args, context, options)
         .then(() => this.set(args, context, options))
-
-    return noContext
-      ? this._options.promise.resolve(result, true)
-      : result
   }
 
-  options (options) {
-    return this._derive({
-      _options: options
-    })
-  }
-}
-
-defineValues(Skema.prototype, {
-  _getConfig (key) {
+  _config (key) {
     const value = this['_' + key]
     return isDefined(value)
       ? value
       : this._type
         ? this._type[getKey(key, PREFIX_IS)]()
         : UNDEFINED
-  },
+  }
 
-  _derive (extra) {
-    const options = Object.assign(Object.create(null), this, extra)
-    return new Skema(options)
-  },
-
-  _hasOwnArray (key) {
+  _hasArray (key) {
     const value = this['_' + key]
     return isDefined(value) && value.length !== 0
-  },
+  }
 
   _has (key) {
     if (this._type && this._type[getKey(key, PREFIX_HAS)]()) {
@@ -100,30 +54,30 @@ defineValues(Skema.prototype, {
     }
 
     return isDefined(this['_' + key])
-  },
+  }
 
   isConfigurable (): Boolean | undefined {
-    return this._getConfig('configurable')
-  },
+    return this._config('configurable')
+  }
 
   isEnumerable (): Boolean | undefined {
-    return this._getConfig('enumerable')
-  },
+    return this._config('enumerable')
+  }
 
   isWritable (): Boolean | undefined {
-    return this._getConfig('writable')
-  },
+    return this._config('writable')
+  }
 
   isOptional (): Boolean | undefined {
     return this._optional === true || (
       this._optional !== false &&
       this._type &&
       this._type.isOptional())
-  },
+  }
 
   hasWhen (): boolean {
     return this._has('when')
-  },
+  }
 
   when (args, context, options) {
     if (isDefined(this._when)) {
@@ -134,11 +88,11 @@ defineValues(Skema.prototype, {
     if (this._type.hasWhen()) {
       return this._type.when(args, context, options)
     }
-  },
+  }
 
   hasDefault (): boolean {
     return this._has('default')
-  },
+  }
 
   default (args, context, options) {
     if (isDefined(this._default)) {
@@ -149,7 +103,7 @@ defineValues(Skema.prototype, {
     if (this._type.hasDefault()) {
       return this._type.default(args, context, options)
     }
-  },
+  }
 
   // Only test against validators
   validate (args, context, options): boolean {
@@ -164,7 +118,7 @@ defineValues(Skema.prototype, {
 
     return start
     .then(pass => {
-      if (!pass || !this._hasOwnArray('validate')) {
+      if (!pass || !this._hasArray('validate')) {
         return pass
       }
 
@@ -182,7 +136,7 @@ defineValues(Skema.prototype, {
       })
       .catch(error => promise.reject(context.makeError(error)))
     })
-  },
+  }
 
   set (args, context, options) {
     const {
@@ -194,7 +148,7 @@ defineValues(Skema.prototype, {
       ? this._type.set(args, context, options)
       : promise.resolve(value)
 
-    if (!this._hasOwnArray('set')) {
+    if (!this._hasArray('set')) {
       return start
     }
 
@@ -209,4 +163,4 @@ defineValues(Skema.prototype, {
       .catch(error => promise.reject(context.makeError(error)))
     })
   }
-})
+}

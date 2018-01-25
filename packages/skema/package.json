@@ -41,10 +41,9 @@
   },
   "dependencies": {
     "@skema/basic": "^1.0.5",
-    "err-object": "^2.0.3",
+    "err-object": "^2.1.0",
     "make-array": "^1.0.2",
     "promise-faker": "^1.2.2",
-    "promise.extra": "^2.1.1",
-    "symbol-for": "^1.0.0"
+    "promise.extra": "^2.1.1"
   }
 }

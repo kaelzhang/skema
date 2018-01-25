@@ -22,7 +22,7 @@ export const factory = ({
   const cases = []
 
   const {
-    skema,
+    shape,
     type,
     objectOf,
     arrayOf,
@@ -34,7 +34,7 @@ export const factory = ({
     types
   })
 
-  const Depth1 = () => skema({
+  const Depth1 = () => shape({
     a: Number,
     b: 'string',
     c: Boolean
@@ -60,7 +60,7 @@ export const factory = ({
   cases.push({
     d: 'structure depth:2',
     s () {
-      return skema({
+      return shape({
         d: Depth1()
       })
     },
@@ -104,27 +104,12 @@ export const factory = ({
   // 3
   cases.push({
     d: 'structure optional',
-    s: () => skema({
+    s: () => shape({
       a: Number,
-      b: type({
+      b: {
         type: String,
         optional: true
-      })
-    }),
-    input: {
-      a: 1
-    },
-    output: {
-      a: 1
-    }
-  })
-
-  // 4
-  cases.push({
-    d: 'structure optional, optional creator',
-    s: () => skema({
-      a: Number,
-      b: skema(String).optional()
+      }
     }),
     input: {
       a: 1
@@ -136,7 +121,7 @@ export const factory = ({
 
   cases.push({
     d: 'structure optional, string syntax',
-    s: () => skema({
+    s: () => shape({
       a: Number,
       b: 'string?'
     }),
@@ -148,18 +133,6 @@ export const factory = ({
     }
   })
 
-  cases.push({
-    d: 'optional skema required again',
-    s: () => skema({
-      a: skema(Number).optional().required()
-    }),
-    input: {},
-    output: {
-      code: 'NOT_OPTIONAL'
-    },
-    e: true
-  })
-
   const TypeDefault = () => type({
     default: 1
   })
@@ -167,7 +140,7 @@ export const factory = ({
   // 5
   cases.push({
     d: 'default value',
-    s: () => skema({
+    s: () => shape({
       a: TypeDefault()
     }),
     input: {},
@@ -178,10 +151,10 @@ export const factory = ({
 
   cases.push({
     d: 'parent default value',
-    s: () => skema({
-      a: type({
+    s: () => shape({
+      a: {
         type: TypeDefault()
-      })
+      }
     }),
     input: {},
     output: {
@@ -191,7 +164,7 @@ export const factory = ({
 
   cases.push({
     d: 'function default',
-    s: () => skema({
+    s: () => shape({
       a: type({
         default () {
           return 1
@@ -222,7 +195,7 @@ export const factory = ({
   // 6
   cases.push({
     d: 'when and skip',
-    s: () => skema({
+    s: () => shape({
       a: TypeWhenAndAlwaysFail()
     }),
     input: {
@@ -239,7 +212,7 @@ export const factory = ({
 
   cases.push({
     d: 'when and skip, parent',
-    s: () => skema({
+    s: () => shape({
       a: type({
         type: TypeWhenAndAlwaysFail()
       })
@@ -259,7 +232,7 @@ export const factory = ({
   // 7
   cases.push({
     d: 'when and not skip, fails',
-    s: () => skema({
+    s: () => shape({
       a: TypeWhenAndAlwaysFail()
     }),
     input: {
@@ -278,7 +251,7 @@ export const factory = ({
 
   cases.push({
     d: 'always skip with when:false',
-    s: () => skema({
+    s: () => shape({
       a: type({
         when: false,
         validate: () => false
@@ -295,7 +268,7 @@ export const factory = ({
   // 8
   cases.push({
     d: 'when and not skip, not fails',
-    s: () => skema({
+    s: () => shape({
       a: TypeWhen()
     }),
     input: {
@@ -436,7 +409,7 @@ export const factory = ({
 
   cases.push({
     d: 'invalid validator',
-    s: () => skema({
+    s: () => shape({
       a: type({
         validate: 1
       })
@@ -468,8 +441,8 @@ export const factory = ({
 
   cases.push({
     d: 'type setter that throws, with hierarchies',
-    s: () => skema({
-      a: skema({
+    s: () => shape({
+      a: shape({
         b: TypeSetterThrows()
       })
     }),
@@ -488,7 +461,7 @@ export const factory = ({
 
   cases.push({
     d: 'type array of setters',
-    s: () => skema({
+    s: () => shape({
       a: type({
         set: [() => 1, i => i + 1]
       })
@@ -503,7 +476,7 @@ export const factory = ({
 
   cases.push({
     d: 'invalid setter',
-    s: () => skema({
+    s: () => shape({
       a: type({
         set: 1
       })
@@ -558,87 +531,60 @@ export const factory = ({
 
   cases.push({
     d: 'sparse array of string, optional',
-    s: () => arrayOf(skema(String).optional()),
+    s: () => arrayOf({
+      type: String,
+      optional: true
+    }),
     input: createSparseArray(2, 1),
     output: createSparseArray(2, '1')
   })
 
   cases.push({
     d: 'array shape',
-    s: () => skema([String, Number]),
+    s: () => shape([String, Number]),
     input: [1, '1'],
     output: ['1', 1]
   })
 
   cases.push({
-    d: 'changes options',
+    d: 'empty type',
     s: () => {
       const {
-        skema: _skema
-      } = defaults({
-        clean: true,
-        types: LOOSE
-      })
-
-      const s = _skema({
-        a: String
-      })
-
-      return skema(s)
-    },
-    input: {
-      a: 1,
-      b: 2
-    },
-    output: clean
-      ? {
-        a: '1'
-      }
-      : {
-        a: '1',
-        b: 2
-      }
-  })
-
-  cases.push({
-    d: 'type not found',
-    s: () => {
-      const {
-        skema
+        type
       } = defaults()
 
-      return skema(Number)
+      return type(Number)
     },
     output: {
-      code: 'EMPTY_SHAPE'
+      code: 'EMPTY_TYPE'
     },
     se: true
   })
 
   cases.push({
-    d: 'empty shape',
-    s: () => skema({}),
+    d: 'empty type',
+    s: () => type({}),
     output: {
-      code: 'EMPTY_SHAPE'
+      code: 'EMPTY_TYPE'
     },
     se: true
   })
 
-  cases.push({
-    d: 're-skema',
-    s: () => skema(skema({a: Number})),
-    input: {
-      a: '1'
-    },
-    output: {
-      a: 1
-    }
-  })
+  // cases.push({
+  //   d: 're-skema',
+  //   s: () => shape(shape({a: Number})),
+  //   input: {
+  //     a: '1'
+  //   },
+  //   output: {
+  //     a: 1
+  //   }
+  // })
 
   cases.push({
     d: 'number type skema alias',
     s: () => {
-      declare(1, skema(Number))
+      declare(1, type(Number))
     },
     output: {
       code: 'INVALID_TYPE_NAME'
@@ -648,16 +594,16 @@ export const factory = ({
 
   cases.push({
     d: 'invalid skema',
-    s: () => skema(1),
+    s: () => type(1),
     output: {
-      code: 'INVALID_SKEMA'
+      code: 'INVALID_TYPE'
     },
     se: true
   })
 
   cases.push({
     d: 'any',
-    s: () => skema({
+    s: () => shape({
       a: any(),
       b: any(),
       c: any()
@@ -695,7 +641,7 @@ export const factory = ({
 
   cases.push({
     d: 'unknown type error',
-    s: () => skema({a: 'unknown'}),
+    s: () => shape({a: 'unknown'}),
     output: {
       code: 'UNKNOWN_TYPE'
     },
@@ -704,7 +650,7 @@ export const factory = ({
 
   cases.push({
     d: 're-declare type error',
-    s: () => declare('string', skema(String)),
+    s: () => declare('string', shape(String)),
     output: {
       code: 'REDECLARE_TYPE'
     },
@@ -713,7 +659,7 @@ export const factory = ({
 
   cases.push({
     d: 're-declare type error',
-    s: () => declare(String, skema(String)),
+    s: () => declare(String, shape(String)),
     output: {
       code: 'REDECLARE_TYPE'
     },
@@ -728,22 +674,18 @@ export const factory = ({
 
   const TypeDescriptorOutput = ({
     enumerable,
-    configurable,
-    writable
+    configurable
   } = {}) => (t, o) => {
     const descriptor = Object.getOwnPropertyDescriptor(o, 'a')
 
-    t.deepEqual(descriptor, {
-      value: 1,
-      enumerable: !!enumerable,
-      configurable: !!configurable,
-      writable: !!writable
-    })
+    t.is(descriptor.enumerable, !!enumerable)
+    t.is(descriptor.configurable, !!configurable)
+    t.is(o.a, 1)
   }
 
   cases.push({
     d: 'descriptor',
-    s: () => skema({
+    s: () => shape({
       a: TypeDescriptor()
     }),
     input: {
@@ -770,15 +712,17 @@ export const factory = ({
 
   const properties = [
     'enumerable',
-    'writable',
     'configurable'
   ]
 
   properties.forEach(key => {
     cases.push({
-      d: `descriptor, creator, ${key}`,
-      s: () => skema({
-        a: TypeDescriptor()[key](true)
+      d: `descriptor, inherit, ${key}`,
+      s: () => shape({
+        a: {
+          type: TypeDescriptor(),
+          [key]: true
+        }
       }),
       input: {
         a: 1

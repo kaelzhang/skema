@@ -41,9 +41,7 @@ export function run (skemaOptions = {}) {
     e,
     // skema create error
     se,
-    only,
-    // special match: only match values, but do not use deepEqual
-    sm
+    only
   }, i) => {
     getTest(only)(`${i}: clean:${!!skemaOptions.clean}, ${d}`, async t => {
       function from (s) {
@@ -57,9 +55,7 @@ export function run (skemaOptions = {}) {
 
             typeof output === 'function'
               ? output(t, o)
-              : sm
-                ? sMatch(t, o, output)
-                : match(t, o, output)
+              : match(t, o, output)
           },
           error => {
             if (!e) {
@@ -96,9 +92,36 @@ export function run (skemaOptions = {}) {
   }
 }
 
+function isObject (v) {
+  return Object(v) === v
+}
+
+function deepEqual (t, value, expect, path) {
+  const originalPath = path
+  path = path || []
+
+  if (!isObject(value)) {
+    return t.fail(`not deepEqual: not an object, path: ${JSON.stringify(path)}`)
+  }
+
+  Object.keys(expect).forEach(key => {
+    const v = expect[key]
+
+    if (isObject(v)) {
+      return deepEqual(t, value[key], v, path.concat(key))
+    }
+
+    t.is(value[key], v, `not equal, key: ${key}, path: ${JSON.stringify(path)}`)
+  })
+
+  if (!originalPath) {
+    t.pass()
+  }
+}
+
 function match (t, value, expect, prefix = '') {
   if (Object(expect) === expect) {
-    t.deepEqual(value, expect, `${prefix}result not match`)
+    deepEqual(t, value, expect)
     return
   }
 

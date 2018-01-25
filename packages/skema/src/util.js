@@ -1,15 +1,12 @@
 import make_array from 'make-array'
 import {error} from './error'
-import symbol from 'symbol-for'
+
+const {defineProperty} = Object
+export {defineProperty}
+
 export const UNDEFINED = void 0
 export const PREFIX_IS = 'is'
 export const PREFIX_HAS = 'has'
-
-export const TYPE_SKEMA = symbol.for('skema')
-export const isSkema = subject => !!subject && subject[TYPE_SKEMA] === true
-
-export const TYPE_ERROR = symbol.for('skema:error')
-export const isError = subject => !!subject && subject[TYPE_ERROR]
 
 export const isString = subject => typeof subject === 'string'
 export const isFunction = subject => typeof subject === 'function'
@@ -21,28 +18,18 @@ export const isDefined = subject => subject !== UNDEFINED
 
 export const isArray = Array.isArray
 
-export function defineProperty (object, key, value, rules = {}) {
-  rules.value = value
-  Object.defineProperty(object, key, rules)
-}
-
-export function defineValue (object, key, value) {
-  Object.defineProperty(object, key, {value})
-}
-
-export function defineValues (object, values) {
-  Object.keys(values).forEach(key => defineValue(object, key, values[key]))
-}
+export const defineValue = (object, key, value) =>
+  defineProperty(object, key, {value})
 
 const hypenate = key => key[0].toUpperCase() + key.slice(1)
 export const getKey = (key, prefix) => prefix + hypenate(key)
 
-export function simpleClone (object) {
+export const simpleClone = object => {
   return Object.assign(Object.create(null), object)
 }
 
 // See "schema design"
-export function parseValidator (validator) {
+export const parseValidator = validator => {
   if (isFunction(validator)) {
     return validator
   }
@@ -54,14 +41,14 @@ export function parseValidator (validator) {
   throw error('INVALID_VALIDATOR')
 }
 
-export function parseValidators (validators) {
+export const parseValidators = validators => {
   if (!validators) {
     return
   }
   return make_array(validators).map(parseValidator)
 }
 
-export function parseSetters (setters) {
+export const parseSetters = setters => {
   if (!setters) {
     return
   }
@@ -75,7 +62,7 @@ export function parseSetters (setters) {
   })
 }
 
-export function parseWhen (when) {
+export const parseWhen = when => {
   if (isFunction(when)) {
     return when
   }
@@ -83,11 +70,9 @@ export function parseWhen (when) {
   if (when === false) {
     return () => false
   }
-
-  // Then true
 }
 
-export function parseDefault (_default) {
+export const parseDefault = _default => {
   if (_default === undefined) {
     return
   }

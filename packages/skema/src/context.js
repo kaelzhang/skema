@@ -1,5 +1,6 @@
 import {error} from './error'
-import {TYPE_ERROR, isError, defineValue} from './util'
+import {defineValue} from './util'
+import {TYPE_ERROR, isError} from './future'
 
 // data = {a: {b: 1}}
 // 1. value: data, key: null, parent: null, path: []
@@ -51,8 +52,6 @@ export class Context {
 
   errorByCode (code, ...args): Error {
     const err = error(code, ...args)
-    err.args = args
-
     return this._wrap(err)
   }
 }
