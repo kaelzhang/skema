@@ -3,6 +3,11 @@ sudo: false
 node_js:
   - "8"
 before_script:
-  - npm run bootstrap
+  - cd packages/skema
+  - npm install
+  - cd -
+  - cd package/basic
+  - npm install
+  - cd -
 after_success:
   - npm run report-cov
