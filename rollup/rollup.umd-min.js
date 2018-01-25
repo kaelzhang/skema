@@ -1,13 +1,13 @@
-import config from './rollup'
+import prev from './rollup.umd'
 import uglify from 'rollup-plugin-uglify'
 import { minify } from 'uglify-es'
 
-config.output = {
-  file: 'umd/skema.min.js',
-  format: 'umd',
-  name: 'Skema',
-}
+const config = Object.assign({}, prev)
 
-config.plugins.push(uglify({}, minify))
+config.output = Object.assign({}, config.output, {
+  file: 'umd/skema.min.js',
+})
+
+config.plugins = config.plugins.concat(uglify({}, minify))
 
 export default config
