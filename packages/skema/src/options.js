@@ -1,5 +1,10 @@
 import FakePromise from 'promise-faker'
-import promiseExtra, {factory} from 'promise.extra'
+import {factory, series, waterfall} from 'promise.extra'
+
+const promiseExtra = {
+  series,
+  waterfall
+}
 
 export class Options {
   constructor ({

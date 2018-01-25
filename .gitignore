@@ -2,6 +2,8 @@
 /lib
 /packages/*/lib
 /packages/skema/README.md
+/packages/skema/umd/
+/packages/*/dist
 
 # Numerous always-ignore extensions
 *.bak
@@ -19,6 +21,7 @@
 *.sass-cache
 *.lock
 .nyc_output/
+*.tgz
 
 # OS or Editor folders
 .DS_Store

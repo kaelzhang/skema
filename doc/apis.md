@@ -81,7 +81,10 @@ Used for traversing schema shape:
 .from(raw, args?: Array, options?: {async: boolean}): any | Promise
 ```
 
-Processes (purifying, validating and transforming) the given value `raw`
+Processes (purifying, validating and transforming) the given value `raw`, and returns
+
+- The purified value if `async` is false
+- Or a promise containing the result value if `async` is true.
 
 ## type()
 
