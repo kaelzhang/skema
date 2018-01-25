@@ -26,7 +26,7 @@ const tryCatchFactory = ({async}) => async
 
 export function run (skemaOptions = {}) {
   const {skema, type} = defaults(skemaOptions)
-  const tryCatch = tryCatchFactory(skemaOptions)
+  const _tryCatch = tryCatchFactory(skemaOptions)
 
   return ({
     // description
@@ -42,12 +42,26 @@ export function run (skemaOptions = {}) {
     // skema create error
     se,
     only,
-    after
+    after,
+    args,
+    async
   }, i) => {
-    getTest(only)(`${i}: clean:${!!skemaOptions.clean}, ${d}`, async t => {
+
+    const hasAsync = async === !!async
+    const tryCatch = hasAsync
+      ? tryCatchFactory({async})
+      : _tryCatch
+
+    getTest(only)(`${i}: ${d}`, async t => {
       function from (s) {
         return tryCatch(
-          () => s.from(input),
+          () => args
+            ? hasAsync
+              ? s.from(input, args, {async})
+              : s.from(input, args)
+            : hasAsync
+              ? s.from(input, {async})
+              : s.from(input),
           async o => {
             if (e) {
               t.fail('should fail')
@@ -107,6 +121,12 @@ function deepEqual (t, value, expect, path) {
 
   if (!isObject(value)) {
     return t.fail(`not deepEqual: not an object, path: ${JSON.stringify(path)}`)
+  }
+
+  if (Object.keys(value).length > Object.keys(expect).length) {
+    let tmp = value
+    value = expect
+    expect = value
   }
 
   Object.keys(expect).forEach(key => {

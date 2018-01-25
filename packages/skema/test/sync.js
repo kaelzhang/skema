@@ -7,11 +7,5 @@ function go (options) {
 }
 
 go({
-  async: false,
-  clean: false
-})
-
-go({
-  async: false,
-  clean: true
+  async: false
 })

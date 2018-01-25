@@ -4,11 +4,12 @@
 import {Context} from './context'
 import {
   UNDEFINED,
-  isDefined,
+  isDefined, isArray, isObject,
   defineValue, getKey,
   PREFIX_IS, PREFIX_HAS
 } from './util'
 import {TYPE_SKEMA} from './future'
+import {Options} from './options'
 
 export class Skema {
   constructor (definition) {
@@ -16,10 +17,18 @@ export class Skema {
     defineValue(this, TYPE_SKEMA, true)
   }
 
-  from (raw, ...args): any {
-    const {_options} = this
-    return _options.promise.resolve(
-      this.f(raw, args, new Context(raw), _options),
+  from (raw, args, options): any {
+    if (!isObject(args) || !isArray(args)) {
+      options = args
+      args = []
+    }
+
+    options = options
+      ? new Options(options)
+      : this._options
+
+    return options.promise.resolve(
+      this.f(raw, args, new Context(raw), options),
       true)
   }
 

@@ -6,15 +6,14 @@ const date = new Date
 const only = true
 
 export const factory = ({
-  async,
-  clean
+  async
 }) => {
   const types = [
     ...LOOSE,
     {
       name: ['path', path],
       definition: {
-        set: path.resolve
+        set: p => path.resolve(__dirname, p)
       }
     }
   ]
@@ -30,7 +29,6 @@ export const factory = ({
     any
   } = defaults({
     async,
-    clean,
     types
   })
 
@@ -192,41 +190,49 @@ export const factory = ({
     }
   })
 
-  // 6
-  cases.push({
-    d: 'when and skip',
-    s: () => shape({
-      a: TypeWhenAndAlwaysFail()
-    }),
-    input: {
-      a: 1,
-      b: 1
-    },
-    output: clean
-      ? {}
-      : {
-        a: 1,
-        b: 1
-      }
-  })
+  function whetherClean (factory, cleanOutput, output) {
+    createClean(factory, true, cleanOutput)
+    createClean(factory, false, output)
+  }
 
-  cases.push({
-    d: 'when and skip, parent',
-    s: () => shape({
-      a: type({
-        type: TypeWhenAndAlwaysFail()
-      })
-    }),
-    input: {
-      a: 1,
-      b: 1
-    },
-    output: clean
-      ? {}
-      : {
+  function createClean (factory, clean, output) {
+    const c = factory(clean)
+    cases.push({
+      ...c,
+      d: `${c.d}, clean:${clean}`,
+      output
+    })
+  }
+
+  whetherClean(clean => {
+    return {
+      d: 'when and skip',
+      s: () => shape({
+        a: TypeWhenAndAlwaysFail()
+      }, clean),
+      input: {
         a: 1,
         b: 1
       }
+    }
+  }, {}, {a: 1, b: 1})
+
+  whetherClean(clean => {
+    return {
+      d: 'when and skip, parent',
+      s: () => shape({
+        a: {
+          type: TypeWhenAndAlwaysFail()
+        }
+      }, clean),
+      input: {
+        a: 1,
+        b: 1
+      }
+    }
+  }, {}, {
+    a: 1,
+    b: 1
   })
 
   // 7
@@ -249,40 +255,37 @@ export const factory = ({
     e: true
   })
 
-  cases.push({
-    d: 'always skip with when:false',
-    s: () => shape({
-      a: type({
-        when: false,
-        validate: () => false
-      })
-    }),
-    input: {
-      a: 1
-    },
-    output: clean
-      ? {}
-      : {a: 1}
-  })
-
-  // 8
-  cases.push({
-    d: 'when and not skip, not fails',
-    s: () => shape({
-      a: TypeWhen()
-    }),
-    input: {
-      a: 1,
-      b: 2
-    },
-    output: clean
-      ? {
+  whetherClean(clean => {
+    return {
+      d: 'always skip with when:false',
+      s: () => shape({
+        a: {
+          when: false,
+          validate: () => false
+        }
+      }, clean),
+      input: {
         a: 1
       }
-      : {
+    }
+  }, {}, {a: 1})
+
+  whetherClean(clean => {
+    return {
+      d: 'when and not skip, not fails',
+      s: () => shape({
+        a: TypeWhen()
+      }, clean),
+      input: {
         a: 1,
         b: 2
       }
+    }
+  }, {
+    a: 1
+  }, {
+    a: 1,
+    b: 2
   })
 
   // 9
@@ -601,31 +604,30 @@ export const factory = ({
     se: true
   })
 
-  cases.push({
-    d: 'any',
-    s: () => shape({
-      a: any(),
-      b: any(),
-      c: any()
-    }),
-    input: {
-      a: 1,
-      b: '2',
-      c: false,
-      d: 3
-    },
-    output: clean
-      ? {
-        a: 1,
-        b: '2',
-        c: false
-      }
-      : {
+  whetherClean(clean => {
+    return {
+      d: 'any',
+      s: () => shape({
+        a: any(),
+        b: any(),
+        c: any()
+      }, clean),
+      input: {
         a: 1,
         b: '2',
         c: false,
         d: 3
       }
+    }
+  }, {
+    a: 1,
+    b: '2',
+    c: false
+  }, {
+    a: 1,
+    b: '2',
+    c: false,
+    d: 3
   })
 
   cases.push({

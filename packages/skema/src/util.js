@@ -15,7 +15,6 @@ export const isRegExp = subject =>
 
 export const isObject = subject => !!subject && Object(subject) === subject
 export const isDefined = subject => subject !== UNDEFINED
-
 export const isArray = Array.isArray
 
 export const defineValue = (object, key, value) =>

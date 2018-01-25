@@ -3,8 +3,8 @@ import promiseExtra, {factory} from 'promise.extra'
 
 export class Options {
   constructor ({
-    async: _async = false,
-    types
+    // For now, there is only one option
+    async: _async = false
   }) {
     this.promise = _async
       ? Promise
