@@ -14,26 +14,35 @@ Let us look into an example of the shape definition step by step.
 ```js
 import {shape} from 'skema'
 
-const User = skema({
+const User = shape({
   // 1
   id: Number,
   // 2
-  profile: {
+  profile: shape({
     // 3
     birth: 'date',
     // 4
     name: 'string?'
-  }
+  })
 })
 ```
 
 1. The user id is a number, and `Number` is an alias of the built-in number type.
 
-2. To define a deep shape, just make the object deeper
+2. To define a deep shape, just make the object deeper.
 
 3. `'date'` is also an alias
 
-4. `'string?'` is equivalent to `skema('string').optional()`
+4. `'string?'` is equivalent to:
+
+```js
+type({
+  type: 'string',
+  optional: true
+})
+```
+
+For more information about optional type, see [optional](#optional) section below.
 
 ```js
 const user = User.from({
@@ -81,11 +90,6 @@ shape({
 })
 
 shape({
-  // use the skema method
-  id: skema(Number).optional()
-})
-
-shape({
   // inherit a skema
   id: type({
     type: Number,
@@ -93,6 +97,8 @@ shape({
   })
 })
 ```
+
+More information about Type Inheritance, see [this example](../examples/type-inheritance).
 
 ### default
 

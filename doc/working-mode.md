@@ -4,12 +4,32 @@ By default, `skema` works synchronously.
 
 ## Woking Asychronously
 
+There are TWO ways to make Skema run synchronously.
+
+1. Specify `options` parameter of `.from(raw, options)`
+2. Change the default settings.
+
+```js
+import {type} from 'skema'
+const Type = type({
+  set: v => v + 1
+})
+
+Type.from(1)  // 2
+
+Type.from(1, {async: true})
+.then(v => {
+  console.log(v)  // 2
+})
+```
+
 ```js
 import {defaults} from 'skema'
 import {LOOSE} from '@skema/basic'
 
 const {
-  skema
+  type,
+  shape
 } = defaults({
   async: true,
   types: LOOSE
@@ -39,7 +59,7 @@ const UserName = type({
   }
 })
 
-const User = skema({
+const User = shape({
   name: UserName
 })
 
@@ -61,5 +81,3 @@ User.from({
 .then(console.log)
 // {name: 'Isaac Z. Schlueter'}
 ```
-
-## Working as the Type Checker

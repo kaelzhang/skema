@@ -6,7 +6,6 @@ The very detail and verbose references of the APIs.
 
 ```js
 import {
-  skema,
   type,
   shape,
   arrayOf,
@@ -21,13 +20,24 @@ import {
 
 **TL;NR**
 
-### `AsyncOrSyncFunc()`
+### `AsyncOrSyncFunc(...args: Array<any>)`
 
-`skema` supports both async functions and sync functions in almost every circumstances either for `when`, `default`, `validate` and `set`.
+- **args** `Array<any>` The arguments of the method `.from(raw, args)`
+
+Skema supports both async functions and sync functions in almost every circumstances either for `when`, `default`, `validate` and `set`.
 
 And in all `AsyncOrSyncFunc`s, we could access
 
-- **this.parent** `object | null` the current object that is processing.
+- **this.parent** `object | null` the parent object that has been processed. If there is no parent object, this variable will be `null`
+
+```js
+// For `object`, there is no parent object
+const object = {
+  // The parent object of `'a'` is `object`
+  a: 1
+}
+```
+
 - **this.key** `string | null` the corresponding property key of the current value.
 - **this.path** `Array<string>` the access path of from which way we get there.
 
@@ -67,49 +77,27 @@ Used for traversing schema shape:
 
 ### method `.from()`
 
-```js
-.from(value [,...args]): any | Promise
+```ts
+.from(raw, args?: Array, options?: {async: boolean}): any | Promise
 ```
 
-Processes (validating and transforming) the given `value`.
-
-### method `.optional()`
-
-```js
-.optional(): Skema
-```
-
-Creates a new `Skema` based on the current one but is optional.
-
-### method `.required()`
-
-```js
-.required(): Skema
-```
-
-Creates a new `Skema` based on the current one but is required.
-
-### method `.enumerable()`
-### method `.writable()`
-### method `.configurable()`
-
-```js
-.enumerable(enumerable: boolean): Skema
-.writable(writable: boolean): Skema
-.configurable(configurable: boolean): Skema
-```
-
-Creates a new `Skema` based on the current one but with the new property value of object descriptors.
+Processes (purifying, validating and transforming) the given value `raw`
 
 ## type()
 
-```js
-type(definition: TypeDefinition): Skema
+```ts
+type(definition: TypeDefinition | SkemaAlias | Skema): Skema
 ```
 
-A type is the minimum unit to describe a single variable. Method `type()` accepts an object of `TypeDefinition` and returns a `Skema`.
+A type is the minimum unit to describe a single variable. Method `type()` accepts:
 
-A type defines two major kinds of things:
+- an object of [`TypeDefinition`](#struct-typedefinition),
+- or an alias of the Skema which declared by [`declare()`](#declare).
+- or a `Skema` instance.
+
+and returns a `Skema`.
+
+A `TypeDefinition` defines two major kinds of things:
 - How we should manage the value:
   - **validate**
   - **set**
@@ -141,27 +129,31 @@ TypeNumber.from('1')  // Error thrown
 
 ## shape()
 
-```js
-shape(object: ShapeStructure): Skema
+```ts
+shape(object: ObjectShape | ArrayShape, clean: boolean): Skema
 ```
 
-Defines a skema structure, and the `ShapeStructure` is:
+- **clean** `?boolean=false` whether removes properties that not defined in the shape.
 
 ```ts
-interface ShapeStructure {
-  [string]: Skema | SkemaAlias | ShapeStructure
+type Def = Skema | SkemaAlias | TypeDefinition
+
+interface ObjectShape {
+  [string]: def
 }
+
+ArrayShape = Array<Def?>
 ```
 
 ```js
 const Address = shape({
   id: Number,
-  address: {
+  address: shape({
     postCode: Number,
-    text: type({
+    text: {
       set: v => v.slice(0, 20)
-    })
-  }
+    }
+  })
 })
 
 Address.from({
@@ -182,8 +174,6 @@ Address.from({
 
 The detail behavior how shape works, see [Skema Shape](./shape.md).
 
-#### Examples
-
 ## declare()
 
 ```js
@@ -191,7 +181,7 @@ declare(name: SkemaAlias, skema: Skema): void
 declare(names: SkemaAlias[], skema: Skema): void
 ```
 
-Declares the alias for a certain skema, and the alias could be used directly in shape definition and `skema(skemaAlias)`
+Declares the alias for a certain skema, and the alias could be used directly in shape definition and `type(skemaAlias)`
 
 - **SkemaAlias** `string | object`
 
@@ -203,7 +193,7 @@ const Path = type({
 
 declare(['path', path], Path)
 
-const README = skema({
+const README = shape({
   // And we could just use nodejs `path` object as the type
   pathname: path,
   // The `String` here is an alias of the built-in string type.
@@ -222,8 +212,8 @@ README.from({
 
 ## arrayOf()
 
-```js
-arrayOf(subject: Skema | SkemaAlias): Skema
+```ts
+arrayOf(subject: Skema | SkemaAlias | TypeDefinition): Skema
 ```
 
 Creates a `Skema` which presents a special array [shape](./shape.md) that all of its items are of type `subject`.
@@ -231,42 +221,26 @@ Creates a `Skema` which presents a special array [shape](./shape.md) that all of
 ## objectOf()
 
 ```js
-objectOf(subject: Skema | SkemaAlias): Skema
+objectOf(subject: Skema | SkemaAlias | TypeDefinition): Skema
 ```
 
 Creates a `Skema` which presents a special object [shape](./shape.md) that all of its property values are of type `subject`.
 
-## skema()
-
-```js
-skema(subject: ShapeStructure | Skema | SkemaAlias): Skema
-```
-
-The over-for-all method to:
-
-- The alias of `.shape()`
-- Make sure an object is a `Skema`
-- Get the `Skema` object by its alias name.
-
-```js
-skema(Number).from('1')  // 1
-```
 
 ## defaults(options)
 
 ```js
 const {
-  skema,
   shape,
+  type,
   arrayOf,
   objectOf,
-  type,
   any
 } = defaults(options)
 ```
 
-Changes the default setting of skema, and creates
+Changes the default setting of skema, and creates new methods which contains the default settings.
 
-- **options** `object`
-  - **clean** `?boolean=false` If true, the properties that not defined in the shape will be purified out.
-  - **async** `?boolean=false` If true, skema will works in async mode.
+### **options** `object`
+
+- **async** `?boolean=false` If true, skema will works in async mode.
