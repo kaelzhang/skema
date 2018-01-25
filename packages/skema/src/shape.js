@@ -63,15 +63,20 @@ class Shape {
       values[symbolKey] = value
     }
 
-    // const writable = config(skema, 'writable')
-    const set = this._setters[key] = value => {
+    const writable = config(skema, 'writable')
+    const set = this._setters[key] = (value, first) => {
+      if (!writable && !first) {
+        throw context.errorByCode('NOT_WRITABLE', key)
+      }
+
       const result = skema.f(value, args, context, options)
       .then(value => values[symbolKey] = value)
+
       return options.promise.resolve(result, true)
     }
 
     defineProperty(values, key, {
-      set,
+      set: v => set(v),
       get: () => values[symbolKey],
       configurable: config(skema, 'configurable'),
       enumerable: config(skema, 'enumerable')

@@ -63,3 +63,8 @@ E('NOT_OPTIONAL', {
     'key %s is not optional', util.inspect(key)),
   ctor: Error
 })
+
+E('NOT_WRITABLE', {
+  message: 'property \'%s\' is readonly',
+  ctor: Error
+})

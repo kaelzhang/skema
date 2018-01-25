@@ -691,7 +691,17 @@ export const factory = ({
     input: {
       a: 1
     },
-    output: TypeDescriptorOutput()
+    output: TypeDescriptorOutput(),
+    async after (t, o) {
+      try {
+        o.a = 2
+      } catch (e) {
+        t.is(e.code, 'NOT_WRITABLE', 'should not be writable')
+        return
+      }
+
+      t.fail('after should fail')
+    }
   })
 
   cases.push({

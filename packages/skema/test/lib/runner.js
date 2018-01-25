@@ -41,13 +41,14 @@ export function run (skemaOptions = {}) {
     e,
     // skema create error
     se,
-    only
+    only,
+    after
   }, i) => {
     getTest(only)(`${i}: clean:${!!skemaOptions.clean}, ${d}`, async t => {
       function from (s) {
         return tryCatch(
           () => s.from(input),
-          o => {
+          async o => {
             if (e) {
               t.fail('should fail')
               return
@@ -56,6 +57,10 @@ export function run (skemaOptions = {}) {
             typeof output === 'function'
               ? output(t, o)
               : match(t, o, output)
+
+            if (after) {
+              await after(t, o)
+            }
           },
           error => {
             if (!e) {

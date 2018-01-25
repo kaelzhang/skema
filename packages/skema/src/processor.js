@@ -21,7 +21,7 @@ export class Processor {
         return
       }
 
-      return this.set(this.context.value)
+      return this.set(this.context.value, true)
     })
   }
 
