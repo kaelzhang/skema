@@ -5,6 +5,8 @@ import {
 } from './util'
 import {Processor} from './processor'
 import {SHAPE, symbol} from './future'
+import {Context} from './context'
+import {error} from './error'
 
 export const TYPE_OBJECT = 'TYPE_OBJECT'
 export const TYPE_ARRAY = 'TYPE_ARRAY'
@@ -21,6 +23,27 @@ const config = (skema, name) => {
     : true
 }
 
+export const set = (object, key, value) => {
+  const setters = object[SHAPE]
+  const setter = setters && setters[key]
+  const context = new Context(
+    value,
+    object,
+    key,
+    [key])
+
+  if (!setter) {
+    throw error('SHAPE_NOT_FOUND')
+  }
+
+  return setter(value, false, context)
+}
+
+function clean (context) {
+  context.rawParent = null
+  context.parent = null
+}
+
 class Shape {
   constructor (shape, clean) {
     this._shape = shape
@@ -29,12 +52,13 @@ class Shape {
   }
 
   from (args, context: Context, options: Options) {
-    const values = this._create(context, options)
+    const values = this._create(context)
     defineValue(values, SHAPE, this._setters)
 
     const tasks = this._tasks(context).map(([context, skema]) => {
+      context.parent = values
       const set = this.make(values, skema, args, context, options)
-      return new Processor({
+      return () => new Processor({
         options,
         skema,
         args,
@@ -42,35 +66,54 @@ class Shape {
         set
       })
       .process()
+      .then(
+        () => clean(context),
+        error => {
+          clean(context)
+          return options.promise.reject(error)
+        }
+      )
     })
 
-    return options.promise.all(tasks)
+    return options.promiseExtra.series(tasks)
     .then(() => values)
   }
 
   make (values, skema, args, context, options) {
     const {
-      context: {
-        key
-      },
-      value
+      key,
+      input
     } = context
 
     const symbolKey = symbol(key)
     defineHidden(values, symbolKey)
 
     if (!this._clean) {
-      values[symbolKey] = value
+      values[symbolKey] = input
     }
 
     const writable = config(skema, 'writable')
-    const set = this._setters[key] = (value, first) => {
-      if (!writable && !first) {
-        throw context.errorByCode('NOT_WRITABLE', key)
+
+    const set = this._setters[key] = (
+      value,
+      // For the first time, we ignore writable
+      force,
+      // Context
+      c,
+    ) => {
+      if (!c) {
+        c = context
+      }
+      c.input = value
+
+      if (!writable && !force) {
+        throw c.errorByCode('NOT_WRITABLE', key)
       }
 
-      const result = skema.f(value, args, context, options)
-      .then(value => values[symbolKey] = value)
+      const result = skema.f(args, c, options)
+      .then(value => {
+        return values[symbolKey] = value
+      })
 
       return options.promise.resolve(result, true)
     }
@@ -90,7 +133,7 @@ export class ObjectShape extends Shape {
   _create (context) {
     return this._clean
       ? Object.create(null)
-      : simpleClone(context.value)
+      : simpleClone(context.input)
   }
 
   _tasks (context) {
@@ -104,7 +147,7 @@ export class ArrayShape extends Shape {
   _create (context) {
     return this._clean
       ? []
-      : [].concat(context.value)
+      : [].concat(context.input)
   }
 
   _tasks (context) {
@@ -118,7 +161,7 @@ export class ObjectOfShape extends Shape {
   }
 
   _tasks (context) {
-    return Object.keys(context.value)
+    return Object.keys(context.input)
     .map(key => [context.descend(key), this._shape])
   }
 }
@@ -130,8 +173,8 @@ export class ArrayOfShape extends Shape {
 
   _tasks (context) {
     const tasks = []
-    const {value} = context
-    const {length} = value
+    const {input} = context
+    const {length} = input
     let i = 0
 
     // Iterate every array item

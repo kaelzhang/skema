@@ -68,3 +68,8 @@ E('NOT_WRITABLE', {
   message: 'property \'%s\' is readonly',
   ctor: Error
 })
+
+E('SHAPE_NOT_FOUND', {
+  message: 'shape definition not found on the object',
+  ctor: Error
+})

@@ -8,9 +8,11 @@ export class Processor {
 
     const {
       key,
-      parent
-    } = this.context.context
-    this._isDefault = !(key in parent)
+      rawParent,
+      input
+    } = this.context
+    this.isDefault = !(key in rawParent)
+    this.input = input
   }
 
   process () {
@@ -21,7 +23,7 @@ export class Processor {
         return
       }
 
-      return this.set(this.context.value, true)
+      return this.set(this.input, true)
     })
   }
 
@@ -49,7 +51,7 @@ export class Processor {
     const {skema} = this
 
     // has the key
-    if (!this._isDefault) {
+    if (!this.isDefault) {
       // not skip
       return false
     }
@@ -59,7 +61,7 @@ export class Processor {
     // so we simply check optional first.
     if (!skema.isOptional()) {
       throw this.context.errorByCode(
-        'NOT_OPTIONAL', this.context.context.key)
+        'NOT_OPTIONAL', this.context.key)
     }
 
     if (!skema.hasDefault()) {
@@ -70,7 +72,7 @@ export class Processor {
     return skema.default(
       this.args, this.context, this.options)
     .then(value => {
-      this.context.value = value
+      this.input = value
       return false
     })
   }

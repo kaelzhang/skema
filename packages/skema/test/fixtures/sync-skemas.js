@@ -26,10 +26,24 @@ export const factory = ({
     objectOf,
     arrayOf,
     declare,
-    any
+    any,
+    set
   } = defaults({
     async,
     types
+  })
+
+  cases.push({
+    d: 'custom path',
+    s: () => shape({
+      a: 'path'
+    }),
+    input: {
+      a: '../../sync.js'
+    },
+    output: {
+      a: path.join(__dirname, '../../sync.js')
+    }
   })
 
   const Depth1 = () => shape({
@@ -51,6 +65,56 @@ export const factory = ({
       a: 1,
       b: '2',
       c: true
+    }
+  })
+
+  cases.push({
+    d: 'structure, type assignment',
+    s: Depth1,
+    input: {
+      a: 1,
+      b: 2,
+      c: 3
+    },
+    async: false,
+    output: {
+      a: 1,
+      b: '2',
+      c: true
+    },
+    after (t, o) {
+      o.b = 4
+      t.is(o.b, '4', 'after not match')
+    }
+  })
+
+  cases.push({
+    d: 'structure, type assignment, async',
+    s: Depth1,
+    input: {
+      a: 1,
+      b: 2,
+      c: 3
+    },
+    async: true,
+    output: {
+      a: 1,
+      b: '2',
+      c: true
+    },
+    async after (t, o) {
+      const value = await set(o, 'b', 4)
+      t.is(value, '4', 'result value')
+      t.is(o.b, '4', 'after not match')
+
+      try {
+        await set({}, 'a', 1)
+      } catch (e) {
+        t.is(e.code, 'SHAPE_NOT_FOUND', 'set on non skema object')
+        return
+      }
+
+      t.fail('should fail')
     }
   })
 
@@ -90,10 +154,6 @@ export const factory = ({
       code: 'NOT_OPTIONAL',
       message: 'key \'c\' is not optional',
       path: ['c'],
-      parent: {
-        a: 1,
-        b: 2
-      },
       args: ['c']
     },
     e: true
@@ -177,13 +237,13 @@ export const factory = ({
 
   const TypeWhen = () => type({
     when () {
-      return !!this.parent.b
+      return !!this.rawParent.b
     }
   })
 
   const TypeWhenAndAlwaysFail = () => type({
     when () {
-      return this.parent.b > 1
+      return this.rawParent.b > 1
     },
     validate () {
       return false
@@ -192,7 +252,7 @@ export const factory = ({
 
   function whetherClean (factory, cleanOutput, output) {
     createClean(factory, true, cleanOutput)
-    createClean(factory, false, output)
+    // createClean(factory, false, output)
   }
 
   function createClean (factory, clean, output) {
@@ -211,8 +271,8 @@ export const factory = ({
         a: TypeWhenAndAlwaysFail()
       }, clean),
       input: {
-        a: 1,
-        b: 1
+        b: 1,
+        a: 1
       }
     }
   }, {}, {a: 1, b: 1})
@@ -226,8 +286,8 @@ export const factory = ({
         }
       }, clean),
       input: {
-        a: 1,
-        b: 1
+        b: 1,
+        a: 1
       }
     }
   }, {}, {
@@ -242,14 +302,14 @@ export const factory = ({
       a: TypeWhenAndAlwaysFail()
     }),
     input: {
-      a: 1,
-      b: 2
+      b: 2,
+      a: 1
     },
     output: {
       code: 'VALIDATION_FAILS',
       message: 'invalid value 1 for key \'a\'',
       args: [1, 'a'],
-      value: 1,
+      input: 1,
       path: ['a']
     },
     e: true
@@ -277,8 +337,8 @@ export const factory = ({
         a: TypeWhen()
       }, clean),
       input: {
-        a: 1,
-        b: 2
+        b: 2,
+        a: 1
       }
     }
   }, {
@@ -361,7 +421,7 @@ export const factory = ({
       code: 'VALIDATION_FAILS',
       message: 'invalid value 0',
       path: [],
-      value: 0
+      input: 0
     },
     e: true
   })
@@ -374,7 +434,7 @@ export const factory = ({
       code: 'CUSTOM_ERROR',
       message: 'foo',
       path: [],
-      value: 1
+      input: 1
     },
     e: true
   })
@@ -398,7 +458,7 @@ export const factory = ({
       code: 'CUSTOM_ERROR',
       message: 'foo',
       path: [],
-      value: 1
+      input: 1
     },
     e: true
   })

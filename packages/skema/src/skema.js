@@ -28,13 +28,13 @@ export class Skema {
       : this._options
 
     return options.promise.resolve(
-      this.f(raw, args, new Context(raw), options),
+      this.f(args, new Context(raw), options),
       true)
   }
 
-  f (raw, args, context, options): any {
+  f (args, context, options): any {
     if (this._any) {
-      return options.promise.resolve(raw)
+      return options.promise.resolve(context.input)
     }
 
     return isDefined(this._shape)
@@ -116,9 +116,6 @@ export class Skema {
 
   // Only test against validators
   validate (args, context, options): boolean {
-    const {
-      value
-    } = context
     const {promise} = options
 
     const start = this._type
@@ -133,11 +130,12 @@ export class Skema {
 
       return options.promiseExtra
       .series.call(context.context, this._validate, function (factory) {
-        return promise.resolve(factory.call(this, value, ...args))
+        const {input} = context
+        return promise.resolve(factory.call(this, input, ...args))
         .then(pass => {
           if (pass === false) {
             throw context.errorByCode(
-              'VALIDATION_FAILS', value, context.context.key)
+              'VALIDATION_FAILS', input, context.context.key)
           }
 
           return true
@@ -148,14 +146,11 @@ export class Skema {
   }
 
   set (args, context, options) {
-    const {
-      value
-    } = context
     const {promise} = options
 
     const start = this._type
       ? this._type.set(args, context, options)
-      : promise.resolve(value)
+      : promise.resolve(context.input)
 
     if (!this._hasArray('set')) {
       return start

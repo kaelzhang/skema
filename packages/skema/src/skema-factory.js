@@ -14,7 +14,8 @@ import {
   ObjectShape,
   ArrayShape,
   ObjectOfShape,
-  ArrayOfShape
+  ArrayOfShape,
+  set
 } from './shape'
 
 const METHODS = [
@@ -84,6 +85,10 @@ class SkemaFactory {
     types.forEach(({name, definition}) => {
       this.declare(name, definition)
     })
+  }
+
+  set (...args) {
+    return set(...args)
   }
 
   // IPTypeDefinition: {set () {}, type: Skema | StringType} -> Skema

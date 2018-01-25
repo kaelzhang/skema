@@ -1,5 +1,7 @@
 import test from 'ava'
+import {run} from './lib/runner'
+import {cases} from './fixtures/async-schemas'
 
-test('description', async t => {
-  t.is(true, true)
-})
+cases.forEach(run({
+  async: true
+}))

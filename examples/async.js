@@ -4,8 +4,7 @@
 import {defaults} from 'skema'
 
 const {
-  skema,
-  type
+  shape
 } = defaults({
   // Turn on async mode,
   // then the following properties will supports async functions:
@@ -18,8 +17,8 @@ const {
 
 const GENDERS = ['MALE', 'FEMALE', 'SECRET']
 
-const User = skema({
-  nickName: type({
+const User = shape({
+  nickName: {
     validate: name => {
       return new Promise((resolve, reject) => {
         checkUniqueFromRemoteServer(name, unique => {
@@ -31,9 +30,9 @@ const User = skema({
         })
       })
     }
-  }),
+  },
 
-  gender: type({
+  gender: {
     set: gender => {
       if (typeof gender === 'number') {
         gender = GENDERS[gender]
@@ -45,7 +44,7 @@ const User = skema({
 
       return gender
     }
-  })
+  }
 })
 
 ;(async () => {

@@ -8,30 +8,46 @@ import {TYPE_ERROR, isError} from './future'
 // 3. descend 'b': value: 1, key: 'b', parent: {b: 1}, path: ['a', 'b']
 export class Context {
   constructor (
-    value,
+    input,
     key = null,
     parent = null,
     path = []
   ) {
-    this.value = value
-    this.context = {
-      parent,
+    this.input = input
+    this.key = key
+    this.rawParent = parent
+    this.parent = null
+    this.path = path
+  }
+
+  get context () {
+    const {
       key,
-      path
+      rawParent,
+      parent,
+      path,
+      input
+    } = this
+
+    return {
+      key,
+      rawParent,
+      parent,
+      path,
+      input
     }
   }
 
   descend (key): Context {
-    const path = this.context.path.concat(key)
-    const parent = this.value
-    const value = this.value[key]
-
-    return new Context(value, key, parent, path)
+    return new Context(
+      this.input[key], key, this.input, this.path.concat(key))
   }
 
   _wrap (error) {
-    Object.assign(error, this.context)
-    error.value = this.value
+    // rawParent and parent will be removed by context later
+    error.key = this.key
+    error.input = this.input
+    error.path = this.path
     defineValue(error, TYPE_ERROR, true)
 
     return error
