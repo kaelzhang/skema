@@ -28,9 +28,10 @@ export const set = (object, key, value) => {
   const setter = setters && setters[key]
   const context = new Context(
     value,
-    object,
     key,
+    object,
     [key])
+  context.parent = object
 
   if (!setter) {
     throw error('SHAPE_NOT_FOUND')
@@ -40,8 +41,7 @@ export const set = (object, key, value) => {
 }
 
 function clean (context) {
-  context.rawParent = null
-  context.parent = null
+  context.rawParent = context.parent = null
 }
 
 class Shape {
@@ -119,7 +119,11 @@ class Shape {
     }
 
     defineProperty(values, key, {
-      set: v => set(v),
+      set: options.async
+        ? () => {
+          throw context.errorByCode('ASSIGN_ASYNC')
+        }
+        : v => set(v),
       get: () => values[symbolKey],
       configurable: config(skema, 'configurable'),
       enumerable: config(skema, 'enumerable')
@@ -151,7 +155,8 @@ export class ArrayShape extends Shape {
   }
 
   _tasks (context) {
-    return this._shape.map((v, i) => [context.descend(i), v])
+    return this._shape
+    .map((v, i) => [context.descend(i), v])
   }
 }
 

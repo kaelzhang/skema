@@ -3,8 +3,7 @@ import {E} from './error'
 import util from 'util'
 
 E('REDECLARE_TYPE', {
-  message: 'type \'%s\' should not be declared again',
-  ctor: Error
+  message: 'type \'%s\' should not be declared again'
 })
 
 E('UNKNOWN_TYPE', {
@@ -58,18 +57,19 @@ E('VALIDATION_FAILS', {
   }
 })
 
+E('ASSIGN_ASYNC', {
+  message: '`set()` should be used to assign new value to property of async skema'
+})
+
 E('NOT_OPTIONAL', {
   message: key => util.format(
-    'key %s is not optional', util.inspect(key)),
-  ctor: Error
+    'key %s is not optional', util.inspect(key))
 })
 
 E('NOT_WRITABLE', {
-  message: 'property \'%s\' is readonly',
-  ctor: Error
+  message: 'property \'%s\' is readonly'
 })
 
 E('SHAPE_NOT_FOUND', {
-  message: 'shape definition not found on the object',
-  ctor: Error
+  message: 'shape definition not found on the object'
 })

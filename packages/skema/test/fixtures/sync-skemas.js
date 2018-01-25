@@ -720,6 +720,16 @@ export const factory = ({
   })
 
   cases.push({
+    d: 're-declare Object type error',
+    s: () => declare(String, shape(String)),
+    output: {
+      code: 'REDECLARE_TYPE',
+      message: 'type \'String\' should not be declared again'
+    },
+    se: true
+  })
+
+  cases.push({
     d: 're-declare type error',
     s: () => declare(String, shape(String)),
     output: {
@@ -755,6 +765,10 @@ export const factory = ({
     },
     output: TypeDescriptorOutput(),
     async after (t, o) {
+      if (async) {
+        return
+      }
+
       try {
         o.a = 2
       } catch (e) {
@@ -801,6 +815,34 @@ export const factory = ({
       },
       output: TypeDescriptorOutput({[key]: true})
     })
+  })
+
+  const OptionalNumber = type({
+    type: Number,
+    optional: true
+  })
+
+  declare('optional-number', OptionalNumber)
+
+  cases.push({
+    d: 'type already optional',
+    s: () => shape({
+      a: 'optional-number?',
+      b: 'number'
+    }),
+    input: {
+      b: 1
+    },
+    output: {
+      b: 1
+    }
+  })
+
+  cases.push({
+    d: 'array shape with clean',
+    s: () => shape([Number,,Number], true),
+    input: [1, 2, 3],
+    output: [1,,3]
   })
 
   return {

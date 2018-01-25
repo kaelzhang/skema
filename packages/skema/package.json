@@ -44,6 +44,6 @@
     "err-object": "^2.1.0",
     "make-array": "^1.0.2",
     "promise-faker": "^1.2.2",
-    "promise.extra": "^2.1.1"
+    "promise.extra": "^2.1.2"
   }
 }

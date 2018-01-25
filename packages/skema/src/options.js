@@ -4,8 +4,7 @@ import promiseExtra, {factory} from 'promise.extra'
 export class Options {
   constructor ({
     // For now, there is only one option
-    async: _async = false,
-    sequence = false
+    async: _async = false
   }) {
     this.promise = _async
       ? Promise
@@ -14,5 +13,7 @@ export class Options {
     this.promiseExtra = _async
       ? promiseExtra
       : factory(FakePromise)
+
+    this.async = _async
   }
 }
