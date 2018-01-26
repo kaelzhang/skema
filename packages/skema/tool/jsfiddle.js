@@ -2,10 +2,10 @@
 // https://github.com/kaelzhang/skema
 ////////////////////////////////////////////////////////
 
-function log (className) {
+function _log (className) {
 	const div = document.createElement('div')
   div.className = className
-    ? className + ' log'
+    ? 'log ' + className
     : 'log'
 
   const contents = []
@@ -24,7 +24,7 @@ function log (className) {
 }
 
 function success () {
-  log.apply(
+  _log.apply(
     null,
     ['success'].concat(
       Array.prototype.slice.call(arguments)
@@ -33,9 +33,18 @@ function success () {
 }
 
 function fail () {
-  log.apply(
+  _log.apply(
     null,
     ['fail'].concat(
+      Array.prototype.slice.call(arguments)
+    )
+  )
+}
+
+function log () {
+  _log.apply(
+    null,
+    ['info'].concat(
       Array.prototype.slice.call(arguments)
     )
   )
@@ -83,6 +92,7 @@ body {
 
 .log {
   min-height: 18px;
+  color: #f7f7f8;
 }
 
 .success {

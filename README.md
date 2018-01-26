@@ -55,8 +55,8 @@ user.id = 'boooom!'
 ## Many Examples
 
 - **Type Definition**
-  - [Basic Validation](./examples/basic-validation.js) [🔬 Live Demo](https://jsfiddle.net/kaelzhang/2au1on62/)
-  - [Async Validation](./examples/async-validation.js)
+  - [Basic Validation](./examples/basic-validation.js)  [Live Demo🔬 ](https://jsfiddle.net/kaelzhang/2au1on62/)
+  - [Async Validation](./examples/async-validation.js)  [Live Demo🔬](https://jsfiddle.net/kaelzhang/1rr5asyb/)
   - [Multiple Validators](./examples/multiple-validators.js)
   - [Basic Usage of Setters](./examples/setters.js)
   - [Inherit Another Type](./examples/type-inheritance.js)
