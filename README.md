@@ -23,6 +23,8 @@ npm i skema
 
 ## Basic Usage
 
+[Live Demo with JsFiddle](https://jsfiddle.net/kaelzhang/0r3g4ogj/14/)
+
 ```js
 import {shape} from 'skema'
 
