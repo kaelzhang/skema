@@ -1,6 +1,6 @@
 {
   "name": "skema",
-  "version": "9.0.7",
+  "version": "9.0.8",
   "description": "JavaScript Data Checker and Purifier.",
   "main": "lib/index.js",
   "module": "src/index.js",
@@ -60,7 +60,7 @@
     }
   },
   "dependencies": {
-    "@skema/basic": "^1.0.13",
+    "@skema/basic": "^1.0.14",
     "err-object": "^3.0.1",
     "make-array": "^1.0.3",
     "promise-faker": "^1.2.4",
