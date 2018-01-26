@@ -3,6 +3,7 @@ sudo: false
 node_js:
   - "8"
 before_script:
+  - npm install
   - cd packages/skema
   - npm install
   - cd -
