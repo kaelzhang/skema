@@ -24,6 +24,21 @@
       ]
     },
 
+    "all": {
+      "presets": [
+        "es2015"
+      ],
+      "plugins": [
+        "transform-decorators-legacy",
+        "transform-flow-strip-types",
+        "transform-class-properties",
+        "transform-object-rest-spread",
+        "transform-exponentiation-operator",
+        "transform-async-to-generator",
+        "syntax-trailing-function-commas"
+      ]
+    },
+
     "ava": {
       "plugins": [
         "transform-decorators-legacy",
