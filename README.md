@@ -23,7 +23,7 @@ npm i skema
 
 ## Basic Usage
 
-[Live Demo with JsFiddle](https://jsfiddle.net/kaelzhang/0r3g4ogj/14/)
+[🔬 Live Demo with JsFiddle](https://jsfiddle.net/kaelzhang/0r3g4ogj/)
 
 ```js
 import {shape} from 'skema'
@@ -55,7 +55,7 @@ user.id = 'boooom!'
 ## Many Examples
 
 - **Type Definition**
-  - [Basic Validation](./examples/basic-validation.js)
+  - [Basic Validation](./examples/basic-validation.js) [🔬 Live Demo](https://jsfiddle.net/kaelzhang/2au1on62/)
   - [Async Validation](./examples/async-validation.js)
   - [Multiple Validators](./examples/multiple-validators.js)
   - [Basic Usage of Setters](./examples/setters.js)
