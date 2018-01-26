@@ -42,10 +42,17 @@ function fail () {
 }
 
 function throws (name, func) {
+  if (typeof name === 'function') {
+    func = name
+    name = ''
+  }
+
   try {
     func()
   } catch (e) {
-    fail(name, e.message, e)
+    name
+      ? fail(name, e.message, e)
+      : fail(e.message, e)
     return
   }
 }
