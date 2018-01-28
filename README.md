@@ -68,7 +68,7 @@ user.id = 'boooom!'
   - [Inherit Another Type](./examples/type-inheritance.js)
   - [Declare a Type Alias to Make a Shortcut (Live Demo🔬)](https://jsfiddle.net/kaelzhang/7d5u4z0s/)
   - [Use Skema as the Strict Type Checker](./examples/strict-basics.js) | [Live Demo🔬](https://jsfiddle.net/kaelzhang/14y4s0e9/)
-- [Errors](https://jsfiddle.net/kaelzhang/scvLn8Ly/)
+- [Errors🔬](https://jsfiddle.net/kaelzhang/scvLn8Ly/)
 
 ## Documentations
 
@@ -76,8 +76,10 @@ user.id = 'boooom!'
   - [APIs](./doc/apis.md)
   - [Builtin Types and How to Change Them](./doc/builtins.md)
 - [Shape Definition](./doc/shape.md)
-- [Error Handling](,/doc/errors.md)
-- [Contributing](./doc/contribute.md)
+- [Working Mode: Sync or Async](./doc/working-mode.md)
+- [Assign a Property after `from()`](./doc/assign.md)
+- [Error Handling](./doc/errors.md)
+- [Contributing](./doc/contributing.md)
 
 ## Related Packages
 

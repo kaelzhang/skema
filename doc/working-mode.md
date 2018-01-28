@@ -4,10 +4,10 @@ By default, `skema` works synchronously.
 
 ## Woking Asychronously
 
-There are TWO ways to make Skema run synchronously.
+There are TWO ways to make Skema run asynchronously.
 
-1. Specify `options` parameter of `.from(raw, options)`
-2. Change the default settings.
+#### 1. Specify `options` parameter of `.from(raw, options)`
+
 
 ```js
 import {type} from 'skema'
@@ -22,6 +22,8 @@ Type.from(1, {async: true})
   console.log(v)  // 2
 })
 ```
+
+#### 2. Change the default settings.
 
 ```js
 import {defaults} from 'skema'

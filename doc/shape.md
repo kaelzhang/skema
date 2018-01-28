@@ -98,7 +98,7 @@ shape({
 })
 ```
 
-More information about Type Inheritance, see [this example](../examples/type-inheritance).
+More information about Type Inheritance, see [this example](../examples/type-inheritance.js).
 
 ### default
 
