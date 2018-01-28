@@ -16,7 +16,7 @@ const a = A.from({
 
 And the validator has been transplanted into the setter of the property `foo`.
 
-If we assign a new value to `foo`, there will be an error.
+If we assign a wrong value to `foo`, there will be an error.
 
 ```js
 a.foo = 5
