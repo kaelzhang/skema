@@ -1,5 +1,5 @@
 import {factory} from './skema-factory'
-import {LOOSE} from '@skema/basic'
+import {LOOSE, STRICT} from '@skema/basic'
 
 import './error-meta'
 
@@ -15,6 +15,10 @@ const {
 })
 
 const defaults = factory
+const BASIC_TYPES = {
+  LOOSE,
+  STRICT
+}
 
 export {
   type,
@@ -23,5 +27,6 @@ export {
   objectOf,
   any,
   declare,
-  defaults
+  defaults,
+  BASIC_TYPES
 }

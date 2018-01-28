@@ -13,8 +13,13 @@ function _log (className) {
   let i = 1
 
   while (i < length) {
+		const arg = arguments[i ++]
   	contents.push(
-    	JSON.stringify(arguments[i ++], null, 2)
+    	arg === void 0
+				? 'undefined'
+				: arg === null
+					? 'null'
+					: JSON.stringify(arg, null, 2)
     )
   }
 

@@ -2,7 +2,7 @@
 
 The very detail and verbose references of the APIs.
 
-## APIs
+## Synopsis
 
 ```js
 import {
@@ -14,6 +14,34 @@ import {
   declare,
   defaults
 } from 'skema'
+```
+
+There are TWO major concepts of skema, type and shape. And both of `type()` and `shape()` returns a `Skema`:
+
+**Type** A type is the minimum unit to describe a single variable. For example, `Number` is a type.
+
+```js
+type({
+  validate: x => x > 10
+})
+```
+
+**Shape** A shape is the structure composed by several types or shapes.
+
+```js
+const OneShape = shape({
+  foo: Number,
+  bar: String
+})
+```
+
+is a shape. Shapes and types could compose a more complicated shape:
+
+```js
+shape({
+  baz: OneShape,
+  qux: Boolean
+})
 ```
 
 ## Structs
@@ -72,6 +100,9 @@ Used for traversing schema shape:
 - **enumerable** `?Boolean=true` defaults to `true`
 - **configurable** `?Boolean=true` defaults to `true`
 - **writable** `?Boolean=true` defaults to `true`
+
+Parent type to be inherited:
+- **type** `?(Skema|SkemaAlias|TypeDefinition)` Parent type to be inherited.
 
 ## class `Skema`
 
@@ -179,7 +210,7 @@ The detail behavior how shape works, see [Skema Shape](./shape.md).
 
 ## declare()
 
-```js
+```ts
 declare(name: SkemaAlias, skema: Skema): void
 declare(names: SkemaAlias[], skema: Skema): void
 ```
@@ -247,3 +278,11 @@ Changes the default setting of skema, and creates new methods which contains the
 ### **options** `object`
 
 - **async** `?boolean=false` If true, skema will works in async mode.
+- **types** `?Array<AliasAndType>` declare built-in types and aliases.
+
+```ts
+interface AliasAndType {
+  alias: SkemaAlias | SkemaAlias[]
+  definition: TypeDefinition | Skema
+}
+```

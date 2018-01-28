@@ -1,4 +1,4 @@
-import {defaults} from '../../src'
+import {defaults, BASIC_TYPES} from '../../src'
 import {LOOSE} from '@skema/basic'
 import path from 'path'
 
@@ -843,6 +843,27 @@ export const factory = ({
     s: () => shape([Number,,Number], true),
     input: [1, 2, 3],
     output: [1,,3]
+  })
+
+  cases.push({
+    async: false,
+    d: 'strict types',
+    s: () => {
+      const {shape} = defaults({
+        types: BASIC_TYPES.STRICT
+      })
+
+      return shape({
+        a: Number
+      })
+    },
+    input: {
+      a: '1'
+    },
+    output: {
+      code: 'CUSTOM_ERROR'
+    },
+    e: true
   })
 
   return {

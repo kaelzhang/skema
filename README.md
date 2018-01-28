@@ -9,7 +9,7 @@
 
 - **NOT only type checker.** Unlike [TypeScript](https://www.typescriptlang.org/), and many others, `skema` is not only a JavaScript type checker, but also a good solution for your [Anti-Corruption Layer (ACL)](https://docs.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) to transform and purify the input data.
 
-- **Pluggable basic types.** Even basic types such as `Number` could also be specified if using `skema`
+- **Pluggable basic types.** Even basic types such as `Number` could also be replaced and customized if using `skema`.
 
 - **Powerful custom types.** Every single type is able to be customized that you can handle almost everything including descriptor, conditions, default values, validators and so on.
 
@@ -54,17 +54,23 @@ user.id = 'boooom!'
 
 ## Many Examples
 
+- **Shape Definition**
+  - [Purify an Object Against a Shape🔬](https://jsfiddle.net/kaelzhang/0wosjdo9/)
+  - [Default Value of a Property🔬](https://jsfiddle.net/kaelzhang/zhu8crde/)
+  - [Optional Properties🔬](https://jsfiddle.net/kaelzhang/pesgkw9c/)
+  - [Skip Processing a Property🔬](https://jsfiddle.net/kaelzhang/joq5vdd7/)
+  - [Properties Descriptors: Non-Enumerable Properties, ...🔬](https://jsfiddle.net/kaelzhang/yhj2xj72/)
 - **Type Definition**
   - [Basic Validation](./examples/basic-validation.js) | [Live Demo🔬 ](https://jsfiddle.net/kaelzhang/2au1on62/)
   - [Async Validation](./examples/async-validation.js) | [Live Demo🔬](https://jsfiddle.net/kaelzhang/1rr5asyb/)
   - [Multiple Validators](./examples/multiple-validators.js)
   - [Basic Usage of Setters](./examples/setters.js)
   - [Inherit Another Type](./examples/type-inheritance.js)
-- **Shape Definition**
+  - [Declare a Type Alias to Make a Shortcut (Live Demo🔬)](https://jsfiddle.net/kaelzhang/7d5u4z0s/)
+  - [Use Skema as the Strict Type Checker](./examples/strict-basics.js) | [Live Demo🔬](https://jsfiddle.net/kaelzhang/14y4s0e9/)
 
 ## Documentations
 
-- [Installation](./doc/install.md)
 - API References
   - [APIs](./doc/apis.md)
   - [Builtin Types and How to Change Them](./doc/builtins.md)
@@ -74,7 +80,7 @@ user.id = 'boooom!'
 
 ## Related Packages
 
-- [@skema/basic](https://www.npmjs.com/package/@skema/basic) The default built-in types of skema.
+- [@skema/basic](https://www.npmjs.com/package/@skema/basic) The default built-in javascript types of skema.
 
 ## License
 
