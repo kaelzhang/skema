@@ -866,6 +866,31 @@ export const factory = ({
     e: true
   })
 
+  cases.push({
+    d: 'error property conflicting',
+    s: () => shape({
+      foo: {
+        validate () {
+          const error = new Error('foo')
+          error.code = 'bar'
+          error.input = 'baz'
+          throw error
+        }
+      }
+    }),
+    input: {
+      foo: 1
+    },
+    output: {
+      code: 'bar',
+      message: 'foo',
+      input: 'baz',
+      path: ['foo'],
+      key: 'foo'
+    },
+    e: true
+  })
+
   return {
     cases
   }

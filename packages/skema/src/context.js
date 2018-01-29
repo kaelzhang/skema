@@ -2,6 +2,8 @@ import {error} from './error'
 import {defineValue} from './util'
 import {TYPE_ERROR, isError} from './future'
 
+const CUSTOM_ERROR = 'CUSTOM_ERROR'
+
 // data = {a: {b: 1}}
 // 1. value: data, key: null, parent: null, path: []
 // 2. descend 'a': value: {b: 1}, key: 'a', parent: data, path: ['a']
@@ -45,9 +47,10 @@ export class Context {
 
   _wrap (error) {
     // rawParent and parent will be removed by context later
-    error.key = this.key
-    error.input = this.input
-    error.path = this.path
+    assign(error, 'key', this.key)
+    assign(error, 'input', this.input)
+    assign(error, 'path', this.path)
+
     defineValue(error, TYPE_ERROR, true)
 
     return error
@@ -61,7 +64,8 @@ export class Context {
     const err = error instanceof Error
       ? error
       : new Error(error)
-    err.code = 'CUSTOM_ERROR'
+
+    assign(err, 'code', CUSTOM_ERROR)
 
     return this._wrap(err)
   }
@@ -70,4 +74,12 @@ export class Context {
     const err = error(code, ...args)
     return this._wrap(err)
   }
+}
+
+function assign (object, key, value) {
+  if (key in object) {
+    return
+  }
+
+  object[key] = value
 }
