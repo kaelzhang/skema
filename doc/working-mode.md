@@ -74,8 +74,7 @@ User.from({
 // - message: 'name is too short'
 // - path: ['name'],
 // - key: 'name',
-// - value: 'izs',
-// - parent: {name: 'izs'}
+// - input: 'izs',
 
 User.from({
   name: 'isaac'

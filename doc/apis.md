@@ -17,7 +17,7 @@ import {
 } from 'skema'
 ```
 
-There are TWO major concepts of skema, type and shape. And both of `type()` and `shape()` returns a `Skema`:
+There are TWO major concepts of skema, **type** and **shape**. And each of `type()` and `shape()` returns a `Skema`:
 
 **Type** A type is the minimum unit to describe a single variable. For example, `Number` is a type.
 
