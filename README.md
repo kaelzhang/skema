@@ -5,11 +5,11 @@
 
 `skema` provides a handy and composable way to validate/transform JavaScript variables:
 
-- **Supports both async and sync flows.** `skema` has two working modes to support either async or sync validators, setters, etc, making it capable with much more complicated challenges.
+- **Supports both async and sync flows.** Skema has two working modes to support either async or sync validators, setters, etc, making it capable with much more complicated challenges.
 
-- **NOT only type checker.** Unlike [TypeScript](https://www.typescriptlang.org/), and many others, `skema` is not only a JavaScript type checker, but also a good solution for your [Anti-Corruption Layer (ACL)](https://docs.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) to transform and purify the input data.
+- **NOT only type checker.** Unlike [TypeScript](https://www.typescriptlang.org/), [joi](https://github.com/hapijs/joi), and many others, Skema is not only a JavaScript type checker, but also a good solution for your [Anti-Corruption Layer (ACL)](https://docs.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) to transform and purify the input data. And Skema could also be configured as a simple schema validator too.
 
-- **Pluggable basic types.** Even basic types such as `Number` could also be replaced and customized if using `skema`.
+- **Pluggable basic types.** Even basic types such as `Number` could also be replaced and customized if using Skema. Actually, in the core of Skema, there is NOT a single definition of one type. 
 
 - **Powerful custom types.** Every single type is able to be customized that you can handle almost everything including descriptor, conditions, default values, validators and so on.
 
