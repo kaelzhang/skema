@@ -284,7 +284,7 @@ Changes the default setting of skema, and creates new methods which contains the
 
 ```ts
 interface AliasAndType {
-  alias: SkemaAlias | SkemaAlias[]
+  name: SkemaAlias | SkemaAlias[]
   definition: TypeDefinition | Skema
 }
 ```
