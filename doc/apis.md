@@ -213,8 +213,8 @@ The detail behavior how shape works, see [Skema Shape](./shape.md).
 ## declare()
 
 ```ts
-declare(name: SkemaAlias, skema: Skema): void
-declare(names: SkemaAlias[], skema: Skema): void
+declare(name: SkemaAlias, skema: Skema | TypeDefinition): void
+declare(names: SkemaAlias[], skema: Skema | TypeDefinition): void
 ```
 
 Declares the alias for a certain skema, and the alias could be used directly in shape definition and `type(skemaAlias)`
