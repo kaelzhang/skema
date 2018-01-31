@@ -71,14 +71,12 @@ export const parseWhen = when => {
   }
 }
 
-export const parseDefault = _default => {
-  if (_default === undefined) {
-    return
+export const parseFunction = subject => {
+  if (isFunction(subject)) {
+    return subject
   }
 
-  if (isFunction(_default)) {
-    return _default
+  if (isDefined(subject)) {
+    return () => subject
   }
-
-  return () => _default
 }

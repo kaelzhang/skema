@@ -1,6 +1,22 @@
 // Processor to run the flow async or sync
 ///////////////////////////////////////////////////////////
 import {Options} from './options'
+import {symbol} from './future'
+import {
+  PREFIX_IS, getKey, isDefined, defineProperty
+} from './util'
+
+const defineHidden = (object, key) =>
+  defineProperty(object, key, {
+    writable: true
+  })
+
+const config = (skema, name) => {
+  const value = skema[getKey(name, PREFIX_IS)]()
+  return isDefined(value)
+    ? value
+    : true
+}
 
 export class Processor {
   constructor (options) {
@@ -13,11 +29,86 @@ export class Processor {
     } = this.context
     this.isDefault = !(key in rawParent)
     this.input = input
+    this.set = null
+  }
+
+  mapKey () {
+    const {
+      skema,
+      options,
+      context
+    } = this
+
+    const key = skema.hasKey()
+      ? skema.key(this.args, context, options)
+      : context.key
+
+    return options.promise.resolve(key)
+  }
+
+  make () {
+    const {
+      values, skema, args, context, options
+    } = this
+
+    const {
+      key,
+      input
+    } = context
+
+    const symbolKey = symbol(key)
+    defineHidden(values, symbolKey)
+
+    if (!this._clean) {
+      values[symbolKey] = input
+    }
+
+    const writable = config(skema, 'writable')
+
+    const set = this.set = this.setters[key] = (
+      value,
+      // For the first time, we ignore writable
+      force,
+      // Context
+      c,
+    ) => {
+      if (!c) {
+        c = context
+      }
+      c.input = value
+
+      if (!writable && !force) {
+        throw c.errorByCode('NOT_WRITABLE', key)
+      }
+
+      const result = skema.f(args, c, options)
+      .then(value => {
+        return values[symbolKey] = value
+      })
+
+      return options.promise.resolve(result, true)
+    }
+
+    defineProperty(values, key, {
+      set: options.async
+        ? () => {
+          throw context.errorByCode('ASSIGN_ASYNC')
+        }
+        : v => set(v),
+      get: () => values[symbolKey],
+      configurable: config(skema, 'configurable'),
+      enumerable: config(skema, 'enumerable')
+    })
   }
 
   process () {
-    return this.options.promise.resolve()
-    .then(() => this.shouldSkip())
+    return this.mapKey()
+    .then(key => {
+      this.context.key = key
+      this.make()
+
+      return this.shouldSkip()
+    })
     .then(skip => {
       if (skip) {
         return

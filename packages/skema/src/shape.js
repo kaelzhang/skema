@@ -1,27 +1,11 @@
-import {
-  PREFIX_IS,
-  getKey, simpleClone, isDefined,
-  defineValue, defineProperty
-} from './util'
+import {simpleClone, defineValue} from './util'
 import {Processor} from './processor'
-import {SHAPE, symbol} from './future'
 import {Context} from './context'
 import {error} from './error'
+import {SHAPE} from './future'
 
 export const TYPE_OBJECT = 'TYPE_OBJECT'
 export const TYPE_ARRAY = 'TYPE_ARRAY'
-
-const defineHidden = (object, key) =>
-  defineProperty(object, key, {
-    writable: true
-  })
-
-const config = (skema, name) => {
-  const value = skema[getKey(name, PREFIX_IS)]()
-  return isDefined(value)
-    ? value
-    : true
-}
 
 export const set = (object, key, value) => {
   const setters = object[SHAPE]
@@ -48,22 +32,22 @@ class Shape {
   constructor (shape, clean) {
     this._shape = shape
     this._clean = clean
-    this._setters = Object.create(null)
   }
 
   from (args, context: Context, options: Options) {
     const values = this._create(context)
-    defineValue(values, SHAPE, this._setters)
+    const setters = Object.create(null)
+    defineValue(values, SHAPE, setters)
 
     const tasks = this._tasks(context).map(([context, skema]) => {
       context.parent = values
-      const set = this.make(values, skema, args, context, options)
       return () => new Processor({
         options,
         skema,
         args,
         context,
-        set
+        values,
+        setters
       })
       .process()
       .then(
@@ -77,59 +61,6 @@ class Shape {
 
     return options.promiseExtra.series(tasks)
     .then(() => values)
-  }
-
-  make (values, skema, args, context, options) {
-    const {
-      key,
-      input
-    } = context
-
-    const symbolKey = symbol(key)
-    defineHidden(values, symbolKey)
-
-    if (!this._clean) {
-      values[symbolKey] = input
-    }
-
-    const writable = config(skema, 'writable')
-
-    const set = this._setters[key] = (
-      value,
-      // For the first time, we ignore writable
-      force,
-      // Context
-      c,
-    ) => {
-      if (!c) {
-        c = context
-      }
-      c.input = value
-
-      if (!writable && !force) {
-        throw c.errorByCode('NOT_WRITABLE', key)
-      }
-
-      const result = skema.f(args, c, options)
-      .then(value => {
-        return values[symbolKey] = value
-      })
-
-      return options.promise.resolve(result, true)
-    }
-
-    defineProperty(values, key, {
-      set: options.async
-        ? () => {
-          throw context.errorByCode('ASSIGN_ASYNC')
-        }
-        : v => set(v),
-      get: () => values[symbolKey],
-      configurable: config(skema, 'configurable'),
-      enumerable: config(skema, 'enumerable')
-    })
-
-    return set
   }
 }
 

@@ -891,6 +891,100 @@ export const factory = ({
     e: true
   })
 
+  cases.push({
+    d: 'string key mapper',
+    s: () => shape({
+      a: {
+        key: 'b'
+      }
+    }),
+    input: {
+      a: 1
+    },
+    output: {
+      b: 2
+    }
+  })
+
+  cases.push({
+    d: 'function key mapper',
+    s: () => shape({
+      a: {
+        key () {
+          return 'b'
+        }
+      }
+    }),
+    input: {
+      a: 1
+    },
+    output: {
+      b: 2
+    }
+  })
+
+  cases.push({
+    d: 'override a key mapper',
+    s: () => {
+      const A = type({
+        key: 'b'
+      })
+
+      return shape({
+        a: {
+          type: A,
+          key: 'c'
+        }
+      })
+    },
+    input: {
+      a: 1
+    },
+    output: {
+      c: 1
+    }
+  })
+
+  cases.push({
+    d: 'inherit a key mapper',
+    s: () => {
+      const A = type({
+        key: 'b'
+      })
+
+      return shape({
+        a: {
+          type: A
+        }
+      })
+    },
+    input: {
+      a: 1
+    },
+    output: {
+      b: 1
+    }
+  })
+
+  cases.push({
+    d: 'context: rawKey and key',
+    s: () => shape({
+      a: {
+        key: 'b',
+        validate: () => false
+      }
+    }),
+    input: {
+      a: 1
+    },
+    output: {
+      code: 'VALIDATION_FAILS',
+      rawKey: 'a',
+      key: 'b'
+    },
+    e: true
+  })
+
   return {
     cases
   }

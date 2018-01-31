@@ -58,11 +58,8 @@ export class Skema {
   }
 
   _has (key) {
-    if (this._type && this._type[getKey(key, PREFIX_HAS)]()) {
-      return true
-    }
-
     return isDefined(this['_' + key])
+      || !!this._type && this._type[getKey(key, PREFIX_HAS)]()
   }
 
   isConfigurable (): Boolean | undefined {
@@ -111,6 +108,22 @@ export class Skema {
 
     if (this._type.hasDefault()) {
       return this._type.default(args, context, options)
+    }
+  }
+
+  hasKey () {
+    return this._has('key')
+  }
+
+  key (args, context, options) {
+    if (isDefined(this._key)) {
+      const {key} = context
+      return options.promise.resolve(
+        this._key.call(context.context, key, ...args))
+    }
+
+    if (this._type.hasKey()) {
+      return this._type.key(args, context, options)
     }
   }
 

@@ -16,6 +16,7 @@ export class Context {
     path = []
   ) {
     this.input = input
+    this.rawKey = key
     this.key = key
     this.rawParent = parent
     this.parent = null
@@ -24,6 +25,7 @@ export class Context {
 
   get context () {
     const {
+      rawKey,
       key,
       rawParent,
       parent,
@@ -32,6 +34,7 @@ export class Context {
     } = this
 
     return {
+      rawKey,
       key,
       rawParent,
       parent,
@@ -48,6 +51,7 @@ export class Context {
   _wrap (error) {
     // rawParent and parent will be removed by context later
     assign(error, 'key', this.key)
+    assign(error, 'rawKey', this.rawKey)
     assign(error, 'input', this.input)
     assign(error, 'path', this.path)
 

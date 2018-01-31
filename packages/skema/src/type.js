@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////
 import {
   isDefined,
-  parseDefault, parseSetters, parseValidators, parseWhen
+  parseFunction, parseSetters, parseValidators, parseWhen
 } from './util'
 
 export class TypeDefinition {
@@ -16,13 +16,15 @@ export class TypeDefinition {
       enumerable,
       writable,
       optional,
-      type
+      type,
+      key
     } = definition
 
-    this._default = parseDefault(_default)
+    this._default = parseFunction(_default)
     this._set = parseSetters(set)
     this._validate = parseValidators(validate)
     this._when = parseWhen(when)
+    this._key = parseFunction(key)
     this._configurable = configurable
     this._enumerable = enumerable
     this._writable = writable
