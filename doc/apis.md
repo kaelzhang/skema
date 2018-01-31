@@ -68,7 +68,8 @@ const object = {
 }
 ```
 
-- **this.key** `string|null` the corresponding property key of the current value.
+- **this.rawKey** `string|null` the corresponding property key of the current value.
+- **this.key** `string|null` the mapped key if `typeDefinition.key` is defined, or it is the same as `this.rawKey`.
 - **this.path** `Array<string>` the access path of from which way we get there.
 
 And in all `AsyncOrSyncFunc`s, we could simply throw an error if something is wrong:
@@ -94,6 +95,7 @@ Used for value validation and transformation:
 - **set** `?(Array.<Setter>|Setter)` A `Setter` is a `AsyncOrSyncFunc()` which receives the value and extra args and returns the altered value or a `Promise`. If there are more than one setters, the previous value has been returned will be passed into the next setter.
 
 Used for traversing schema shape:
+- **key** `?(AsyncOrSyncFunc()|string)` To map the property value to a new property key.
 - **when** `?(AsyncOrSyncFunc()|false|any)` To indicate that whether we should process the value.
   - If the value or return value is `false` or `Promise<false>`, then skip processing the current key;
   - Otherwise, not skip.
@@ -138,6 +140,7 @@ A `TypeDefinition` defines two major kinds of things:
   - **validate**
   - **set**
 - And how we should deal with it if it is a member of an object or an array. The following configurations do not have any effects if we test against the type alone. And we will talk about these descriptors later with [shape definition](./shape.md)
+  - **key**
   - **when**
   - **default**
   - **optional**
