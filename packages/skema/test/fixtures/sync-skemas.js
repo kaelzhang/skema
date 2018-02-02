@@ -985,6 +985,57 @@ export const factory = ({
     e: true
   })
 
+  cases.push({
+    d: 'hierarchies, key',
+    s: () => shape({
+      a: {
+        key: 'b',
+        type: shape({
+          a: {
+            key: 'c',
+            type: Number
+          }
+        })
+      }
+    }),
+    input: {
+      a: {
+        a: '1'
+      }
+    },
+    output: {
+      b: {
+        c: 1
+      }
+    }
+  })
+
+  cases.push({
+    d: 'hierarchies, key, error path',
+    s: () => shape({
+      a: {
+        key: 'b',
+        type: shape({
+          a: {
+            key: 'c',
+            validate: () => false
+          }
+        }, true)
+      }
+    }, true),
+    input: {
+      a: {
+        a: 1
+      }
+    },
+    output: {
+      code: 'VALIDATION_FAILS',
+      path: ['a', 'a'],
+      key: 'c'
+    },
+    e: true
+  })
+
   return {
     cases
   }

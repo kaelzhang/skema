@@ -10,7 +10,6 @@ go({
   async: false
 })
 
-
 import {
   shape
 } from '../src'

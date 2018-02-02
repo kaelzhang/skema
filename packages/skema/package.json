@@ -1,7 +1,7 @@
 {
   "name": "skema",
   "version": "9.3.0",
-  "description": "JavaScript Data Checker and Purifier.",
+  "description": "Skema provides a handy & composable way to validate / transform / purify the input data.",
   "main": "lib/index.js",
   "module": "src/index.js",
   "files": [
@@ -37,13 +37,17 @@
     "orm",
     "object",
     "struct",
+    "structure",
     "throw",
     "types",
     "validation",
     "validator",
     "typescript",
     "joi",
-    "vue"
+    "vue",
+    "composable",
+    "transformer",
+    "purifier"
   ],
   "engines": {
     "node": ">=4"

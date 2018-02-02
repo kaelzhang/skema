@@ -11,10 +11,22 @@ import {
 import {TYPE_SKEMA} from './future'
 import {Options} from './options'
 
+function hasArray (key) {
+  const value = this['_' + key]
+  return isDefined(value) && value.length !== 0
+}
+
 export class Skema {
   constructor (definition) {
     Object.assign(this, definition)
     defineValue(this, TYPE_SKEMA, true)
+
+    // has validators
+    this._hasV = hasArray.call(this, 'validate')
+    // has setters
+    this._hasS = hasArray.call(this, 'set')
+    // is not only a wrapper
+    this._nw = this._hasV || this._hasS
   }
 
   from (raw, args, options): any {
@@ -33,17 +45,21 @@ export class Skema {
   }
 
   f (args, context, options): any {
-    if (this._any) {
-      return options.promise.resolve(context.input)
-    }
+    const {input} = context
 
-    return isDefined(this._shape)
-      ? this._shape.from(args, context, options)
-      : this.validate(args, context, options)
-        .then(() => this.set(args, context, options))
+    return this._any
+      ? options.promise.resolve(input)
+      : isDefined(this._shape)
+        ? this._shape.from(args, context, options)
+        : this._nw
+          ? this.validate(args, context, options)
+            .then(() => this.set(args, context, options))
+          : this._type
+            ? this._type.f(args, context, options)
+            : options.promise.resolve(input)
   }
 
-  _config (key) {
+  _c (key) {
     const value = this['_' + key]
     return isDefined(value)
       ? value
@@ -52,26 +68,21 @@ export class Skema {
         : UNDEFINED
   }
 
-  _hasArray (key) {
-    const value = this['_' + key]
-    return isDefined(value) && value.length !== 0
-  }
-
   _has (key) {
     return isDefined(this['_' + key])
       || !!this._type && this._type[getKey(key, PREFIX_HAS)]()
   }
 
   isConfigurable (): Boolean | undefined {
-    return this._config('configurable')
+    return this._c('configurable')
   }
 
   isEnumerable (): Boolean | undefined {
-    return this._config('enumerable')
+    return this._c('enumerable')
   }
 
   isWritable (): Boolean | undefined {
-    return this._config('writable')
+    return this._c('writable')
   }
 
   isOptional (): Boolean | undefined {
@@ -130,14 +141,13 @@ export class Skema {
   // Only test against validators
   validate (args, context, options): boolean {
     const {promise} = options
-
     const start = this._type
       ? this._type.validate(args, context, options)
       : promise.resolve(true)
 
     return start
     .then(pass => {
-      if (!pass || !this._hasArray('validate')) {
+      if (!pass || !this._hasV) {
         return pass
       }
 
@@ -165,7 +175,7 @@ export class Skema {
       ? this._type.set(args, context, options)
       : promise.resolve(context.input)
 
-    if (!this._hasArray('set')) {
+    if (!this._hasS) {
       return start
     }
 
