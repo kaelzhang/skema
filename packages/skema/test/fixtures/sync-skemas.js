@@ -600,6 +600,7 @@ export const factory = ({
       })
     }),
     input: {
+      // a should be an object
       a: 1
     },
     output: {

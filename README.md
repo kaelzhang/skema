@@ -52,6 +52,17 @@ user.id = 'boooom!'
 // - code: 'VALIDATION_FAILS'
 ```
 
+## Documentations
+
+- API References
+  - [APIs](./doc/apis.md)
+  - [Builtin Types and How to Change Them](./doc/builtins.md)
+- [Shape Definition](./doc/shape.md)
+- [Working Mode: Sync or Async](./doc/working-mode.md)
+- [Assign a Property after `from()`](./doc/assign.md)
+- [Error Handling](./doc/errors.md)
+- [Contributing](./doc/contributing.md)
+
 ## Many Examples
 
 - **Shape Definition**
@@ -69,17 +80,6 @@ user.id = 'boooom!'
   - [Declare a Type Alias to Make a Shortcut (Live Demo🔬)](https://jsfiddle.net/kaelzhang/7d5u4z0s/)
   - [Use Skema as the Strict Type Checker](./examples/strict-basics.js) | [Live Demo🔬](https://jsfiddle.net/kaelzhang/14y4s0e9/)
 - [Errors🔬](https://jsfiddle.net/kaelzhang/scvLn8Ly/)
-
-## Documentations
-
-- API References
-  - [APIs](./doc/apis.md)
-  - [Builtin Types and How to Change Them](./doc/builtins.md)
-- [Shape Definition](./doc/shape.md)
-- [Working Mode: Sync or Async](./doc/working-mode.md)
-- [Assign a Property after `from()`](./doc/assign.md)
-- [Error Handling](./doc/errors.md)
-- [Contributing](./doc/contributing.md)
 
 ## Related Packages
 
