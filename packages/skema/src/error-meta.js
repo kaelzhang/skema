@@ -63,7 +63,12 @@ E('ASSIGN_ASYNC', {
 
 E('NOT_OPTIONAL', {
   message: key => util.format(
-    'key %s is not optional', util.inspect(key))
+    'property %s is not optional', util.inspect(key))
+})
+
+E('NOT_OBJECT', {
+  message: key => util.format(
+    'the value of property %s is not an object', util.inspect(key))
 })
 
 E('NOT_WRITABLE', {

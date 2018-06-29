@@ -152,7 +152,7 @@ export const factory = ({
     },
     output: {
       code: 'NOT_OPTIONAL',
-      message: 'key \'c\' is not optional',
+      message: 'property \'c\' is not optional',
       path: ['c'],
       args: ['c']
     },
@@ -586,8 +586,25 @@ export const factory = ({
     s: TypeArrayOf,
     input: createSparseArray(2, 1),
     output: {
-      message: 'key 0 is not optional',
+      message: 'property 0 is not optional',
       key: 0
+    },
+    e: true
+  })
+
+  cases.push({
+    d: '#7: shape not an object',
+    s: () => shape({
+      a: shape({
+        a: Number
+      })
+    }),
+    input: {
+      a: 1
+    },
+    output: {
+      message: 'the value of property \'a\' is not an object',
+      key: 'a'
     },
     e: true
   })

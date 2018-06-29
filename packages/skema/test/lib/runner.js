@@ -78,7 +78,7 @@ export function run (skemaOptions = {}) {
           },
           error => {
             if (!e) {
-              console.error('unexpected error:', error.stack || error)
+              console.error('unexpected error:', error && error.stack || error)
               t.fail('should not fail')
               return
             }

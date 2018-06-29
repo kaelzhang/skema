@@ -28,6 +28,8 @@ function clean (context) {
   context.rawParent = context.parent = null
 }
 
+const isObject = v => Object(v) === v
+
 class Shape {
   constructor (shape, clean) {
     this._shape = shape
@@ -35,6 +37,11 @@ class Shape {
   }
 
   from (args, context: Context, options: Options) {
+    if (!isObject(context.input)) {
+      const error = context.errorByCode('NOT_OBJECT', context.key)
+      return options.promise.reject(error)
+    }
+
     const values = this._create(context)
     const setters = Object.create(null)
     defineValue(values, SHAPE, setters)
