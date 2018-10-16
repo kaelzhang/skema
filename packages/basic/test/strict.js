@@ -9,4 +9,4 @@ const CASES = [
   ['string', String, 1, 'not a string', true]
 ]
 
-CASES.forEach(run(STRICT))
+CASES.forEach(run(STRICT, 'strict'))

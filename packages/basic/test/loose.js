@@ -31,7 +31,7 @@ const CASES = [
   ['object', Object, {a: 1}, {a: 1}],
 ]
 
-CASES.forEach(run(LOOSE))
+CASES.forEach(run(LOOSE, 'loose'))
 
 
 import {ids, check} from './lib/check'

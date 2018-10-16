@@ -18,14 +18,14 @@ function typeName (type) {
   return type.name || type
 }
 
-export function run (types) {
+export function run (types, prefix) {
   const {shape} = defaults({
     types
   })
 
-  return ([type, Type, input, output, error]) => {
+  return ([type, Type, input, output, error], i) => {
     [type, Type].forEach(type => {
-      test(`${typeName(type)}:input:${toString(input)},output:${toString(output)}`, t => {
+      test(`${i}: ${prefix}: ${typeName(type)}:input:${toString(input)},output:${toString(output)}`, t => {
         const Skema = shape({
           foo: type
         })
