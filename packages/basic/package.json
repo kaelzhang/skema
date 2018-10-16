@@ -37,9 +37,13 @@
     "url": "https://github.com/kaelzhang/skema/issues"
   },
   "ava": {
-    "require": "babel-register",
+    "require": [
+      "@babel/register"
+    ],
     "babel": {
-      "babelrc": true
+      "testOptions": {
+        "babelrc": true
+      }
     }
   },
   "devDependencies": {

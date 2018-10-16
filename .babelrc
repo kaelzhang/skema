@@ -8,9 +8,9 @@
     "cjs": {
       "plugins": [
         "transform-es2015-modules-commonjs",
-        "transform-decorators-legacy",
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
         "transform-flow-strip-types",
-        "transform-class-properties",
+        "@babel/proposal-class-properties",
         "transform-object-rest-spread",
         "transform-exponentiation-operator",
         "transform-async-to-generator",
@@ -29,9 +29,9 @@
         "es2015"
       ],
       "plugins": [
-        "transform-decorators-legacy",
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
         "transform-flow-strip-types",
-        "transform-class-properties",
+        "@babel/proposal-class-properties",
         "transform-object-rest-spread",
         "transform-exponentiation-operator",
         "transform-async-to-generator",
@@ -41,10 +41,10 @@
 
     "ava": {
       "plugins": [
-        "transform-decorators-legacy",
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
         "transform-flow-strip-types",
         "transform-es2015-modules-commonjs",
-        "transform-class-properties",
+        "@babel/proposal-class-properties",
         "transform-object-rest-spread",
         "transform-exponentiation-operator",
         "transform-async-to-generator",

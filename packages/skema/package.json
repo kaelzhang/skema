@@ -58,16 +58,20 @@
     "url": "https://github.com/kaelzhang/skema/issues"
   },
   "ava": {
-    "require": "babel-register",
+    "require": [
+      "@babel/register"
+    ],
     "babel": {
-      "babelrc": true
+      "testOptions": {
+        "babelrc": true
+      }
     }
   },
   "dependencies": {
     "@skema/basic": "^1.0.26",
-    "err-object": "^3.0.1",
-    "make-array": "^1.0.3",
-    "promise-faker": "^1.2.4",
-    "promise.extra": "^2.1.25"
+    "err-object": "^3.0.5",
+    "make-array": "^1.0.5",
+    "promise-faker": "^1.2.5",
+    "promise.extra": "^3.0.3"
   }
 }
