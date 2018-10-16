@@ -163,7 +163,7 @@ export class Skema {
 
           return true
         })
-      }, reducer)
+      })
       .catch(error => promise.reject(context.makeError(error)))
     })
   }

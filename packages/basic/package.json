@@ -12,8 +12,7 @@
     "build": "BABEL_ENV=all ../../node_modules/.bin/babel src --out-dir lib",
     "test": "BABEL_ENV=ava ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
     "test-no-cov": "BABEL_ENV=ava ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
-    "prepublishOnly": "npm run build",
-    "// report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
