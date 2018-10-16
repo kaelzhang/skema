@@ -7,48 +7,27 @@
   "env": {
     "cjs": {
       "plugins": [
-        "transform-es2015-modules-commonjs",
+        "@babel/plugin-transform-modules-commonjs",
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
-        "transform-flow-strip-types",
-        "@babel/proposal-class-properties",
-        "transform-object-rest-spread",
-        "transform-exponentiation-operator",
-        "transform-async-to-generator",
-        "syntax-trailing-function-commas"
+        "@babel/plugin-transform-flow-strip-types",
+        "@babel/plugin-proposal-object-rest-spread"
       ]
     },
 
     "es5": {
       "presets": [
-        "es2015"
-      ]
-    },
-
-    "all": {
-      "presets": [
-        "es2015"
-      ],
-      "plugins": [
-        ["@babel/plugin-proposal-decorators", { "legacy": true }],
-        "transform-flow-strip-types",
-        "@babel/proposal-class-properties",
-        "transform-object-rest-spread",
-        "transform-exponentiation-operator",
-        "transform-async-to-generator",
-        "syntax-trailing-function-commas"
+        "@babel/preset-env"
       ]
     },
 
     "ava": {
+      "presets": [
+        "@babel/preset-env"
+      ],
       "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
         "transform-flow-strip-types",
-        "transform-es2015-modules-commonjs",
-        "@babel/proposal-class-properties",
-        "transform-object-rest-spread",
-        "transform-exponentiation-operator",
-        "transform-async-to-generator",
-        "syntax-trailing-function-commas"
+        "@babel/plugin-proposal-object-rest-spread"
       ]
     }
   }
