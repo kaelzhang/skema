@@ -30,6 +30,10 @@ function clean (context) {
 
 const isObject = v => Object(v) === v
 
+function reducer (prev, factory) {
+  return factory.call(this, prev)
+}
+
 class Shape {
   constructor (shape, clean) {
     this._shape = shape
@@ -66,7 +70,7 @@ class Shape {
       )
     })
 
-    return options.promiseExtra.series(tasks)
+    return options.promiseExtra.series(tasks, reducer)
     .then(() => values)
   }
 }

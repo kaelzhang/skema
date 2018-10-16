@@ -21,12 +21,10 @@
     },
 
     "ava": {
-      "presets": [
-        "@babel/preset-env"
-      ],
       "plugins": [
+        "@babel/plugin-transform-modules-commonjs",
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
-        "transform-flow-strip-types",
+        "@babel/plugin-transform-flow-strip-types",
         "@babel/plugin-proposal-object-rest-spread"
       ]
     }

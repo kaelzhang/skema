@@ -152,7 +152,7 @@ export class Skema {
       }
 
       return options.promiseExtra
-      .series.call(context.context, this._validate, function (factory) {
+      .series.call(context.context, this._validate, function (_, factory) {
         const {input} = context
         return promise.resolve(factory.call(this, input, ...args))
         .then(pass => {
@@ -163,7 +163,7 @@ export class Skema {
 
           return true
         })
-      })
+      }, reducer)
       .catch(error => promise.reject(context.makeError(error)))
     })
   }
