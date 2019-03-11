@@ -28,7 +28,7 @@ export function run (types, prefix) {
     types
   })
 
-  return ([type, Type, input, output, error]) => {
+  return ([type, Type, input, output, error], i) => {
     [
       type,
       Type
