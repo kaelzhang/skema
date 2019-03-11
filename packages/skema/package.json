@@ -16,8 +16,8 @@
     "build:min": "../../node_modules/.bin/uglifyjs umd/skema.es5.js -o umd/skema.min.js --compress",
     "build:jf": "BABEL_ENV=es5 ../../node_modules/.bin/babel --root-mode upward tool/jsfiddle.js -o umd/jsfiddle.js",
     "build": "npm run build:cjs && npm run build:umd && npm run build:es5 && npm run build:min && npm run build:jf",
-    "test": "BABEL_ENV=node ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
-    "test-no-cov": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
+    "test": "BABEL_ENV=node ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
+    "test-no-cov": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
     "prepublishOnly": "npm run build",
     "report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
@@ -58,12 +58,9 @@
     "url": "https://github.com/kaelzhang/skema/issues"
   },
   "ava": {
-    "require": "@babel/register",
-    "babel": {
-      "testOptions": {
-        "rootMode": "upward"
-      }
-    }
+    "require": [
+      "./test/_register.js"
+    ]
   },
   "dependencies": {
     "@skema/basic": "^1.0.28",

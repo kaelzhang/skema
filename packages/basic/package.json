@@ -10,8 +10,8 @@
   ],
   "scripts": {
     "build": "BABEL_ENV=all ../../node_modules/.bin/babel --root-mode upward src --out-dir lib",
-    "test": "BABEL_ENV=node ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
-    "test-no-cov": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
+    "test": "BABEL_ENV=node ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
+    "test-no-cov": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
     "prepublishOnly": "npm run build",
     "// report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
@@ -37,12 +37,9 @@
     "url": "https://github.com/kaelzhang/skema/issues"
   },
   "ava": {
-    "require": "@babel/register",
-    "babel": {
-      "testOptions": {
-        "rootMode": "upward"
-      }
-    }
+    "require": [
+      "./test/_register.js"
+    ]
   },
   "devDependencies": {
     "skema": "^9.3.7"
