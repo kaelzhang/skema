@@ -1,6 +1,6 @@
 {
   "name": "skema",
-  "version": "9.3.8",
+  "version": "9.3.9",
   "description": "Skema provides a handy & composable way to validate / transform / purify the input data.",
   "main": "lib/index.js",
   "module": "src/index.js",
@@ -63,7 +63,7 @@
     ]
   },
   "dependencies": {
-    "@skema/basic": "^1.0.29",
+    "@skema/basic": "^1.0.30",
     "err-object": "^3.0.5",
     "make-array": "^1.0.5",
     "promise-faker": "^1.2.5",
