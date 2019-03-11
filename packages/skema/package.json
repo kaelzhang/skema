@@ -68,5 +68,6 @@
     "make-array": "^1.0.5",
     "promise-faker": "^1.2.5",
     "promise.extra": "^3.0.3"
-  }
+  },
+  "gitHead": "be2913ecfdfa9756c237497a6bbdfc66d5b7578f"
 }
