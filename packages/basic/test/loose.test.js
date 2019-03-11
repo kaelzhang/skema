@@ -33,7 +33,6 @@ const CASES = [
 
 CASES.forEach(run(LOOSE, 'loose'))
 
-
 import {ids, check} from './lib/check'
 
 ids.forEach(check(LOOSE))

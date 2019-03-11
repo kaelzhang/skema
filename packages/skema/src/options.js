@@ -9,16 +9,16 @@ const promiseExtra = {
 export class Options {
   constructor ({
     // For now, there is only one option
-    async: _async = false
+    async = false
   }) {
-    this.promise = _async
+    this.promise = async
       ? Promise
       : FakePromise
 
-    this.promiseExtra = _async
+    this.promiseExtra = async
       ? promiseExtra
       : factory(FakePromise)
 
-    this.async = _async
+    this.async = async
   }
 }

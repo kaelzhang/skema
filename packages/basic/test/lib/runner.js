@@ -1,3 +1,4 @@
+import {inspect} from 'util'
 import test from 'ava'
 import {defaults} from 'skema'
 import {isSymbol} from 'core-util-is'
@@ -7,7 +8,11 @@ function toString (value) {
     return 'Symbol'
   }
 
-  return value
+  if (value instanceof Error) {
+    return `Error:${value.message}`
+  }
+
+  return inspect(value)
 }
 
 function typeName (type) {
@@ -23,9 +28,16 @@ export function run (types, prefix) {
     types
   })
 
-  return ([type, Type, input, output, error], i) => {
-    [type, Type].forEach(type => {
-      test(`${i}: ${prefix}: ${typeName(type)}:input:${toString(input)},output:${toString(output)}`, t => {
+  return ([type, Type, input, output, error]) => {
+    [
+      type,
+      Type
+    ].forEach(type => {
+      const title = `${i}: ${prefix}: ${typeName(type)
+        }:input:${toString(input)
+        },output:${toString(output)}`
+
+      test(title, t => {
         const Skema = shape({
           foo: type
         })
