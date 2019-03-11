@@ -9,10 +9,11 @@
     "lib"
   ],
   "scripts": {
-    "build": "BABEL_ENV=cjs ../../node_modules/.bin/babel src --out-dir lib",
-    "test": "BABEL_ENV=ava ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
-    "test-no-cov": "BABEL_ENV=ava ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
-    "prepublishOnly": "npm run build"
+    "build": "BABEL_ENV=all ../../node_modules/.bin/babel --root-mode upward src --out-dir lib",
+    "test": "BABEL_ENV=node ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
+    "test-no-cov": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.js",
+    "prepublishOnly": "npm run build",
+    "// report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "repository": {
     "type": "git",
@@ -36,12 +37,10 @@
     "url": "https://github.com/kaelzhang/skema/issues"
   },
   "ava": {
-    "require": [
-      "@babel/register"
-    ],
+    "require": "@babel/register",
     "babel": {
       "testOptions": {
-        "babelrc": true
+        "rootMode": "upward"
       }
     }
   },

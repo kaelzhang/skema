@@ -73,19 +73,19 @@ export class Skema {
       || !!this._type && this._type[getKey(key, PREFIX_HAS)]()
   }
 
-  isConfigurable (): Boolean | undefined {
+  isConfigurable (): boolean | undefined {
     return this._c('configurable')
   }
 
-  isEnumerable (): Boolean | undefined {
+  isEnumerable (): boolean | undefined {
     return this._c('enumerable')
   }
 
-  isWritable (): Boolean | undefined {
+  isWritable (): boolean | undefined {
     return this._c('writable')
   }
 
-  isOptional (): Boolean | undefined {
+  isOptional (): boolean | undefined {
     return this._optional === true || (
       this._optional !== false &&
       this._type &&
