@@ -24,7 +24,9 @@ test('from() options', async t => {
   })
 })
 
-test('inspect hierachical', async t => {
+const cleanInspectSupported = parseInt(process.versions.node, 10) > 9
+
+cleanInspectSupported && test('inspect hierachical', async t => {
   const Type = shape({
     a: Number,
     b: Number,
