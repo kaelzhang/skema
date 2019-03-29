@@ -1,6 +1,6 @@
 {
   "name": "@skema/basic",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Basic types for skema",
   "main": "lib/index.js",
   "module": "src/index.js",
@@ -42,7 +42,7 @@
     ]
   },
   "devDependencies": {
-    "skema": "^9.3.9"
+    "skema": "^9.4.0"
   },
   "dependencies": {
     "core-util-is": "^1.0.2"
