@@ -70,3 +70,4 @@ export const TYPE_ERROR = symbol.for('skema:error')
 export const isError = subject => !!subject && subject[TYPE_ERROR]
 
 export const SHAPE = symbol.for('skema:shape')
+export const CUSTOM_INSPECT_SYMBOL = symbol.for('nodejs.util.inspect.custom')

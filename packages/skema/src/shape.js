@@ -3,6 +3,7 @@ import {Processor} from './processor'
 import {Context} from './context'
 import {error} from './error'
 import {SHAPE} from './future'
+import {attach} from './inspect'
 
 export const TYPE_OBJECT = 'TYPE_OBJECT'
 export const TYPE_ARRAY = 'TYPE_ARRAY'
@@ -49,6 +50,7 @@ class Shape {
     const values = this._create(context)
     const setters = Object.create(null)
     defineValue(values, SHAPE, setters)
+    attach(values)
 
     const tasks = this._tasks(context).map(([context, skema]) => {
       context.parent = values

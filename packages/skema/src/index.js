@@ -1,6 +1,7 @@
-import {factory} from './skema-factory'
 import {LOOSE, STRICT} from '@skema/basic'
 
+import {factory} from './skema-factory'
+import {inspect} from './inspect'
 import './error-meta'
 
 const {
@@ -28,5 +29,6 @@ export {
   any,
   declare,
   defaults,
-  BASIC_TYPES
+  BASIC_TYPES,
+  inspect
 }

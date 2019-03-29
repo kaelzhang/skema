@@ -7,6 +7,7 @@ export {defineProperty}
 export const UNDEFINED = void 0
 export const PREFIX_IS = 'is'
 export const PREFIX_HAS = 'has'
+export const NOOP = () => {}
 
 export const isString = subject => typeof subject === 'string'
 export const isFunction = subject => typeof subject === 'function'
