@@ -79,6 +79,7 @@ const User = skema({
 })
 
 const user = User.from({
+  // id must be a number
   id: '1',
   name: 'Steve'
 })
