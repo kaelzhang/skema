@@ -11,9 +11,9 @@
   "scripts": {
     "build": "BABEL_ENV=all ../../node_modules/.bin/babel --root-mode upward src --out-dir lib",
     "test": "BABEL_ENV=node ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
-    "test-no-cov": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
+    "test:dev": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
     "prepublishOnly": "npm run build",
-    "// report-cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "// report:cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "repository": {
     "type": "git",

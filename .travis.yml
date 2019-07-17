@@ -12,4 +12,4 @@ before_script:
   - npm install
   - cd -
 after_success:
-  - npm run report-cov
+  - npm run report:cov

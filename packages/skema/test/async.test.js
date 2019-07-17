@@ -4,6 +4,7 @@ import {run} from './lib/runner'
 import {cases} from './fixtures/async-skemas'
 import {
   shape,
+  arrayOf,
   inspect
 } from '../src'
 
@@ -32,7 +33,8 @@ cleanInspectSupported && test('inspect hierachical', async t => {
     b: Number,
     c: shape({
       d: Number
-    })
+    }),
+    e: arrayOf(Number)
   })
 
   const raw = {
@@ -40,7 +42,10 @@ cleanInspectSupported && test('inspect hierachical', async t => {
     b: '2',
     c: {
       d: '3'
-    }
+    },
+    e: [
+      '1'
+    ]
   }
 
   const parsed = {
@@ -48,7 +53,10 @@ cleanInspectSupported && test('inspect hierachical', async t => {
     b: 2,
     c: {
       d: 3
-    }
+    },
+    e: [
+      1
+    ]
   }
 
   const result = await Type.from(raw, {async: true})

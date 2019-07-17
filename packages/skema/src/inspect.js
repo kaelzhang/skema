@@ -1,3 +1,5 @@
+import {isArray} from 'core-util-is'
+
 import {CUSTOM_INSPECT_SYMBOL, SHAPE} from './future'
 import {defineValue, NOOP, isObject} from './util'
 
@@ -20,7 +22,10 @@ const inspectSkemaObject = object =>
   Object.keys(object[SHAPE]).reduce((ret, key) => {
     ret[key] = inspect(object[key])
     return ret
-  }, {})
+  }, isArray(object)
+    ? []
+    : {}
+  )
 
 function inspectSelf () {
   return inspectSkemaObject(this)
