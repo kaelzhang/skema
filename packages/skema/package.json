@@ -17,9 +17,11 @@
     "build:jf": "BABEL_ENV=es5 ../../node_modules/.bin/babel --root-mode upward tool/jsfiddle.js -o umd/jsfiddle.js",
     "build": "npm run build:cjs && npm run build:umd && npm run build:es5 && npm run build:min && npm run build:jf",
     "test": "BABEL_ENV=node ../../node_modules/.bin/nyc ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
-    "test:dev": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js",
+    "test:dev": "BABEL_ENV=node ../../node_modules/.bin/ava --verbose --timeout=10s test/*.test.js && npm run report:dev",
     "prepublishOnly": "npm run build",
-    "report:cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "report:cov": "../../node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "report:dev": "../../node_modules/.bin/nyc report --reporter=html && npm run report:open",
+    "report:open": "open coverage/index.html"
   },
   "repository": {
     "type": "git",
@@ -65,7 +67,7 @@
   "dependencies": {
     "@skema/basic": "^1.0.33",
     "core-util-is": "^1.0.2",
-    "err-object": "^5.1.2",
+    "err-object": "^5.1.4",
     "make-array": "^1.0.5",
     "promise-faker": "^1.2.5",
     "promise.extra": "^4.0.0"
