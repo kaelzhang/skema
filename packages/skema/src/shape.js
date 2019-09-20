@@ -41,20 +41,22 @@ class Shape {
     this._clean = clean
   }
 
-  from (args, context: Context, options: Options) {
-    if (!isObject(context.input)) {
-      const error = context.errorByCode('NOT_OBJECT', context.key)
+  from (args, parentContext: Context, options: Options) {
+    if (!isObject(parentContext.input)) {
+      const error = parentContext.errorByCode('NOT_OBJECT', parentContext.key)
       return options.promise.reject(error)
     }
 
-    const values = this._create(context)
+    const values = this._create(parentContext)
     const setters = Object.create(null)
     defineValue(values, SHAPE, setters)
     attach(values)
 
-    const tasks = this._tasks(context).map(([context, skema]) => {
+    const tasks = this._taskKeys(parentContext).map(key => () => {
+      const [context, skema] = this._task(key, parentContext)
       context.parent = values
-      return () => new Processor({
+
+      return new Processor({
         options,
         skema,
         args,
@@ -77,58 +79,66 @@ class Shape {
   }
 }
 
-export class ObjectShape extends Shape {
+class GenericObjectShape extends Shape {
+  _task (key, context) {
+    return [context.descend(key), this._shape[key]]
+  }
+}
+
+export class ObjectShape extends GenericObjectShape {
   _create (context) {
     return this._clean
       ? Object.create(null)
       : simpleClone(context.input)
   }
 
-  _tasks (context) {
-    const shape = this._shape
-    return Object.keys(shape)
-    .map(key => [context.descend(key), shape[key]])
+  _taskKeys () {
+    return Object.keys(this._shape)
   }
 }
 
-export class ArrayShape extends Shape {
-  _create (context) {
+export class ArrayShape extends GenericObjectShape {
+  _create ({input}) {
     return this._clean
       ? []
-      : [].concat(context.input)
+      : [].concat(input)
   }
 
-  _tasks (context) {
+  _taskKeys () {
     return this._shape
-    .map((v, i) => [context.descend(i), v])
+    .map((_, i) => i)
   }
 }
 
-export class ObjectOfShape extends Shape {
+class GenericOfShape extends Shape {
+  _task (key, context) {
+    return [context.descend(key), this._shape]
+  }
+}
+
+export class ObjectOfShape extends GenericOfShape {
   _create () {
     return Object.create(null)
   }
 
-  _tasks (context) {
-    return Object.keys(context.input)
-    .map(key => [context.descend(key), this._shape])
+  _taskKeys ({input}) {
+    return Object.keys(input)
   }
 }
 
-export class ArrayOfShape extends Shape {
+export class ArrayOfShape extends GenericOfShape {
   _create () {
     return []
   }
 
-  _tasks (context) {
+  _taskKeys ({input}) {
     const tasks = []
-    const {input} = context
     const {length} = input
     let i = 0
 
     // Iterate every array item
     for (; i < length; i ++) {
-      tasks.push([context.descend(i), this._shape])
+      tasks.push(i)
     }
 
     return tasks
