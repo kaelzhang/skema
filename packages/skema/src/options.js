@@ -6,10 +6,13 @@ const promiseExtra = {
   waterfall
 }
 
+const IS_DEFAULT = (rawParent, key) => !(key in rawParent)
+
 export class Options {
   constructor ({
     // For now, there is only one option
-    async = false
+    async = false,
+    isDefault = IS_DEFAULT
   }) {
     this.promise = async
       ? Promise
@@ -20,5 +23,7 @@ export class Options {
       : factory(FakePromise)
 
     this.async = async
+
+    this.isDefault = isDefault
   }
 }

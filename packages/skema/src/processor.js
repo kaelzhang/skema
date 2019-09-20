@@ -27,7 +27,9 @@ export class Processor {
       rawParent,
       input
     } = this.context
-    this.isDefault = !(key in rawParent)
+    const {isDefault} = this.options
+
+    this.isDefault = isDefault(rawParent, key)
     this.input = input
     this.set = null
   }
