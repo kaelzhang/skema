@@ -15,6 +15,7 @@
   },
   "scripts": {
     "test": "lerna run test",
+    "build": "lerna run build",
     "bootstrap": "lerna bootstrap",
     "cp-readme": "cp ./README.md ./packages/skema",
     "publish": "npm run cp-readme && lerna publish --force-publish=skema -- --access=public",
