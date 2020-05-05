@@ -159,6 +159,29 @@ export const factory = ({
     e: true
   })
 
+  cases.push({
+    d: 'structure not optional but missing, with mapped key',
+    s: () => shape({
+      a: Number,
+      b: 'string',
+      c: {
+        key: 'cc',
+        type: Boolean
+      }
+    }),
+    input: {
+      a: 1,
+      b: 2
+    },
+    output: {
+      code: 'NOT_OPTIONAL',
+      message: 'property \'c\' is not optional',
+      path: ['c'],
+      args: ['c']
+    },
+    e: true
+  })
+
   // 3
   cases.push({
     d: 'structure optional',

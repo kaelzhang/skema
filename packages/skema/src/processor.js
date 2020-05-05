@@ -154,7 +154,7 @@ export class Processor {
     // so we simply check optional first.
     if (!skema.isOptional()) {
       throw this.context.errorByCode(
-        'NOT_OPTIONAL', this.context.key)
+        'NOT_OPTIONAL', this.context.rawKey)
     }
 
     if (!skema.hasDefault()) {
