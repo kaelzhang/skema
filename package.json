@@ -1,17 +1,17 @@
 {
   "private": true,
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/plugin-proposal-decorators": "^7.4.4",
-    "@babel/plugin-transform-flow-strip-types": "^7.4.4",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/register": "^7.5.5",
-    "ava": "^2.3.0",
-    "browserify": "^16.5.0",
-    "codecov": "^3.5.0",
-    "lerna": "^3.16.4",
-    "nyc": "^14.1.1",
-    "uglify-js": "^3.6.0"
+    "@babel/cli": "^7.8.4",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
+    "@babel/plugin-transform-flow-strip-types": "^7.9.0",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/register": "^7.9.0",
+    "ava": "^3.8.1",
+    "browserify": "^16.5.1",
+    "codecov": "^3.6.5",
+    "lerna": "^3.20.2",
+    "nyc": "^15.0.1",
+    "uglify-js": "^3.9.2"
   },
   "scripts": {
     "test": "lerna run test",

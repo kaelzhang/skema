@@ -18,5 +18,7 @@ test('change the behavior of isDefault', t => {
 
   t.throws(() => A.from({
     a: undefined
-  }), 'property \'a\' is not optional')
+  }), {
+    message: 'property \'a\' is not optional'
+  })
 })
