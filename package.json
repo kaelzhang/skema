@@ -16,7 +16,7 @@
   "scripts": {
     "test": "lerna run test",
     "build": "lerna run build",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "rm -rf packages/*/package-lock.json && lerna bootstrap",
     "cp-readme": "cp ./README.md ./packages/skema",
     "publish": "npm run cp-readme && lerna publish --force-publish=skema -- --access=public",
     "report:cov": "lerna run report:cov"
